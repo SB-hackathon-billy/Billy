@@ -66,7 +66,7 @@ export class VoiceClient {
     this.finishIntent = new ActionScope();
     try {
       if (!navigator.mediaDevices?.getUserMedia || !window.isSecureContext)
-        throw new Error('마이크를 사용하려면 HTTPS와 지원 브라우저가 필요해요.');
+        throw new Error('마이크를 사용하려면 localhost 접속과 지원 브라우저가 필요해요.');
       // Some engines return a generic capture error even for a known denied permission.
       // Respect the browser permission state first, with getUserMedia as the Safari fallback.
       const permission = await navigator.permissions

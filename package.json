@@ -13,6 +13,9 @@
     "packages/*"
   ],
   "scripts": {
+    "check:boundaries": "node scripts/check-module-boundary.mjs",
+    "agents:sync": "node scripts/agents-sync.mjs",
+    "agents:check": "node scripts/agents-sync.mjs --check",
     "dev": "npm run -w @sb/web dev",
     "build": "npm run -w @sb/web build",
     "typecheck": "npm run typecheck --workspaces",
@@ -22,7 +25,6 @@
     "format:check": "prettier --check .",
     "db:up": "docker compose up -d db",
     "seed": "node infra/scripts/stack.mjs seed",
-    "certs": "node infra/scripts/certs.mjs",
     "up": "node infra/scripts/stack.mjs up",
     "down": "node infra/scripts/stack.mjs down",
     "test:e2e": "node infra/scripts/e2e.mjs",

@@ -1,38 +1,49 @@
-# 성북 공유대여 MVP
+# 성북 공유대여
 
-성북구 1인가구지원센터를 위한 한국어 모바일 PWA입니다. 음성으로 필요한 물품을 요청하고 공공·주민 물품의 제안을 비교합니다. 흐름은 결제 미리보기에서 끝나며 실제 결제와 예약은 이루어지지 않습니다.
+한국어 모바일 PWA와 API·worker를 포함한 개발 기반입니다. 현재 앱은 MVP 구현을 유지하고 있으며 실제 결제와 기관 예약을 수행하지 않습니다.
+
+## 후속 개발 시작
+
+**1번 접수 에이전트의 기능·동작은 수정 금지입니다. 2번 AI 물품 등록, 3번 물품 탐색·대여 관리 및 나머지 MVP 코드는 교체할 수 있습니다.** 공용 코드에서 1번에 영향을 주는 부분도 보호합니다.
+
+- [공통 AI 지침](AGENTS.md): Codex와 Claude가 함께 사용하는 작업 규칙
+- [모듈 경계와 현재 코드](docs/current/MODULE_BOUNDARIES.md)
+- [명세 작성·개발 절차](docs/current/DEVELOPMENT.md), [AI 작업 흐름](docs/current/AI_WORKFLOW.md), [후속 명세 목록](docs/specs/README.md)
+- [문서 안내](docs/README.md)
+
+기존 PRD·공통 컨트랙트·QA·구현 보고는 `docs/archive/mvp/`로 옮겼습니다. 현재 요구사항이 아니며 기본 탐색 대상에서 제외합니다. 코드의 현재 API 계약은 `packages/contracts/src`와 생성된 `packages/contracts/openapi.json`에서 확인합니다. 이 계약도 1번 호환성을 유지하면서 후속 명세에 따라 변경할 수 있습니다.
 
 ## 실행
 
-Node.js 26.8.2, npm 11, Docker Compose 및 mkcert가 필요합니다.
+Node.js 26.8.2 이상 27 미만, npm 11, Docker Compose를 사용합니다. 정확한 의존성은 `package.json`과 lockfile을 따릅니다.
 
 ```sh
 npm ci
 cp .env.example .env
 # .env에 OPENAI_API_KEY를 입력합니다.
-npm run certs
 npm run up
+# 새 개발 DB에 데모 데이터가 필요할 때만 실행합니다.
 npm run seed -- --scenario default
 ```
 
-`https://localhost:8443`으로 접속합니다. 인증서 신뢰 설정과 휴대폰 접속은 [실기기 안내](infra/DEVICE_TEST.md)를 참고하세요. seed는 개발 DB의 업무 데이터를 초기화하므로 공유 DB 사용자와 조율해야 합니다. 공유 DB에 `docker compose down -v`를 실행하지 마세요.
+`http://localhost:8000`으로 접속합니다. 서비스는 이 PC의 localhost에서만 열립니다. seed는 개발 DB의 업무 데이터를 초기화하므로 공유 DB 사용자와 조율해야 합니다. 공유 DB에 `docker compose down -v`를 실행하지 마세요.
 
 ## 구조와 검증
 
 - `apps/web`: React PWA
-- `apps/api`: Fastify API·음성 연결
+- `apps/api`: Fastify API·접수 음성 연결
 - `apps/worker`: 검색·AI 작업·만료 처리
-- `packages`: 계약·DB·AI·데모 데이터
-- [문서 목록](docs/README.md), [공통 계약](docs/COMMON_CONTRACT.md)
+- `packages`: 실행 가능한 계약·DB·AI·데모 데이터
 
 ```sh
+npm run check:boundaries
 npm run typecheck
 npm test
 npm run build
 ```
 
-실기기, 실제 사람 음성, 스크린리더는 별도 검증이 필요합니다. 기존 자동화 결과는 [QA 문서](docs/AGENT_REFACTOR_QA.md)에서 확인할 수 있습니다. 기존 실행 산출물은 포함하지 않으며 테스트 스크립트로 다시 생성합니다.
+DB/API/worker 테스트는 PostgreSQL이 필요합니다. 실제 사람 음성·휴대폰·스크린리더 검증은 별도이며, 과거 결과는 현재 버전의 합격 증거가 아닙니다.
 
 ## 팀 공유
 
-Git 저장소 또는 `git archive --format=zip --output=../seongbuk-mvp.zip HEAD`로 공유하세요. `.env`, 인증서·개인 키, 의존성, 빌드 산출물과 개인 도구 설정은 포함하지 않습니다. 각 환경에서 `.env.example`을 복사하고 인증서를 발급하세요.
+변경을 커밋한 Git 저장소 또는 `git archive --format=zip --output=../seongbuk.zip HEAD`로 공유하세요. `git archive`에는 미커밋 변경이 포함되지 않습니다. `AGENTS.md`, `CLAUDE.md`, `.claude/settings.json`, AI 작업 설정(`.agents/`, `.claude/agents`, `.claude/skills`, `.codex/config.toml`, `.codex/agents`), 경계 검사와 후속 명세도 함께 버전 관리합니다. `.env`, 개인 키, 의존성, 빌드 산출물과 개인 도구 설정은 포함하지 않습니다.

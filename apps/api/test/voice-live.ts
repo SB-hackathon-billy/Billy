@@ -78,7 +78,7 @@ const report: Record<string, unknown> = {
     scriptedInput: utterance,
   },
   limitations: [
-    'Desktop Chromium with synthetic Korean speech; physical phones, human speech quality, and trusted LAN HTTPS are not verified.',
+    'Desktop Chromium with synthetic Korean speech; physical phones and human speech quality are not verified.',
   ],
 };
 const diagnostics: {

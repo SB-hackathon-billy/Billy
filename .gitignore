@@ -6,16 +6,27 @@ dist/
 coverage/
 *.pem
 *.key
-infra/certs/
 .orca/
 test-artifacts/
 .DS_Store
 *.tsbuildinfo
 
 # Local tooling and generated verification output
-.agents/
-.codex/
-AGENTS.md
+# Shared AI workflow (source .agents/, generated .claude/ and .codex/) is versioned;
+# personal overrides are not.
+.agents/*
+!.agents/tiers.json
+!.agents/roles/
+!.agents/skills/
+.codex/*
+!.codex/config.toml
+!.codex/agents/
+AGENTS.override.md
+CLAUDE.local.md
+.claude/*
+!.claude/settings.json
+!.claude/agents/
+!.claude/skills/
 *.log
 tests/acceptance/results/
 apps/worker/reports/

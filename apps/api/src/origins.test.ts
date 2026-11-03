@@ -2,12 +2,12 @@ import { expect, it, vi } from 'vitest';
 import { createTestDatabase } from '@sb/db';
 import { buildApi } from './index.js';
 
-it('accepts exact configured HTTPS origins and rejects unlisted or lookalike origins', async () => {
+it('accepts exact configured origins and rejects unlisted or lookalike origins', async () => {
   const { db, cleanup } = await createTestDatabase();
-  vi.stubEnv('APP_ORIGINS', ' https://localhost:8443, https://192.168.1.2:8443 ');
+  vi.stubEnv('APP_ORIGINS', ' http://localhost:8000, http://127.0.0.1:8000 ');
   const app = await buildApi({ db });
   try {
-    for (const origin of ['https://localhost:8443', 'https://192.168.1.2:8443']) {
+    for (const origin of ['http://localhost:8000', 'http://127.0.0.1:8000']) {
       const response = await app.inject({
         method: 'POST',
         url: '/api/v1/demo-sessions',
@@ -16,7 +16,7 @@ it('accepts exact configured HTTPS origins and rejects unlisted or lookalike ori
       });
       expect(response.statusCode).toBe(201);
     }
-    for (const origin of ['https://unlisted.example', 'https://localhost:8443.evil.example']) {
+    for (const origin of ['http://unlisted.example', 'http://localhost:8000.evil.example']) {
       const response = await app.inject({
         method: 'POST',
         url: '/api/v1/demo-sessions',

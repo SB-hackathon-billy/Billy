@@ -1,0 +1,6 @@
+# 생성 파일: .agents/ 원본을 고친 뒤 `npm run agents:sync`. 직접 수정 금지.
+# 개인 설정으로 바꾸려면 docs/current/AI_WORKFLOW.md 참고.
+[agents]
+max_concurrent_threads_per_session = 3
+default_subagent_model = "gpt-6.1-terra"
+default_subagent_reasoning_effort = "medium"

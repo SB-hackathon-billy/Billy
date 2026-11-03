@@ -1,0 +1,19 @@
+name: Module boundary
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  module-1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26.8.2'
+      - name: Verify protected intake files
+        run: node scripts/check-module-boundary.mjs

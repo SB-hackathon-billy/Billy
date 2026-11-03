@@ -4,7 +4,7 @@ import { createTestDatabase, type Database } from '@sb/db';
 import { createEmptyNeed, SseEventSchema } from '@sb/contracts';
 import { buildApi } from './index.js';
 let app: FastifyInstance, db: Database, cleanup: () => Promise<void>, base: string, cookie: string;
-const origin = 'https://localhost:8443';
+const origin = 'http://localhost:8000';
 beforeAll(async () => {
   const test = await createTestDatabase();
   db = test.db;

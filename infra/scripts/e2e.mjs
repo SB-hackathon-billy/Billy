@@ -1,15 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
-import { compose, composeEnvironment, root, run } from './common.mjs';
+import { compose, root, run } from './common.mjs';
 
 // Only the test's private database is seeded/dropped. The shared sb DB is preserved.
 const database = `sb_e2e_${randomUUID().replaceAll('-', '')}`;
-const env = composeEnvironment({
+const env = {
+  ...process.env,
   SB_DATABASE_URL: `postgres://sb:sb@db:5432/${database}`,
   SB_AI_MODE: 'fixture',
   SB_APP_MODE: 'automated-test',
-});
+};
 let created = false;
 let code = 1;
 try {

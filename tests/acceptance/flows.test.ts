@@ -26,9 +26,7 @@ describe('AT01–AT20 real HTTP, PostgreSQL and pg-boss acceptance', () => {
       payload: { handle: 'demo-hana' },
     });
     expect(r.statusCode).toBe(201);
-    expect(r.headers['set-cookie']).toMatch(
-      /__Host-demo_session=.*; Path=\/;.*HttpOnly; Secure; SameSite=Lax/,
-    );
+    expect(r.headers['set-cookie']).toMatch(/demo_session=.*; Path=\/;.*HttpOnly; SameSite=Lax/);
     expect(r.body).not.toMatch(/인증 완료|verified|authenticated/);
     expect(
       (await h.api('hana', 'POST', '/requests', { need: h.need(), requesterId: 'u_jun' }))

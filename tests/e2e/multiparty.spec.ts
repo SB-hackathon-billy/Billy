@@ -6,11 +6,10 @@ test('AT04/07/13/14/19/22: three cookie stores, real server, keyboard journey an
   browser,
 }, info) => {
   const options = {
-    baseURL: 'https://localhost:8443',
+    baseURL: 'http://localhost:8000',
     viewport: { width: 390, height: 844 },
     locale: 'ko-KR',
     timezoneId: 'Asia/Seoul',
-    ignoreHTTPSErrors: true,
   };
   const contexts = await Promise.all([
     browser.newContext(options),
@@ -29,13 +28,12 @@ test('AT04/07/13/14/19/22: three cookie stores, real server, keyboard journey an
     await screenshot(hana, '01-home');
     const cookies = await Promise.all(contexts.map((context) => context.cookies()));
     expect(
-      new Set(
-        cookies.map((list) => list.find((cookie) => cookie.name === '__Host-demo_session')!.value),
-      ).size,
+      new Set(cookies.map((list) => list.find((cookie) => cookie.name === 'demo_session')!.value))
+        .size,
     ).toBe(3);
     for (const list of cookies)
-      expect(list.find((cookie) => cookie.name === '__Host-demo_session')).toMatchObject({
-        secure: true,
+      expect(list.find((cookie) => cookie.name === 'demo_session')).toMatchObject({
+        secure: false,
         httpOnly: true,
         sameSite: 'Lax',
       });
@@ -211,7 +209,7 @@ test('AT04/07/13/14/19/22: three cookie stores, real server, keyboard journey an
     const evidence = {
       viewport: '390x844',
       aiMode: 'fixture',
-      transport: 'HTTPS + PostgreSQL + pg-boss + SSE',
+      transport: 'HTTP + PostgreSQL + pg-boss + SSE',
       requestToOwnerMs,
       ownerToRequesterMs,
       keyboardCoreJourney: true,

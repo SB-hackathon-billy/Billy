@@ -9,7 +9,7 @@ import { createTestDatabase, Database, type Commands } from '@sb/db';
 import { buildApi } from '../../apps/api/src/index.js';
 import { RentalWorker } from '../../apps/worker/src/worker.js';
 
-export const origin = 'https://localhost:8443';
+export const origin = 'http://localhost:8000';
 export type Actor = { cookie: string; csrf: string; userId: string };
 export const fixture = (scenario: FixtureScenario = 'normal') =>
   createAiPorts({ AI_MODE: 'fixture' }, { scenario });

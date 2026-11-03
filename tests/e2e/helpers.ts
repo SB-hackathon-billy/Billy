@@ -53,7 +53,7 @@ export async function enter(page: Page, handle: string) {
     `demo-${handle}`,
   );
   await activate(page, page.getByRole('button', { name: '데모 시작하기', exact: true }));
-  await expect(page).toHaveURL('https://localhost:8443/');
+  await expect(page).toHaveURL('http://localhost:8000/');
 }
 export async function observeSse(page: Page) {
   const client = await page.context().newCDPSession(page);

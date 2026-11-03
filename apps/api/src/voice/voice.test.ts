@@ -26,7 +26,7 @@ let hana: Actor, duri: Actor;
 const connections: Fake[] = [];
 let failCreate = false;
 let turnDecision: ai.VoiceTurnDecision = { complete: true, scope: 'ALLOWED' };
-const origin = 'https://localhost:8443';
+const origin = 'http://localhost:8000';
 const call = (
   actor: Actor,
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE',

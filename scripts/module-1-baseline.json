@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "baselineCommit": "0d643d00b494e22fe2467616fb99a00b1df5ab11",
+  "description": "Module 1 intake implementation and dedicated regression evidence. Shared files are governed by docs/current/MODULE_BOUNDARIES.md. Do not regenerate to bypass protection.",
+  "files": {
+    "apps/api/src/voice/bindings.ts": "7f16d7984320c0dd618086af6d3235ec9b1cd5888eb140a568393e98181e56b9",
+    "apps/api/src/voice/completion-audio.test.ts": "d9964ad84d492925481a2f912306b08bffc41dd056e1774ffa0e79a46158fbf2",
+    "apps/api/src/voice/completion-audio.ts": "ecbd32156d8cd8a9f2da551fe1be5af4daa948347b50232a178d98ab43be8a54",
+    "apps/api/src/voice/guards.test.ts": "f615f3ba37ce3646a25063e74900debb370c1ac825c505aae968bcbef41c53a3",
+    "apps/api/src/voice/guards.ts": "31e1a36f0a250cccdad1762b74088039717bd9917afb3ec005d709ebfc78e851",
+    "apps/api/src/voice/index.ts": "c7c378ddf673aabd4ff4ef393d94b27530f021bf3492b2a55a2a94423727bcb9",
+    "apps/api/src/voice/voice.test.ts": "8b8deec0be866e3e747e4328adb8545c705fdaf9b194c5b9ff677f8ef094cbb0",
+    "apps/api/test/fixtures/voice/korean-request.wav": "6d0d619ef0e10ee8761055567dd1f1c0ff6518c941cbc08bdbb612a95fa644be",
+    "apps/api/test/voice-auto-finish-live.ts": "2d9f506e6149b5c7d29f6fe8a86c4576da90b8c195e6121653afbf255a21eb21",
+    "apps/api/test/voice-live.ts": "fd00a4069246b36cd7bb0ca8a21e218ab831d15a343d79dd9f0012c76191faef",
+    "apps/web/scripts/verify-voice-completion.mjs": "1a7cb152cf80c6174d9dddd5f08fc95fce02e0b19b71072450be5db74bedbbb1",
+    "apps/web/src/features/rental/NeedEditor.tsx": "51dc6c2b3e9f6ec7c06dd1aa8c2454e7a00123135bacdd98bb83b2f3eff1309c",
+    "apps/web/src/features/rental/VoicePage.tsx": "6444c91ce1fdcd6224e94b92ea2a82e831755a3b31d32487dc7ba1b5ba7cd381",
+    "apps/web/src/lib/voice-completion.test.ts": "45adfdd1a08d8f584c3414f615f02a6d942be588e83d2397ccf5c498772a4973",
+    "apps/web/src/lib/voice-completion.ts": "fd0a49269790d296d60702e5f2518331c216caf4c50220b145fd093bdf666c86",
+    "apps/web/src/lib/voice.test.ts": "8b4a3b6481f8c69268ee91113b0e79dd0a81265d02516792785b1579028803fc",
+    "apps/web/src/lib/voice.ts": "e212a50bb6b1a614c6e494bc6de7c1c2ede3766f1bc0f947fff2f2057dfe96d2",
+    "packages/ai/src/voice-turn.test.ts": "22c1f6613f5cc317c187aa4e7b95c66a7aed5b9e3419d03536d7590e866046ef",
+    "packages/ai/src/voice-turn.ts": "6e844fa836e9cfc93a9e6b5f03eec8638ff22d634eef6c614abbd4ca640fdf02",
+    "packages/ai/src/voice.test.ts": "273d2fc3625f65cb230463db5ad901409376d4436881dce1d76b9a55a13c003d",
+    "packages/ai/src/voice.ts": "41d7f7c6b7eb0fcd7dad8d4ab7faa93ad4800d9337abd1b2dd4a21579f2dfbfa",
+    "packages/db/src/voice.test.ts": "940e5f03a0ed47789500b4d3b993bddd079dddee9f41d6a02272dde9ac1c99f8"
+  }
+}

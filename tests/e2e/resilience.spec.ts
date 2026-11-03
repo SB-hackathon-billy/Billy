@@ -70,7 +70,7 @@ test('AT22/PWA: denied microphone, offline controls, public-only caches and inst
   await enter(page, 'jun');
   await activate(page, page.getByRole('link', { name: '공유대여', exact: true }));
   const client = await context.newCDPSession(page);
-  await context.grantPermissions([], { origin: 'https://localhost:8443' });
+  await context.grantPermissions([], { origin: 'http://localhost:8000' });
   expect(
     await page.evaluate(
       async () =>

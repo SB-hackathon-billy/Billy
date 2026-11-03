@@ -21,7 +21,7 @@ let db: Database, app: FastifyInstance, cleanup: () => Promise<void>;
 let now = new Date('2026-11-01T01:00:00Z');
 type Actor = { cookie: string; csrf: string };
 const actors: Record<string, Actor> = {};
-const origin = 'https://localhost:8443';
+const origin = 'http://localhost:8000';
 async function enter(handle: string) {
   const res = await app.inject({
     method: 'POST',
@@ -143,8 +143,8 @@ describe('HTTP/PostgreSQL acceptance', () => {
       payload: { handle: 'demo-hana' },
     });
     const cookie = session.headers['set-cookie'] as string;
-    expect(cookie).toMatch(/__Host-demo_session=/);
-    expect(cookie).toMatch(/Secure/);
+    expect(cookie).toMatch(/demo_session=/);
+    expect(cookie).not.toMatch(/Secure/);
     expect(cookie).toMatch(/HttpOnly/);
     expect(cookie).toMatch(/SameSite=Lax/);
     expect(cookie).toMatch(/Path=\//);

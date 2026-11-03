@@ -151,18 +151,14 @@ export async function buildApi(options: ApiOptions = {}): Promise<FastifyInstanc
   const appOrigins = new Set(
     (
       options.appOrigin ??
-      (process.env.APP_ORIGINS?.trim() || process.env.APP_ORIGIN || 'https://localhost:8443')
+      (process.env.APP_ORIGINS?.trim() || process.env.APP_ORIGIN || 'http://localhost:8000')
     )
       .split(',')
       .map((origin) => origin.trim())
       .filter(Boolean),
   );
-  const cookieName = options.cookieName ?? process.env.COOKIE_NAME ?? '__Host-demo_session';
-  const cookieSecure = options.cookieSecure ?? process.env.COOKIE_SECURE !== 'false';
-  if (cookieName.startsWith('__Host-') && !cookieSecure)
-    throw new Error(
-      'The __Host- session cookie requires Secure. Set a development COOKIE_NAME when disabling COOKIE_SECURE.',
-    );
+  const cookieName = options.cookieName ?? process.env.COOKIE_NAME ?? 'demo_session';
+  const cookieSecure = options.cookieSecure ?? false;
   const meta = (): C.Meta => ({
     contractVersion: C.CONTRACT_VERSION,
     serverTime: db.now().toISOString(),

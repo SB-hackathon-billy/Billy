@@ -425,7 +425,7 @@ export function buildOpenApi() {
     paths,
     components: {
       securitySchemes: {
-        demoSession: { type: 'apiKey', in: 'cookie', name: '__Host-demo_session' },
+        demoSession: { type: 'apiKey', in: 'cookie', name: 'demo_session' },
       },
       schemas: componentSchemas,
     },

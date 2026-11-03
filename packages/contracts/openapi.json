@@ -4306,7 +4306,7 @@
       "demoSession": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "__Host-demo_session"
+        "name": "demo_session"
       }
     },
     "schemas": {
