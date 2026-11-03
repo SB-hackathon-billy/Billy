@@ -1,0 +1,19 @@
+{
+  "name": "recommend_fee",
+  "success": true,
+  "latencyMs": 2948,
+  "output": {
+    "taskId": "task_recommend_fee",
+    "kind": "RECOMMEND_FEE",
+    "inputVersion": {
+      "kind": "FEE",
+      "conditionsHash": "fixture-hash",
+      "policyVersion": "demo-fee-v1"
+    },
+    "result": {
+      "feeOptionId": "LOWER",
+      "reasonCode": "FLEXIBLE_HANDOFF",
+      "reasonText": "희망 거래 장소가 두 곳으로 인계 장소를 유연하게 정할 수 있습니다."
+    }
+  }
+}

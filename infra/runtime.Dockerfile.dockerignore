@@ -1,0 +1,17 @@
+**
+!package.json
+!package-lock.json
+!.npmrc
+!tsconfig.base.json
+!types/**
+!packages/**
+!apps/api/**
+!apps/worker/**
+!apps/web/package.json
+**/node_modules
+**/dist
+**/.env*
+**/*.pem
+**/*.key
+**/test-artifacts
+apps/api/test

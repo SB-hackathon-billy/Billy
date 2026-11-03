@@ -1,0 +1,50 @@
+{
+  "input": {
+    "taskId": "task_explain_terms",
+    "actorUserId": "u_hana",
+    "requestId": "req_fixture",
+    "negotiationId": "neg_fixture",
+    "locale": "ko-KR",
+    "timeZone": "Asia/Seoul",
+    "serverNow": "2026-11-01T01:00:00Z",
+    "kind": "EXPLAIN_TERMS",
+    "inputVersion": {
+      "kind": "NEGOTIATION",
+      "negotiationId": "neg_fixture",
+      "negotiationVersion": 3,
+      "termsRevision": 2
+    },
+    "context": {
+      "oldTerms": {
+        "startAt": "2026-11-03T01:00:00Z",
+        "endAt": "2026-11-04T07:00:00Z",
+        "placeId": "place-center",
+        "totalFeeKrw": 4000,
+        "currency": "KRW",
+        "quoteId": "quote_fixture"
+      },
+      "newTerms": {
+        "startAt": "2026-11-03T01:00:00Z",
+        "endAt": "2026-11-04T07:00:00Z",
+        "placeId": "place-station",
+        "totalFeeKrw": 4000,
+        "currency": "KRW",
+        "quoteId": "quote_fixture"
+      }
+    }
+  },
+  "output": {
+    "taskId": "task_explain_terms",
+    "kind": "EXPLAIN_TERMS",
+    "inputVersion": {
+      "kind": "NEGOTIATION",
+      "negotiationId": "neg_fixture",
+      "negotiationVersion": 3,
+      "termsRevision": 2
+    },
+    "result": {
+      "summary": "수령 장소가 성신여대입구역으로 변경된 제안입니다.",
+      "changedFields": ["PLACE"]
+    }
+  }
+}

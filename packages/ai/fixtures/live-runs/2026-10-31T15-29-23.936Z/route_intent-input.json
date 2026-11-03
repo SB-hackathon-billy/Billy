@@ -1,0 +1,22 @@
+{
+  "taskId": "task_route_intent",
+  "actorUserId": "u_hana",
+  "requestId": "req_fixture",
+  "negotiationId": null,
+  "locale": "ko-KR",
+  "timeZone": "Asia/Seoul",
+  "serverNow": "2026-10-31T15:29:23.941Z",
+  "kind": "ROUTE_INTENT",
+  "inputVersion": {
+    "kind": "TURN",
+    "turnId": "turn_fixture"
+  },
+  "context": {
+    "text": "프로젝터 빌리고 싶어요",
+    "currentScreen": "R01",
+    "allowedRoutes": [
+      "RENTAL_REQUEST",
+      "CENTER_INFO"
+    ]
+  }
+}

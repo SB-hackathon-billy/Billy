@@ -1,0 +1,19 @@
+{
+  "name": "recommend_fee",
+  "success": true,
+  "latencyMs": 2418,
+  "output": {
+    "taskId": "task_recommend_fee",
+    "kind": "RECOMMEND_FEE",
+    "inputVersion": {
+      "kind": "FEE",
+      "conditionsHash": "fixture-hash",
+      "policyVersion": "demo-fee-v1"
+    },
+    "result": {
+      "feeOptionId": "LOWER",
+      "reasonCode": "FLEXIBLE_HANDOFF",
+      "reasonText": "희망 거래 장소가 둘 이상이어서 유연한 전달이 가능합니다."
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "seongbuk-sharing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@11.19.1",
+  "engines": {
+    "node": ">=26.8.2 <27",
+    "npm": ">=11 <12"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run -w @sb/web dev",
+    "build": "npm run -w @sb/web build",
+    "typecheck": "npm run typecheck --workspaces",
+    "test": "vitest run",
+    "lint": "npm run typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose up -d db",
+    "seed": "node infra/scripts/stack.mjs seed",
+    "certs": "node infra/scripts/certs.mjs",
+    "up": "node infra/scripts/stack.mjs up",
+    "down": "node infra/scripts/stack.mjs down",
+    "test:e2e": "node infra/scripts/e2e.mjs",
+    "openapi": "npm run -w @sb/contracts openapi",
+    "test:acceptance": "vitest run --config tests/acceptance/vitest.config.ts"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "vitest": "5.0.5",
+    "tsx": "4.23.15",
+    "prettier": "3.9.10",
+    "@types/node": "26.6.6"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "fsevents@2.3.3": true
+  }
+}

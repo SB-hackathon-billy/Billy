@@ -1,0 +1,83 @@
+{
+  "timestamp": "2026-10-31T15-29-58.477Z",
+  "sdk": "openai@7.47.0",
+  "models": {
+    "agent": "gpt-6.1-terra",
+    "decision": "gpt-6-luna",
+    "voice": "gpt-live-1"
+  },
+  "results": [
+    {
+      "name": "route_intent",
+      "success": true,
+      "latencyMs": 457,
+      "output": {
+        "taskId": "task_route_intent",
+        "kind": "ROUTE_INTENT",
+        "inputVersion": {
+          "kind": "TURN",
+          "turnId": "turn_fixture"
+        },
+        "result": {
+          "intent": "RENTAL_REQUEST"
+        }
+      }
+    },
+    {
+      "name": "extract_need",
+      "success": true,
+      "latencyMs": 4006,
+      "output": {
+        "taskId": "task_extract_need",
+        "kind": "EXTRACT_NEED",
+        "inputVersion": {
+          "kind": "NEED",
+          "needRevision": 1,
+          "turnId": "turn_fixture"
+        },
+        "result": {
+          "proposedNeed": {
+            "category": "HOBBY",
+            "queryText": "프로젝터",
+            "startAt": "2026-11-03T01:00:00Z",
+            "endAt": "2026-11-04T07:00:00Z",
+            "preferredPlaceIds": [
+              "place-center",
+              "place-station"
+            ],
+            "maxBudgetKrw": null
+          },
+          "missingFields": [],
+          "clarificationQuestion": null
+        }
+      }
+    },
+    {
+      "name": "recommend_fee",
+      "success": true,
+      "latencyMs": 3401,
+      "output": {
+        "taskId": "task_recommend_fee",
+        "kind": "RECOMMEND_FEE",
+        "inputVersion": {
+          "kind": "FEE",
+          "conditionsHash": "fixture-hash",
+          "policyVersion": "demo-fee-v1"
+        },
+        "result": {
+          "feeOptionId": "LOWER",
+          "reasonCode": "FLEXIBLE_HANDOFF",
+          "reasonText": "희망 전달 장소가 두 곳이어서 인계가 유연합니다."
+        }
+      }
+    },
+    {
+      "name": "live",
+      "success": false,
+      "latencyMs": 9361,
+      "error": {
+        "code": "LIVE_APPEND_TIMEOUT"
+      }
+    }
+  ]
+}

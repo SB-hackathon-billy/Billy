@@ -1,0 +1,26 @@
+{
+	admin off
+	auto_https off
+	servers {
+		protocols h1 h2
+	}
+}
+
+https://:8443 {
+	tls /certs/local.pem /certs/local-key.pem
+	@api path /api /api/*
+	handle @api {
+		reverse_proxy api:3000 {
+			flush_interval -1
+		}
+	}
+	handle {
+		root * /srv
+		@fresh path /index.html /sw.js /registerSW.js /manifest.webmanifest
+		header @fresh Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+	header X-Content-Type-Options nosniff
+	header Referrer-Policy same-origin
+}

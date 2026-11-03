@@ -1,0 +1,8 @@
+{
+  "name": "live",
+  "success": false,
+  "latencyMs": 9328,
+  "error": {
+    "code": "LIVE_APPEND_TIMEOUT"
+  }
+}

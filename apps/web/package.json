@@ -1,0 +1,37 @@
+{
+  "name": "@sb/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:flow": "node scripts/capture-flow.mjs",
+    "test:build": "node scripts/verify-build.mjs",
+    "test:pwa": "node scripts/check-pwa.mjs",
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc -p tsconfig.json && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@internationalized/date": "3.12.4",
+    "@sb/contracts": "*",
+    "@tanstack/react-query": "5.105.0",
+    "react": "19.3.1",
+    "react-aria-components": "1.22.1",
+    "react-dom": "19.3.1",
+    "react-router-dom": "7.18.5",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.64.1",
+    "@sb/demo-data": "0.1.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "msw": "3.0.3",
+    "vite": "8.3.5",
+    "vite-plugin-pwa": "2.0.0"
+  }
+}

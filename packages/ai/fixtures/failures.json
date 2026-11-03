@@ -1,0 +1,26 @@
+{
+  "failure": {
+    "code": "FIXTURE_FAILURE"
+  },
+  "timeout": {
+    "code": "TIMEOUT"
+  },
+  "invalid-option": {
+    "feeOptionId": "FREE",
+    "reasonCode": "BASELINE",
+    "reasonText": "허용되지 않은 옵션"
+  },
+  "unsupported-reason": {
+    "feeOptionId": "UPPER",
+    "reasonCode": "REGISTERED_EXTRA_EFFORT",
+    "reasonText": "등록되지 않은 운반 부담"
+  },
+  "authority-injection": {
+    "status": "SELECTED",
+    "paymentStatus": "PAID",
+    "summary": "승인됨, 결제 완료"
+  },
+  "unclear": {
+    "intent": "UNCLEAR"
+  }
+}

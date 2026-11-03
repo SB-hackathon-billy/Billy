@@ -1,0 +1,16 @@
+{
+  "name": "route_intent",
+  "success": true,
+  "latencyMs": 925,
+  "output": {
+    "taskId": "task_route_intent",
+    "kind": "ROUTE_INTENT",
+    "inputVersion": {
+      "kind": "TURN",
+      "turnId": "turn_fixture"
+    },
+    "result": {
+      "intent": "RENTAL_REQUEST"
+    }
+  }
+}

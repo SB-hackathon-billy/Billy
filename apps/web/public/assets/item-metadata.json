@@ -1,0 +1,122 @@
+[
+  {
+    "id": "pub-projector",
+    "src": "/assets/items/pub-projector.svg",
+    "width": 320,
+    "height": 280,
+    "alt": "공공 프로젝터 데모 일러스트",
+    "decorative": false,
+    "license": "프로젝트 자체 제작 에셋. 프로젝트 내 사용·수정 가능.",
+    "creator": "성북 공유대여 · 자체 수채화 SVG",
+    "format": "svg",
+    "byteSize": 1076
+  },
+  {
+    "id": "pub-cleaner",
+    "src": "/assets/items/pub-cleaner.svg",
+    "width": 320,
+    "height": 280,
+    "alt": "공공 청소기 데모 일러스트",
+    "decorative": false,
+    "license": "프로젝트 자체 제작 에셋. 프로젝트 내 사용·수정 가능.",
+    "creator": "성북 공유대여 · 자체 수채화 SVG",
+    "format": "svg",
+    "byteSize": 1146
+  },
+  {
+    "id": "pub-ladder",
+    "src": "/assets/items/pub-ladder.svg",
+    "width": 320,
+    "height": 280,
+    "alt": "공공 사다리 데모 일러스트",
+    "decorative": false,
+    "license": "프로젝트 자체 제작 에셋. 프로젝트 내 사용·수정 가능.",
+    "creator": "성북 공유대여 · 자체 수채화 SVG",
+    "format": "svg",
+    "byteSize": 808
+  },
+  {
+    "id": "pub-case",
+    "src": "/assets/items/pub-case.svg",
+    "width": 320,
+    "height": 280,
+    "alt": "공공 여행 가방 데모 일러스트",
+    "decorative": false,
+    "license": "프로젝트 자체 제작 에셋. 프로젝트 내 사용·수정 가능.",
+    "creator": "성북 공유대여 · 자체 수채화 SVG",
+    "format": "svg",
+    "byteSize": 1016
+  },
+  {
+    "id": "res-projector-duri",
+    "src": "/assets/items/res-projector-duri.svg",
+    "width": 320,
+    "height": 280,
+    "alt": "두리의 프로젝터 데모 일러스트",
+    "decorative": false,
+    "license": "프로젝트 자체 제작 에셋. 프로젝트 내 사용·수정 가능.",
+    "creator": "성북 공유대여 · 자체 수채화 SVG",
+    "format": "svg",
+    "byteSize": 1079
+  },
+  {
+    "id": "res-cleaner-duri",
+    "src": "/assets/items/res-cleaner-duri.svg",
+    "width": 320,
+    "height": 280,
+    "alt": "두리의 청소기 데모 일러스트",
+    "decorative": false,
+    "license": "프로젝트 자체 제작 에셋. 프로젝트 내 사용·수정 가능.",
+    "creator": "성북 공유대여 · 자체 수채화 SVG",
+    "format": "svg",
+    "byteSize": 1149
+  },
+  {
+    "id": "res-projector-seul",
+    "src": "/assets/items/res-projector-seul.svg",
+    "width": 320,
+    "height": 280,
+    "alt": "슬의 프로젝터 데모 일러스트",
+    "decorative": false,
+    "license": "프로젝트 자체 제작 에셋. 프로젝트 내 사용·수정 가능.",
+    "creator": "성북 공유대여 · 자체 수채화 SVG",
+    "format": "svg",
+    "byteSize": 1076
+  },
+  {
+    "id": "res-case-seul",
+    "src": "/assets/items/res-case-seul.svg",
+    "width": 320,
+    "height": 280,
+    "alt": "슬의 여행 가방 데모 일러스트",
+    "decorative": false,
+    "license": "프로젝트 자체 제작 에셋. 프로젝트 내 사용·수정 가능.",
+    "creator": "성북 공유대여 · 자체 수채화 SVG",
+    "format": "svg",
+    "byteSize": 1016
+  },
+  {
+    "id": "res-tool-hana",
+    "src": "/assets/items/res-tool-hana.svg",
+    "width": 320,
+    "height": 280,
+    "alt": "하나의 공구 세트 데모 일러스트",
+    "decorative": false,
+    "license": "프로젝트 자체 제작 에셋. 프로젝트 내 사용·수정 가능.",
+    "creator": "성북 공유대여 · 자체 수채화 SVG",
+    "format": "svg",
+    "byteSize": 867
+  },
+  {
+    "id": "res-case-hana",
+    "src": "/assets/items/res-case-hana.svg",
+    "width": 320,
+    "height": 280,
+    "alt": "하나의 여행 가방 데모 일러스트",
+    "decorative": false,
+    "license": "프로젝트 자체 제작 에셋. 프로젝트 내 사용·수정 가능.",
+    "creator": "성북 공유대여 · 자체 수채화 SVG",
+    "format": "svg",
+    "byteSize": 1019
+  }
+]

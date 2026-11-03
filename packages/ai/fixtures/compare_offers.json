@@ -1,0 +1,84 @@
+{
+  "input": {
+    "taskId": "task_compare_offers",
+    "actorUserId": "u_hana",
+    "requestId": "req_fixture",
+    "negotiationId": null,
+    "locale": "ko-KR",
+    "timeZone": "Asia/Seoul",
+    "serverNow": "2026-11-01T01:00:00Z",
+    "kind": "COMPARE_OFFERS",
+    "inputVersion": {
+      "kind": "COMPARE",
+      "offers": [
+        {
+          "negotiationId": "neg_fixture",
+          "offerId": "offer_fixture",
+          "termsRevision": 2
+        }
+      ]
+    },
+    "context": {
+      "need": {
+        "category": "HOBBY",
+        "queryText": "프로젝터",
+        "startAt": "2026-11-03T01:00:00Z",
+        "endAt": "2026-11-04T07:00:00Z",
+        "preferredPlaceIds": ["place-center", "place-station"],
+        "maxBudgetKrw": null
+      },
+      "offers": [
+        {
+          "negotiationId": "neg_fixture",
+          "offerId": "offer_fixture",
+          "termsRevision": 2,
+          "terms": {
+            "startAt": "2026-11-03T01:00:00Z",
+            "endAt": "2026-11-04T07:00:00Z",
+            "placeId": "place-center",
+            "totalFeeKrw": 4000,
+            "currency": "KRW",
+            "quoteId": "quote_fixture"
+          },
+          "itemSummary": {
+            "id": "res-projector-duri",
+            "title": "프로젝터",
+            "category": "HOBBY",
+            "source": "RESIDENT",
+            "ownerDisplayName": "두리",
+            "image": {
+              "url": "/projector.svg",
+              "alt": "프로젝터 일러스트",
+              "isIllustration": true
+            }
+          },
+          "validUntil": "2026-11-01T01:05:00Z"
+        }
+      ]
+    }
+  },
+  "output": {
+    "taskId": "task_compare_offers",
+    "kind": "COMPARE_OFFERS",
+    "inputVersion": {
+      "kind": "COMPARE",
+      "offers": [
+        {
+          "negotiationId": "neg_fixture",
+          "offerId": "offer_fixture",
+          "termsRevision": 2
+        }
+      ]
+    },
+    "result": {
+      "summary": "제안 조건을 확인하고 직접 선택해 주세요.",
+      "rows": [
+        {
+          "negotiationId": "neg_fixture",
+          "termsRevision": 2,
+          "explanation": "요청 기간에 이용할 수 있는 프로젝터 제안입니다."
+        }
+      ]
+    }
+  }
+}

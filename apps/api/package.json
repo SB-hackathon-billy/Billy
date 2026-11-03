@@ -1,0 +1,27 @@
+{
+  "name": "@sb/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "dev": "node --env-file-if-exists=../../.env --import tsx --watch src/server.ts",
+    "start": "node --env-file-if-exists=../../.env --import tsx src/server.ts"
+  },
+  "dependencies": {
+    "@sb/contracts": "*",
+    "@sb/db": "*",
+    "@sb/ai": "*",
+    "fastify": "5.12.7",
+    "@fastify/cookie": "11.1.5",
+    "@fastify/rate-limit": "11.2.1",
+    "zod": "4.6.7",
+    "pg": "8.23.1",
+    "pg-boss": "12.38.0"
+  },
+  "devDependencies": {
+    "@types/pg": "8.23.1"
+  },
+  "exports": "./src/index.ts"
+}

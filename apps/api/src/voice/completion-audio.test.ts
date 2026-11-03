@@ -1,0 +1,34 @@
+import { expect, it } from 'vitest';
+import { VOICE_COMPLETION_NOTICE } from '@sb/contracts';
+import { CompletionAudio } from './completion-audio.js';
+const pcm = (ms: number) => Buffer.alloc(ms * 48, 1).toString('base64');
+it('matches the entire fixed notice to its audio timeline, excluding previous speech', () => {
+  const audio = new CompletionAudio();
+  audio.addAudio({ startMs: 0, endMs: 1000 }, pcm(1000));
+  audio.addTranscript({ startMs: 100, endMs: 900 }, '기존 답변');
+  audio.addTranscript({ startMs: 1200, endMs: 3500 }, VOICE_COMPLETION_NOTICE);
+  expect(audio.wav()).toBeNull();
+  audio.addAudio({ startMs: 1000, endMs: 3400 }, pcm(2400));
+  expect(audio.wav()).toBeNull();
+  audio.addAudio({ startMs: 3400, endMs: 4000 }, pcm(600));
+  const wav = Buffer.from(audio.wav()!, 'base64');
+  expect(wav.subarray(0, 4).toString()).toBe('RIFF');
+  expect(wav.readUInt32LE(40)).toBe((3750 - 1100) * 48);
+});
+it('rejects partial wording, gaps and oversized capture', () => {
+  const audio = new CompletionAudio();
+  audio.addAudio({ startMs: 0, endMs: 3000 }, pcm(3000));
+  audio.addTranscript({ startMs: 100, endMs: 2000 }, '정보를 모았어요');
+  expect(audio.wav()).toBeNull();
+  audio.addTranscript({ startMs: 3100, endMs: 5000 }, VOICE_COMPLETION_NOTICE);
+  audio.addAudio({ startMs: 4000, endMs: 5500 }, pcm(1500));
+  expect(audio.wav()).toBeNull();
+  const large = new CompletionAudio();
+  large.addAudio({ startMs: 0, endMs: 31000 }, pcm(31000));
+  large.addTranscript({ startMs: 100, endMs: 2000 }, VOICE_COMPLETION_NOTICE);
+  expect(large.wav()).toBeNull();
+  const clipped = new CompletionAudio();
+  clipped.addTranscript({ startMs: 100, endMs: 2500 }, VOICE_COMPLETION_NOTICE);
+  clipped.addAudio({ startMs: 200, endMs: 3000 }, pcm(2800));
+  expect(clipped.wav()).toBeNull();
+});

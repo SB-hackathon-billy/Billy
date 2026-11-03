@@ -1,0 +1,461 @@
+{
+  "contentVersion": "1.0.0",
+  "contractVersion": "0.3.0",
+  "items": [
+    {
+      "content": {
+        "id": "center-about",
+        "type": "ABOUT",
+        "title": "혼자여도, 함께하는 일상",
+        "summary": "성북의 1인가구가 서로 연결되는 곳입니다.",
+        "body": "마음을 돌보는 시간부터 동네 친구와 나누는 취미까지. 센터의 공개 메뉴를 모바일에서 편하게 둘러볼 수 있도록 구성한 데모입니다.\n이곳에 소개된 프로그램과 활동은 화면을 살펴보기 위한 합성 예시입니다. 실제 운영 내용은 공식 안내에서 확인해 주세요.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/about",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "",
+        "status": "",
+        "startAt": "",
+        "endAt": "",
+        "venue": "",
+        "audience": "",
+        "process": "",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "center-foundation",
+        "type": "ABOUT",
+        "title": "운영법인과 센터의 발자취",
+        "summary": "성북복지재단과 함께합니다.",
+        "body": "공식 운영법인 소개에는 성북복지재단의 지역 복지 활동이 안내되어 있습니다.\n센터의 설립·운영 경과와 연혁은 공식 히스토리 페이지에서 최신 내용을 확인할 수 있습니다. 이 데모는 공식 포털과 연결된 회원 서비스가 아닙니다.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/about/foundation",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "",
+        "status": "",
+        "startAt": "",
+        "endAt": "",
+        "venue": "",
+        "audience": "",
+        "process": "",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "center-guide",
+        "type": "GUIDE",
+        "title": "처음 방문하셨나요?",
+        "summary": "궁금한 활동을 고르고, 공식 안내를 확인해 주세요.",
+        "body": "일반회원과 정회원의 이용 범위는 공식 이용안내에서 확인할 수 있습니다. 일부 활동에는 별도의 자격 확인이 필요합니다.\n이 앱의 데모 아이디는 센터 회원가입이나 신원 인증을 대신하지 않습니다. 회원가입·인증과 협력기관 업무는 기존 사이트에서 안내합니다. 실제 연락처나 증빙서류를 이곳에 입력하지 마세요.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/about/guide",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "",
+        "status": "",
+        "startAt": "",
+        "endAt": "",
+        "venue": "",
+        "audience": "",
+        "process": "",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "center-directions",
+        "type": "GUIDE",
+        "title": "센터에 오시는 길",
+        "summary": "서울특별시 성북구 장위로8길 20, 성북복지재단 2층",
+        "body": "운영시간: 평일 09:00–18:00 (점심 12:00–13:00)\n대표전화: 070-4271-5490 / 070-4152-4467\n이메일: sbwf@sbwelfare.or.kr\n2026. 11. 1. 공개 안내 확인. 방문 전 공식 사이트에서 운영시간과 위치를 다시 확인해 주세요.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/about/directions",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "",
+        "status": "",
+        "startAt": "",
+        "endAt": "",
+        "venue": "",
+        "audience": "",
+        "process": "",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "program-mind",
+        "type": "PROGRAM",
+        "title": "나를 돌보는 작은 습관",
+        "summary": "산책과 기록으로 내 마음의 속도를 살펴봐요.",
+        "body": "산책과 기록으로 내 마음의 속도를 살펴봐요.\n처음 참여하는 분도 편안하게 둘러볼 수 있도록 구성한 프로그램 예시입니다. 간단한 소개, 주제 활동, 소감 나눔 순서로 진행하는 모습을 미리 볼 수 있어요.\n일정·모집 상태·대상·장소는 합성 데이터이며 실제 모집 공고가 아닙니다. 신청 미리보기에는 실제 개인정보를 쓰지 마세요.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/online/program",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "심리 정서 지원",
+        "status": "모집 예시",
+        "startAt": "2026-11-07T01:00:00Z",
+        "endAt": "2026-11-07T03:00:00Z",
+        "venue": "센터 함께방 (예시)",
+        "audience": "활동에 관심 있는 1인가구 (예시)",
+        "process": "프로그램 안내 → 양식 살펴보기 → 입력 내용 미리보기",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "program-table",
+        "type": "PROGRAM",
+        "title": "동네 친구와 한 끼",
+        "summary": "가벼운 한 끼를 준비하며 이웃과 인사를 나눠요.",
+        "body": "가벼운 한 끼를 준비하며 이웃과 인사를 나눠요.\n처음 참여하는 분도 편안하게 둘러볼 수 있도록 구성한 프로그램 예시입니다. 간단한 소개, 주제 활동, 소감 나눔 순서로 진행하는 모습을 미리 볼 수 있어요.\n일정·모집 상태·대상·장소는 합성 데이터이며 실제 모집 공고가 아닙니다. 신청 미리보기에는 실제 개인정보를 쓰지 마세요.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/online/program",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "사회적 관계망 지원",
+        "status": "모집 예시",
+        "startAt": "2026-11-11T10:00:00Z",
+        "endAt": "2026-11-11T12:00:00Z",
+        "venue": "센터 함께방 (예시)",
+        "audience": "활동에 관심 있는 1인가구 (예시)",
+        "process": "프로그램 안내 → 양식 살펴보기 → 입력 내용 미리보기",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "program-garden",
+        "type": "PROGRAM",
+        "title": "내 방의 작은 정원",
+        "summary": "작은 화분 하나로 일상에 초록을 더해요.",
+        "body": "작은 화분 하나로 일상에 초록을 더해요.\n처음 참여하는 분도 편안하게 둘러볼 수 있도록 구성한 프로그램 예시입니다. 간단한 소개, 주제 활동, 소감 나눔 순서로 진행하는 모습을 미리 볼 수 있어요.\n일정·모집 상태·대상·장소는 합성 데이터이며 실제 모집 공고가 아닙니다. 신청 미리보기에는 실제 개인정보를 쓰지 마세요.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/online/program",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "교육 및 여가문화",
+        "status": "모집 예시",
+        "startAt": "2026-11-14T05:00:00Z",
+        "endAt": "2026-11-14T07:00:00Z",
+        "venue": "센터 함께방 (예시)",
+        "audience": "활동에 관심 있는 1인가구 (예시)",
+        "process": "프로그램 안내 → 양식 살펴보기 → 입력 내용 미리보기",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "program-repair",
+        "type": "PROGRAM",
+        "title": "혼자서도 든든한 생활 수리",
+        "summary": "기본 공구 사용과 생활 속 간단한 수리를 알아봐요.",
+        "body": "기본 공구 사용과 생활 속 간단한 수리를 알아봐요.\n처음 참여하는 분도 편안하게 둘러볼 수 있도록 구성한 프로그램 예시입니다. 간단한 소개, 주제 활동, 소감 나눔 순서로 진행하는 모습을 미리 볼 수 있어요.\n일정·모집 상태·대상·장소는 합성 데이터이며 실제 모집 공고가 아닙니다. 신청 미리보기에는 실제 개인정보를 쓰지 마세요.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/online/program",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "기타 생활 지원",
+        "status": "예정 예시",
+        "startAt": "2026-11-17T05:00:00Z",
+        "endAt": "2026-11-17T07:00:00Z",
+        "venue": "센터 함께방 (예시)",
+        "audience": "활동에 관심 있는 1인가구 (예시)",
+        "process": "프로그램 안내 → 양식 살펴보기 → 입력 내용 미리보기",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "program-reading",
+        "type": "PROGRAM",
+        "title": "토요일의 조용한 독서",
+        "summary": "각자의 책을 읽고 기억에 남은 문장을 나눠요.",
+        "body": "각자의 책을 읽고 기억에 남은 문장을 나눠요.\n처음 참여하는 분도 편안하게 둘러볼 수 있도록 구성한 프로그램 예시입니다. 간단한 소개, 주제 활동, 소감 나눔 순서로 진행하는 모습을 미리 볼 수 있어요.\n일정·모집 상태·대상·장소는 합성 데이터이며 실제 모집 공고가 아닙니다. 신청 미리보기에는 실제 개인정보를 쓰지 마세요.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/online/program",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "교육 및 여가문화",
+        "status": "마감 예시",
+        "startAt": "2026-11-21T01:00:00Z",
+        "endAt": "2026-11-21T03:00:00Z",
+        "venue": "센터 함께방 (예시)",
+        "audience": "활동에 관심 있는 1인가구 (예시)",
+        "process": "프로그램 안내 → 양식 살펴보기 → 입력 내용 미리보기",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "club-walk",
+        "type": "CLUB",
+        "title": "천천히, 동네 한 바퀴",
+        "summary": "가까운 산책길에서 만나 가볍게 걸어요.",
+        "body": "처음 온 이웃도 부담 없이 함께할 수 있는 산책 모임 예시입니다.\n리더는 모임의 주제와 계획을, 팀원은 참여하고 싶은 이유를 적어 양식을 살펴볼 수 있습니다. 초대나 심사, 서류 제출은 이루어지지 않습니다.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/online/club",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "걷기",
+        "status": "모집",
+        "startAt": "",
+        "endAt": "",
+        "venue": "성북천 산책길 (예시)",
+        "audience": "산책을 좋아하는 1인가구 (예시)",
+        "process": "",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "club-book",
+        "type": "CLUB",
+        "title": "문장 사이, 우리",
+        "summary": "한 달에 한 권, 서로 다른 생각을 나눠요.",
+        "body": "함께 읽은 책의 문장을 나누는 독서 모임 예시입니다.\n현재 모집을 설명하기 위한 화면이며 실제 모집 중인 동아리가 아닙니다.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/online/club",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "독서",
+        "status": "모집",
+        "startAt": "",
+        "endAt": "",
+        "venue": "센터 함께방 (예시)",
+        "audience": "책과 대화를 좋아하는 1인가구 (예시)",
+        "process": "",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "club-plant",
+        "type": "CLUB",
+        "title": "초록을 나누는 사이",
+        "summary": "작은 식물을 가꾸며 일상을 기록했어요.",
+        "body": "식물 돌보기와 삽목 이야기를 나눈 활동의 합성 기록입니다.\n활동보고 양식에서는 활동 내용과 소감을 입력해 요약만 확인합니다. 사진·증빙 업로드, 보고서 저장과 전송은 제공하지 않습니다.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/online/club",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "취미",
+        "status": "활동",
+        "startAt": "",
+        "endAt": "",
+        "venue": "센터 함께방 (예시)",
+        "audience": "예시 동아리 참여자",
+        "process": "",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "space-together",
+        "type": "SPACE",
+        "title": "함께방",
+        "summary": "이웃과 취미를 나누기 좋은 아늑한 공간",
+        "body": "대화와 소규모 모임을 위한 공간 구성 예시입니다. 책상과 의자를 함께 사용할 수 있는 모습을 보여줍니다.\n날짜와 시간을 선택하면 예약 양식의 요약만 확인합니다. 실제 공간의 가용 시간이나 예약 승인 상태가 아닙니다. 실제 시설·이용 대상·운영시간은 공식 안내를 확인해 주세요.",
+        "images": [
+          {
+            "url": "/content/center/v1/center-space.svg",
+            "alt": "창가 책상과 식물이 있는 공간을 그린 합성 일러스트",
+            "isIllustration": true
+          }
+        ],
+        "sourceUrl": "https://sb1in.or.kr/online/space",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "",
+        "status": "",
+        "startAt": "",
+        "endAt": "",
+        "venue": "센터 2층 (예시)",
+        "audience": "",
+        "process": "",
+        "capacity": 6,
+        "features": ["테이블·의자 예시", "소규모 모임", "무료 이용 안내"]
+      }
+    },
+    {
+      "content": {
+        "id": "space-focus",
+        "type": "SPACE",
+        "title": "모아방",
+        "summary": "함께 배우고 작은 활동을 펼치는 공간",
+        "body": "작은 워크숍이나 독서 활동을 위한 공간 예시입니다. 화면 속 배치와 수용 인원은 실제 시설 정보가 아닙니다.\n예약 미리보기는 재고·출입 권한과 연결되지 않습니다. 실제 예약은 센터의 공식 안내를 따라 주세요.",
+        "images": [
+          {
+            "url": "/content/center/v1/center-space.svg",
+            "alt": "창가 책상과 식물이 있는 공간을 그린 합성 일러스트",
+            "isIllustration": true
+          }
+        ],
+        "sourceUrl": "https://sb1in.or.kr/online/space",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "",
+        "status": "",
+        "startAt": "",
+        "endAt": "",
+        "venue": "센터 2층 (예시)",
+        "audience": "",
+        "process": "",
+        "capacity": 8,
+        "features": ["이동식 책상 예시", "독서·워크숍", "무료 이용 안내"]
+      }
+    },
+    {
+      "content": {
+        "id": "notice-demo",
+        "type": "NOTICE",
+        "title": "센터 화면을 둘러보는 방법",
+        "summary": "프로그램부터 공간까지, 미리보기로 만나보세요.",
+        "body": "센터의 공개 메뉴 구성을 참고해 만든 데모 콘텐츠입니다.\n프로그램, 동아리, 공간의 양식은 미리보기만 제공하며 실제 신청·예약되지 않습니다. 입력한 예시 내용은 현재 화면에서만 유지됩니다. 창을 닫거나 새로고침하면 사라집니다.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/news?cat=notice",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "",
+        "status": "",
+        "startAt": "",
+        "endAt": "",
+        "venue": "",
+        "audience": "",
+        "process": "",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "notice-season",
+        "type": "NOTICE",
+        "title": "함께하는 11월, 이런 활동 어때요?",
+        "summary": "걷기·식물·독서로 채우는 일상을 상상해요.",
+        "body": "11월 활동을 상상하며 구성한 합성 공지입니다. 실제 센터의 행사 일정이나 운영 공지가 아닙니다.\n새로운 이웃을 만나는 프로그램과 동아리를 둘러보고 관심을 표시해 보세요. 관심 표시는 이 브라우저 탭에서만 유지됩니다.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/news?cat=notice",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "",
+        "status": "",
+        "startAt": "",
+        "endAt": "",
+        "venue": "",
+        "audience": "",
+        "process": "",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "press-neighbor",
+        "type": "PRESS",
+        "title": "이웃과 연결되는 일상의 공간",
+        "summary": "1인가구의 연결을 주제로 만든 읽을거리 예시",
+        "body": "동네에서 함께할 일을 찾고 서로의 경험을 나누는 장면을 소개하는 합성 글입니다.\n실제 보도기사나 언론사 인용문이 아닙니다. 공식 보도자료는 센터 사이트에서 확인해 주세요.",
+        "images": [],
+        "sourceUrl": "https://sb1in.or.kr/news?cat=press",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "",
+        "status": "",
+        "startAt": "",
+        "endAt": "",
+        "venue": "",
+        "audience": "",
+        "process": "",
+        "capacity": 0,
+        "features": []
+      }
+    },
+    {
+      "content": {
+        "id": "gallery-garden",
+        "type": "GALLERY",
+        "title": "초록을 나눈 하루",
+        "summary": "따뜻한 모임의 풍경을 그림으로 담았어요.",
+        "body": "차를 마시며 이웃과 이야기하는 장면을 그린 자체 일러스트입니다.\n실제 참여자 사진이나 실제 행사 기록이 아닌 합성 갤러리 예시입니다.",
+        "images": [
+          {
+            "url": "/content/center/v1/center-garden.svg",
+            "alt": "정원에서 두 이웃이 차를 나누는 합성 일러스트",
+            "isIllustration": true
+          },
+          {
+            "url": "/content/center/v1/center-space.svg",
+            "alt": "창가 책상과 식물이 있는 공간을 그린 합성 일러스트",
+            "isIllustration": true
+          }
+        ],
+        "sourceUrl": "https://sb1in.or.kr/news?cat=gallery",
+        "isDemo": true,
+        "updatedAt": "2026-11-01T00:00:00Z"
+      },
+      "display": {
+        "category": "",
+        "status": "",
+        "startAt": "",
+        "endAt": "",
+        "venue": "",
+        "audience": "",
+        "process": "",
+        "capacity": 0,
+        "features": []
+      }
+    }
+  ]
+}

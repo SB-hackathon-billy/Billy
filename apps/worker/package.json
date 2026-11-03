@@ -1,0 +1,24 @@
+{
+  "name": "@sb/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/worker.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "dev": "node --env-file-if-exists=../../.env --import tsx --watch src/main.ts",
+    "start": "node --env-file-if-exists=../../.env --import tsx src/main.ts",
+    "smoke:live": "node --env-file-if-exists=../../.env --import tsx scripts/smoke-live.ts"
+  },
+  "dependencies": {
+    "@sb/ai": "*",
+    "@sb/contracts": "*",
+    "@sb/db": "*",
+    "pg-boss": "12.38.0"
+  },
+  "devDependencies": {
+    "@sb/api": "0.1.0",
+    "@sb/demo-data": "0.1.0"
+  }
+}

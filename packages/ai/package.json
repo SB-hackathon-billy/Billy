@@ -1,0 +1,25 @@
+{
+  "name": "@sb/ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "smoke:live": "node --env-file=../../.env --import tsx scripts/smoke-live.ts"
+  },
+  "dependencies": {
+    "@sb/contracts": "*",
+    "openai": "7.47.0",
+    "ws": "8.22.1",
+    "zod": "4.6.7"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./fixtures": "./src/fixtures.ts"
+  },
+  "devDependencies": {
+    "@types/ws": "8.18.2",
+    "werift": "0.25.2"
+  }
+}

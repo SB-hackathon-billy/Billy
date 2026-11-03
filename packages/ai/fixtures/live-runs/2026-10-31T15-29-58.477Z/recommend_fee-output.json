@@ -1,0 +1,19 @@
+{
+  "name": "recommend_fee",
+  "success": true,
+  "latencyMs": 3401,
+  "output": {
+    "taskId": "task_recommend_fee",
+    "kind": "RECOMMEND_FEE",
+    "inputVersion": {
+      "kind": "FEE",
+      "conditionsHash": "fixture-hash",
+      "policyVersion": "demo-fee-v1"
+    },
+    "result": {
+      "feeOptionId": "LOWER",
+      "reasonCode": "FLEXIBLE_HANDOFF",
+      "reasonText": "희망 전달 장소가 두 곳이어서 인계가 유연합니다."
+    }
+  }
+}

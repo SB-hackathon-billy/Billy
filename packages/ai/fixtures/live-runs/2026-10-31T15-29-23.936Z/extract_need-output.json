@@ -1,0 +1,29 @@
+{
+  "name": "extract_need",
+  "success": true,
+  "latencyMs": 4648,
+  "output": {
+    "taskId": "task_extract_need",
+    "kind": "EXTRACT_NEED",
+    "inputVersion": {
+      "kind": "NEED",
+      "needRevision": 1,
+      "turnId": "turn_fixture"
+    },
+    "result": {
+      "proposedNeed": {
+        "category": "HOBBY",
+        "queryText": "프로젝터",
+        "startAt": "2026-11-03T01:00:00Z",
+        "endAt": "2026-11-04T07:00:00Z",
+        "preferredPlaceIds": [
+          "place-center",
+          "place-station"
+        ],
+        "maxBudgetKrw": null
+      },
+      "missingFields": [],
+      "clarificationQuestion": null
+    }
+  }
+}

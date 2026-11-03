@@ -1,0 +1,23 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+coverage/
+*.pem
+*.key
+infra/certs/
+.orca/
+test-artifacts/
+.DS_Store
+*.tsbuildinfo
+
+# Local tooling and generated verification output
+.agents/
+.codex/
+AGENTS.md
+*.log
+tests/acceptance/results/
+apps/worker/reports/
+apps/api/test/fixtures/voice/*.json
+apps/api/test/fixtures/voice/*.png

@@ -1,0 +1,37 @@
+{
+  "taskId": "task_recommend_fee",
+  "actorUserId": "u_hana",
+  "requestId": "req_fixture",
+  "negotiationId": null,
+  "locale": "ko-KR",
+  "timeZone": "Asia/Seoul",
+  "serverNow": "2026-10-31T15:32:08.627Z",
+  "kind": "RECOMMEND_FEE",
+  "inputVersion": {
+    "kind": "FEE",
+    "conditionsHash": "fixture-hash",
+    "policyVersion": "demo-fee-v1"
+  },
+  "context": {
+    "item": {
+      "id": "res-projector-duri",
+      "title": "프로젝터",
+      "source": "RESIDENT",
+      "pricingFacts": {
+        "registeredExtraEffort": false
+      }
+    },
+    "startAt": "2026-11-03T01:00:00Z",
+    "endAt": "2026-11-04T07:00:00Z",
+    "feeOptions": {
+      "LOWER": 3000,
+      "STANDARD": 4000,
+      "UPPER": 5000
+    },
+    "allowedReasonCodes": [
+      "BASELINE",
+      "FLEXIBLE_HANDOFF"
+    ],
+    "preferredPlaceCount": 2
+  }
+}

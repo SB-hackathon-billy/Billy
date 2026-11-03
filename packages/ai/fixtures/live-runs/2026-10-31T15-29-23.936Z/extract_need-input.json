@@ -1,0 +1,40 @@
+{
+  "taskId": "task_extract_need",
+  "actorUserId": "u_hana",
+  "requestId": "req_fixture",
+  "negotiationId": null,
+  "locale": "ko-KR",
+  "timeZone": "Asia/Seoul",
+  "serverNow": "2026-10-31T15:29:26.123Z",
+  "kind": "EXTRACT_NEED",
+  "inputVersion": {
+    "kind": "NEED",
+    "needRevision": 1,
+    "turnId": "turn_fixture"
+  },
+  "context": {
+    "text": "모레 오전 10시부터 다음날 오후 4시까지 프로젝터 빌리고 싶어요, 장소는 아무데나",
+    "draft": {
+      "category": null,
+      "queryText": "",
+      "startAt": null,
+      "endAt": null,
+      "preferredPlaceIds": [],
+      "maxBudgetKrw": null
+    },
+    "places": [
+      {
+        "id": "place-center",
+        "label": "성북구 1인가구지원센터",
+        "description": "센터 앞",
+        "isDemo": true
+      },
+      {
+        "id": "place-station",
+        "label": "성신여대입구역",
+        "description": "역 앞",
+        "isDemo": true
+      }
+    ]
+  }
+}
