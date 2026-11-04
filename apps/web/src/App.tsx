@@ -26,6 +26,15 @@ const SelectPage = lazy(() =>
 const CounterPage = lazy(() =>
   import('./features/rental/CounterPage.js').then((module) => ({ default: module.CounterPage })),
 );
+const ListingsPage = lazy(() =>
+  import('./features/listing/pages.js').then((module) => ({ default: module.ListingsPage })),
+);
+const NewListingPage = lazy(() =>
+  import('./features/listing/pages.js').then((module) => ({ default: module.NewListingPage })),
+);
+const ListingEditPage = lazy(() =>
+  import('./features/listing/pages.js').then((module) => ({ default: module.ListingEditPage })),
+);
 
 function Protected({ children }: { children: ReactNode }) {
   const { session, loading } = useSession();
@@ -78,6 +87,12 @@ function TabIcon({ name }: { name: string }) {
       <>
         <path d="M4 21V8l8-5 8 5v13M2 21h20M9 21v-6h6v6" />
         <path d="M8 9h1m6 0h1" />
+      </>
+    ),
+    lend: (
+      <>
+        <path d="M3 8h4l2-3h6l2 3h4v12H3z" />
+        <circle cx="12" cy="13" r="3.5" />
       </>
     ),
     me: (
@@ -154,6 +169,7 @@ function AppShell() {
             ['/', '홈', 'home'],
             ['/rental', '공유대여', 'rental'],
             ['/inbox', '요청함', 'inbox'],
+            ['/listings', '빌려주기', 'lend'],
             ['/center', '센터', 'center'],
             ['/me', '내 정보', 'me'],
           ].map(([to, label, icon]) => (
@@ -253,6 +269,13 @@ export function App() {
             </Protected>
           ),
         },
+        ...(
+          [
+            ['/listings', <ListingsPage />],
+            ['/listings/new', <NewListingPage />],
+            ['/listings/:listingId', <ListingEditPage />],
+          ] as const
+        ).map(([path, page]) => ({ path, element: <Protected>{page}</Protected> })),
         ...centerRoutes,
         {
           path: '*',

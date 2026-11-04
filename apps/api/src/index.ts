@@ -396,6 +396,7 @@ export async function buildApi(options: ApiOptions = {}): Promise<FastifyInstanc
     const register = plugin.default ?? plugin.voicePlugin;
     if (register) await app.register(register);
   }
+  await app.register((await import('./listings/index.js')).default);
   if (!options.db) app.addHook('onClose', async () => db.close());
   return app;
 }

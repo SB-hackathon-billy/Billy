@@ -32,3 +32,9 @@ export {
 export { TASK_AGENTS, VOICE_AGENT, TURN_AGENT, VOICE_CAPABILITIES } from './agents/definitions.js';
 export { VOICE_RULES } from './agents/instructions.js';
 export { type AgentDiagnostic, type AgentRunOptions } from './agents/task-runner.js';
+export {
+  createListingDrafter,
+  LISTING_DRAFT_FIXTURE,
+  type ListingDrafter,
+  type ListingPhoto,
+} from './registration.js';
