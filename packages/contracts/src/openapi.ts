@@ -4,8 +4,9 @@ import * as primitives from './primitives.js';
 import * as entities from './entities.js';
 import * as ai from './ai.js';
 import * as http from './http.js';
+import * as listing from './listing.js';
 
-const namedSchemas = { ...enums, ...primitives, ...entities, ...ai, ...http };
+const namedSchemas = { ...enums, ...primitives, ...entities, ...ai, ...http, ...listing };
 const schemas: Record<string, z.ZodType> = {};
 for (const [name, schema] of Object.entries(namedSchemas)) {
   if (name.endsWith('Schema') && schema instanceof z.ZodType) schemas[name.slice(0, -6)] = schema;
@@ -32,6 +33,9 @@ const responses = {
   VoiceCompletionAudio: http.successEnvelopeSchema(http.VoiceCompletionAudioDataSchema),
   TaskAccepted: http.successEnvelopeSchema(http.TaskAcceptedDataSchema),
   AgentTaskDetail: http.successEnvelopeSchema(ai.AgentTaskDetailSchema),
+  UploadedImage: http.successEnvelopeSchema(listing.UploadedImageSchema),
+  Listing: http.successEnvelopeSchema(listing.ListingSchema),
+  Listings: http.successEnvelopeSchema(http.listDataSchema(listing.ListingSchema)),
 };
 for (const [name, schema] of Object.entries(responses)) schemas[`${name}Response`] = schema;
 
@@ -46,6 +50,7 @@ type Operation = {
   query?: string;
   public?: boolean;
   sse?: boolean;
+  binary?: boolean;
 };
 /** The method/path pairs in COMMON_CONTRACT §6.1. */
 export const API_OPERATIONS: readonly Operation[] = [
@@ -317,6 +322,77 @@ export const API_OPERATIONS: readonly Operation[] = [
     status: 200,
     response: 'AgentTaskDetail',
   },
+  // 2번 AI 물품 등록. 명세: docs/specs/0002-item-registration.md
+  {
+    method: 'post',
+    path: '/images',
+    operationId: 'uploadImage',
+    summary: '물품 사진 업로드(base64, 5MB 이하)',
+    status: 201,
+    response: 'UploadedImage',
+    body: 'ImageUploadBody',
+  },
+  {
+    method: 'get',
+    path: '/images/{id}',
+    operationId: 'getImage',
+    summary: '물품 사진 바이트',
+    status: 200,
+    binary: true,
+  },
+  {
+    method: 'post',
+    path: '/listings',
+    operationId: 'createListing',
+    summary: '사진으로 AI 등록 초안 생성(DRAFT)',
+    status: 201,
+    response: 'Listing',
+    body: 'CreateListingBody',
+  },
+  {
+    method: 'get',
+    path: '/listings',
+    operationId: 'listListings',
+    summary: 'mine=true면 내 전체, 아니면 게시 물품만',
+    status: 200,
+    response: 'Listings',
+    query: 'ListingsQuery',
+  },
+  {
+    method: 'get',
+    path: '/listings/{id}',
+    operationId: 'getListing',
+    summary: '게시 물품 또는 내 물품 상세',
+    status: 200,
+    response: 'Listing',
+  },
+  {
+    method: 'patch',
+    path: '/listings/{id}',
+    operationId: 'patchListing',
+    summary: '등록글 수정(게시 중이면 게시 조건 재검사)',
+    status: 200,
+    response: 'Listing',
+    body: 'PatchListingBody',
+  },
+  {
+    method: 'post',
+    path: '/listings/{id}/publish',
+    operationId: 'publishListing',
+    summary: '사람 확인 후 게시',
+    status: 200,
+    response: 'Listing',
+    body: 'ListingVersionBody',
+  },
+  {
+    method: 'post',
+    path: '/listings/{id}/deactivate',
+    operationId: 'deactivateListing',
+    summary: '게시 물품 비활성화',
+    status: 200,
+    response: 'Listing',
+    body: 'ListingVersionBody',
+  },
 ];
 export function buildOpenApi() {
   const componentSchemas = Object.fromEntries(
@@ -385,17 +461,22 @@ export function buildOpenApi() {
     const success =
       operation.status === 204
         ? { description: '종료됨. 응답 body 없음' }
-        : operation.sse
+        : operation.binary
           ? {
-              description:
-                'SseEvent JSON, heartbeat는 Heartbeat JSON이며 id가 없습니다. 업무 데이터는 REST로 다시 조회합니다.',
-              content: { 'text/event-stream': { schema: { type: 'string' } } },
-              'x-event-schemas': { persistent: ref('SseEvent'), heartbeat: ref('Heartbeat') },
+              description: '이미지 바이트',
+              content: { 'image/*': { schema: { type: 'string', format: 'binary' } } },
             }
-          : {
-              description: '성공',
-              content: { 'application/json': { schema: ref(`${operation.response}Response`) } },
-            };
+          : operation.sse
+            ? {
+                description:
+                  'SseEvent JSON, heartbeat는 Heartbeat JSON이며 id가 없습니다. 업무 데이터는 REST로 다시 조회합니다.',
+                content: { 'text/event-stream': { schema: { type: 'string' } } },
+                'x-event-schemas': { persistent: ref('SseEvent'), heartbeat: ref('Heartbeat') },
+              }
+            : {
+                description: '성공',
+                content: { 'application/json': { schema: ref(`${operation.response}Response`) } },
+              };
     paths[operation.path] ??= {};
     paths[operation.path]![operation.method] = {
       operationId: operation.operationId,
