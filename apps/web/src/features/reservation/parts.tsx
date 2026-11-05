@@ -212,7 +212,9 @@ export function WaitlistCard({ entry }: { entry: WaitlistEntry }) {
           onPress={() =>
             action.run(async (scope) => {
               await api.execute(
-                scope.command(`/waitlist-entries/${idPath(entry.id)}`, 'DELETE'),
+                scope.command(`/waitlist-entries/${idPath(entry.id)}`, 'DELETE', {
+                  expectedVersion: entry.version,
+                }),
                 WaitlistEntrySchema,
               );
               refresh();

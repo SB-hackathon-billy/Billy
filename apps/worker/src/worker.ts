@@ -2,7 +2,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { PgBoss, type Job } from 'pg-boss';
 import { AiAdapterError, createAiPorts, validateTaskResult, type AiPorts } from '@sb/ai';
 import { AgentTaskSchema, type AgentTask } from '@sb/contracts';
-import { Database, DomainError } from '@sb/db';
+import { Database, DomainError, sweepReservations } from '@sb/db';
 
 export const TASK_QUEUE = 'sb-agent-tasks';
 type TaskJob = { taskId: string };
@@ -132,6 +132,9 @@ export class RentalWorker {
       this.schedule('outbox', dispatchMs, () => this.dispatchOutbox());
       this.schedule('recovery', recoveryMs, () => this.recoverTasks());
       this.schedule('expiry', expiryMs, () => this.options.db.expireDue());
+      // 3번(명세 0004): 응답 기한 만료·공공 모의 응답·대기 우선권. 시작 경로와 1번 작업에서 분리해
+      // 실패해도 `reservations.error`로만 기록되고 다른 주기 작업과 큐 처리는 계속된다.
+      this.schedule('reservations', expiryMs, () => sweepReservations(this.options.db));
       this.log('worker.started', { concurrency, expiryIntervalMs: expiryMs });
       return this;
     } catch (error) {

@@ -16,7 +16,7 @@ import {
   type ReservationView,
   type WaitlistEntry,
 } from '@sb/contracts';
-import { createTestDatabase, type Database } from '@sb/db';
+import { createTestDatabase, sweepReservations, type Database } from '@sb/db';
 import { buildApi } from '../index.js';
 
 let db: Database, app: FastifyInstance, cleanup: () => Promise<void>;
@@ -302,7 +302,7 @@ describe('3번 reservations and waitlist', () => {
 
     // 우선권이 지나면(정리 작업) 다음 순위로
     now = new Date(now.getTime() + 31 * 60_000);
-    await db.expireDue(now);
+    await sweepReservations(db, now);
     expect((await waitlist('seul'))[0]).toMatchObject({
       status: 'EXPIRED',
       closedReason: 'PRIORITY_EXPIRED',
@@ -358,7 +358,7 @@ describe('3번 reservations and waitlist', () => {
     const ladder = await reserved('hana', 'pub-ladder', p, 'place-center');
     expect(projector.reservation.ownerId).toBeNull();
     expect((await respond('duri', projector, 'APPROVE')).statusCode).toBe(404);
-    await db.expireDue(now);
+    await sweepReservations(db, now);
     expect((await get('hana', projector.reservation.id)).reservation.status).toBe('CONFIRMED');
     expect((await get('hana', ladder.reservation.id)).reservation).toMatchObject({
       status: 'DECLINED',
@@ -383,6 +383,68 @@ describe('3번 reservations and waitlist', () => {
       closedReason: 'RESPONSE_EXPIRED',
     });
     expect((await notifications('seul')).items[0]).toMatchObject({ type: 'RESERVATION_EXPIRED' });
+  });
+
+  it('closes an approval that can no longer succeed and isolates a broken record in the sweep', async () => {
+    // 2번에서 물품을 비활성화한 뒤의 승인: 신청을 닫고 신청자에게 알린다(리뷰 지적 반영).
+    const p = period(90, 3);
+    const pending = await reserved('seul', 'res-tool-hana', p, 'place-center');
+    await db.pool.query(
+      "UPDATE items SET data=jsonb_set(data,'{enabled}','false') WHERE id='res-tool-hana'",
+    );
+    const blocked = await respond('hana', pending, 'APPROVE');
+    expect(blocked.statusCode).toBe(409);
+    expect(blocked.json().error.details).toMatchObject({ reason: 'ITEM_DISABLED', closed: true });
+    expect((await get('seul', pending.reservation.id)).reservation).toMatchObject({
+      status: 'DECLINED',
+      closedReason: 'ITEM_DISABLED',
+    });
+    expect((await notifications('seul')).items[0]).toMatchObject({
+      type: 'RESERVATION_DECLINED',
+      reservationId: pending.reservation.id,
+    });
+    await db.pool.query(
+      "UPDATE items SET data=jsonb_set(data,'{enabled}','true') WHERE id='res-tool-hana'",
+    );
+
+    // 대기 취소의 버전 검사(점유된 기간을 먼저 만든다)
+    const busy = period(120, 2);
+    const owned = await reserved('jun', 'pub-projector', busy, 'place-center');
+    await sweepReservations(db, now);
+    expect((await get('jun', owned.reservation.id)).reservation.status).toBe('CONFIRMED');
+    const wait = await api('seul', 'POST', '/waitlist-entries', {
+      itemId: 'pub-projector',
+      ...busy,
+    });
+    expect(wait.statusCode, wait.body).toBe(201);
+    const entry = WaitlistEntrySchema.parse(wait.json().data);
+    const stale = await api('seul', 'DELETE', `/waitlist-entries/${entry.id}`, {
+      expectedVersion: entry.version + 1,
+    });
+    expect(stale.statusCode).toBe(409);
+    const removed = await api('seul', 'DELETE', `/waitlist-entries/${entry.id}`, {
+      expectedVersion: entry.version,
+    });
+    expect(WaitlistEntrySchema.parse(removed.json().data).status).toBe('CANCELLED');
+
+    // 정리 작업: 한 건이 깨져도 나머지는 처리하고 마지막에 오류를 알린다.
+    const a = await reserved('jun', 'pub-cleaner', period(110, 2), 'place-center');
+    const b = await reserved('jun', 'pub-projector', period(112, 2), 'place-center');
+    await db.pool.query(
+      `UPDATE reservations SET data=jsonb_set(data,'{item}','{}'::jsonb) WHERE id=$1`,
+      [a.reservation.id],
+    );
+    await expect(sweepReservations(db, now)).rejects.toThrow(/Invalid reservation/);
+    const rows = await db.pool.query('SELECT id, status FROM reservations WHERE id=ANY($1)', [
+      [a.reservation.id, b.reservation.id],
+    ]);
+    expect(Object.fromEntries(rows.rows.map((r) => [r.id, r.status]))).toEqual({
+      [a.reservation.id]: 'PENDING',
+      [b.reservation.id]: 'CONFIRMED',
+    });
+    await db.pool.query("UPDATE reservations SET status='CANCELLED' WHERE id=$1", [
+      a.reservation.id,
+    ]);
   });
 
   it('marks notifications read and lists newest first', async () => {

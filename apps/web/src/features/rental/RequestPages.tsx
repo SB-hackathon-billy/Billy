@@ -26,7 +26,8 @@ import { NeedEditor } from './NeedEditor.js';
 import { Candidates } from './Candidates.js';
 import { illustrations } from '../../assets/illustrations/manifest.js';
 import { TaskExplanation } from '../../components/TaskExplanation.js';
-import { useReservations } from '../reservation/data.js';
+import { availabilityReasonLabels, useReservations } from '../reservation/data.js';
+import type { AvailabilityReason } from '@sb/contracts';
 import { ReservationStatusBadge } from '../reservation/parts.js';
 
 function Comparison({ view }: { view: RequestView }) {
@@ -84,7 +85,12 @@ function Comparison({ view }: { view: RequestView }) {
             />
             <TaskExplanation view={view} negotiationId={row.negotiationId} />
             {row.validUntil && <Countdown until={row.validUntil} />}
-            {row.unavailableReason && <p>{row.unavailableReason}</p>}
+            {row.unavailableReason && (
+              <p>
+                {availabilityReasonLabels[row.unavailableReason as AvailabilityReason] ??
+                  row.unavailableReason}
+              </p>
+            )}
             {row.status === 'AWAITING_OWNER' && (
               <p className="field-hint">소유자가 직접 응답할 때까지 기다려 주세요.</p>
             )}
@@ -280,7 +286,10 @@ export function SelectPage() {
       </div>
       <div className="demo-notice">
         <strong>다른 후보 요청은 종료됩니다.</strong>
-        <p>선택 후 10분 동안 데모 점유가 생깁니다. 실제 결제와 예약이 이루어지지 않습니다.</p>
+        <p>
+          선택 후 10분 동안 데모 점유가 생깁니다. 결제 미리보기에서 확정하면 앱 안의 데모 예약이
+          되고, 실제 결제와 기관 예약은 이루어지지 않습니다.
+        </p>
       </div>
       <Check isSelected={confirmed} onChange={setConfirmed}>
         물품·기간·장소·총액을 확인했고, 다른 활성 후보 요청을 종료하는 데 동의합니다.
@@ -372,7 +381,8 @@ export function PaymentPage() {
       <p className="demo-notice">
         <strong>실제 결제와 예약이 이루어지지 않습니다.</strong>
         <br />
-        결제 정보를 입력하거나 비용을 청구하지 않아요.
+        결제 정보를 입력하거나 비용을 청구하지 않아요. 아래에서 예약을 확정하면 앱 안의 데모 예약만
+        만들어져요.
       </p>
       <div className="content-card">
         <ItemHeader item={data.itemSummary} />

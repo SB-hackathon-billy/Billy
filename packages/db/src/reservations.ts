@@ -49,6 +49,20 @@ const period = (startAt: string, endAt: string) =>
 const overlaps = (a: { startAt: string; endAt: string }, b: { startAt: string; endAt: string }) =>
   Date.parse(a.startAt) < Date.parse(b.endAt) && Date.parse(b.startAt) < Date.parse(a.endAt);
 
+/**
+ * 저장 직전 내부 검증. ZodError는 API mutation 래퍼가 422 응답으로 바꿔 트랜잭션을 커밋하므로
+ * 일반 오류로 던져 전체를 되돌린다(리뷰 지적: 부분 커밋 방지).
+ */
+function checked<T>(
+  schema: { safeParse(value: unknown): { success: true; data: T } | { success: false } },
+  value: unknown,
+  what: string,
+): T {
+  const parsed = schema.safeParse(value);
+  if (!parsed.success) throw new Error(`Invalid ${what} record`);
+  return parsed.data;
+}
+
 export async function priorityMs(u: Unit): Promise<number> {
   return (await u.config()).name === 'expiry-fast'
     ? WAITLIST_PRIORITY_FAST_MS
@@ -86,20 +100,24 @@ type NotificationInput = Pick<Notification, 'type' | 'title' | 'body'> &
 
 /** 알림 행을 쓰고 SSE `notification.created`를 보낸다. 같은 트랜잭션의 결과와 함께 커밋된다. */
 export async function notify(u: Unit, userId: string, input: NotificationInput) {
-  const notification: Notification = NotificationSchema.parse({
-    id: id('ntf'),
-    link: null,
-    reservationId: null,
-    waitlistEntryId: null,
-    requestId: null,
-    negotiationId: null,
-    itemId: null,
-    ...input,
-    title: input.title.slice(0, 100),
-    body: input.body.slice(0, 300),
-    createdAt: u.iso,
-    readAt: null,
-  });
+  const notification: Notification = checked(
+    NotificationSchema,
+    {
+      id: id('ntf'),
+      link: null,
+      reservationId: null,
+      waitlistEntryId: null,
+      requestId: null,
+      negotiationId: null,
+      itemId: null,
+      ...input,
+      title: input.title.slice(0, 100),
+      body: input.body.slice(0, 300),
+      createdAt: u.iso,
+      readAt: null,
+    },
+    'notification',
+  );
   await u.c.query('INSERT INTO notifications(id,user_id,data,created_at) VALUES($1,$2,$3,$4)', [
     notification.id,
     userId,
@@ -192,7 +210,7 @@ export async function readNotifications(u: Unit, userId: string, ids: string[] |
 // 예약 저장·이력·화면
 
 async function insertReservation(u: Unit, r: Reservation) {
-  ReservationSchema.parse(r);
+  checked(ReservationSchema, r, 'reservation');
   await u.c.query(
     'INSERT INTO reservations(id,data,item_id,requester_id,owner_id,request_id,status,start_at,end_at,response_due_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
     [
@@ -213,7 +231,7 @@ async function insertReservation(u: Unit, r: Reservation) {
 async function updateReservation(u: Unit, r: Reservation) {
   r.version++;
   r.updatedAt = u.iso;
-  ReservationSchema.parse(r);
+  checked(ReservationSchema, r, 'reservation');
   await u.c.query('UPDATE reservations SET data=$2,status=$3,response_due_at=$4 WHERE id=$1', [
     r.id,
     r,
@@ -600,7 +618,14 @@ export async function respondReservation(
   }
   const item = await u.item(r.itemId);
   const reason = (await u.availability(item, r.requesterId, r)) as AvailabilityReason | null;
-  if (reason) fail('AVAILABILITY_CONFLICT', { reason, waitlistable: false });
+  if (reason) {
+    // 잠시 뒤 풀리는 점유(10분 데모 점유·대기 우선권)는 신청을 그대로 두고 다시 승인할 수 있게 한다.
+    if (reason === 'ACTIVE_HOLD' || reason === 'WAITLIST_PRIORITY')
+      fail('AVAILABILITY_CONFLICT', { reason, waitlistable: false });
+    // 물품 조건이 바뀌어 다시 승인할 수 없는 신청은 닫고 신청자에게 알린다(리뷰 지적).
+    await declineBySystem(u, r, reason);
+    fail('AVAILABILITY_CONFLICT', { reason, waitlistable: false, closed: true }, true);
+  }
   r.status = 'CONFIRMED';
   r.responseDueAt = null;
   await updateReservation(u, r);
@@ -642,6 +667,26 @@ export async function cancelReservation(
   // 확정 취소는 점유를 풀기 때문에 대기 1순위를 바로 검토한다.
   await promoteWaitlist(u, r.itemId);
   return reservationView(u, actor, r, true);
+}
+
+/** 물품 조건 변경(비활성·불가 기간·장소 등)으로 더 진행할 수 없는 신청을 닫는다. */
+async function declineBySystem(u: Commands, r: Reservation, reason: string) {
+  r.status = 'DECLINED';
+  r.closedReason = reason;
+  r.responseDueAt = null;
+  await updateReservation(u, r);
+  await recordHistory(u, r, 'SYSTEM', reason);
+  reservationEvents(u, r, reason);
+  await closeLinkedWaitlist(u, r, 'RESERVATION_DECLINED');
+  await notify(u, r.requesterId, {
+    type: 'RESERVATION_DECLINED',
+    title: '예약 신청을 이어갈 수 없어요',
+    body: `${r.item.title} · ${period(r.startAt, r.endAt)}. 물품의 대여 조건이 바뀌었어요. 다른 기간이나 물품을 찾아보세요.`,
+    link: `/reservations/${r.id}`,
+    reservationId: r.id,
+    itemId: r.itemId,
+  });
+  await promoteWaitlist(u, r.itemId);
 }
 
 async function expireReservation(u: Commands, r: Reservation) {
@@ -710,7 +755,7 @@ async function saveWaitlist(u: Unit, entry: StoredWaitlistEntry, insert = false)
   const next: StoredWaitlistEntry = insert
     ? entry
     : { ...entry, version: entry.version + 1, updatedAt: u.iso };
-  WaitlistEntrySchema.parse({ ...next, position: null });
+  checked(WaitlistEntrySchema, { ...next, position: null }, 'waitlist entry');
   if (insert)
     await u.c.query(
       'INSERT INTO waitlist_entries(id,data,item_id,user_id,status,start_at,end_at,priority_until) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',
@@ -823,13 +868,20 @@ export async function listWaitlistEntries(u: Unit, actor: string, status?: Waitl
   return positions(u, rows);
 }
 
-export async function cancelWaitlistEntry(u: Commands, actor: string, entryId: string) {
+export async function cancelWaitlistEntry(
+  u: Commands,
+  actor: string,
+  entryId: string,
+  expectedVersion?: number,
+) {
   const peek = await read<StoredWaitlistEntry>(u.c, 'waitlist_entries', entryId);
   if (!peek || peek.userId !== actor) fail('NOT_FOUND');
   await u.lockItems([peek.itemId]);
   const entry = (
     await u.c.query('SELECT data FROM waitlist_entries WHERE id=$1 FOR UPDATE', [entryId])
   ).rows[0].data as StoredWaitlistEntry;
+  if (expectedVersion !== undefined && entry.version !== expectedVersion)
+    fail('VERSION_CONFLICT', { currentVersion: entry.version });
   if (!OPEN.includes(entry.status)) fail('INVALID_STATE');
   const saved = await saveWaitlist(u, {
     ...entry,
@@ -1068,29 +1120,43 @@ export async function sweepReservations(db: Database, now?: Date) {
     [at.toISOString()],
   );
   let changed = 0;
+  // 한 건의 실패가 나머지 정리와 다른 worker 작업을 막지 않도록 건별로 격리하고, 끝에 알린다.
+  let firstError: unknown = null;
+  const isolated = async (work: () => Promise<number>) => {
+    try {
+      changed += await work();
+    } catch (error) {
+      firstError ??= error;
+    }
+  };
   for (const row of due.rows)
-    changed += await db.transaction(async (u) => {
-      const peek = await read<Reservation>(u.c, 'reservations', row.id);
-      if (!peek || peek.status !== 'PENDING') return 0;
-      await u.lockItems([peek.itemId]);
-      const r = await lockReservation(u, peek.id);
-      if (r.status !== 'PENDING') return 0;
-      if (pastDue(u, r)) await expireReservation(u, r);
-      else if (r.source === 'PUBLIC') await publicDecision(u, r);
-      else return 0;
-      return 1;
-    }, now);
+    await isolated(() =>
+      db.transaction(async (u) => {
+        const peek = await read<Reservation>(u.c, 'reservations', row.id);
+        if (!peek || peek.status !== 'PENDING') return 0;
+        await u.lockItems([peek.itemId]);
+        const r = await lockReservation(u, peek.id);
+        if (r.status !== 'PENDING') return 0;
+        if (pastDue(u, r)) await expireReservation(u, r);
+        else if (r.source === 'PUBLIC') await publicDecision(u, r);
+        else return 0;
+        return 1;
+      }, now),
+    );
   const items = await db.pool.query(
     "SELECT DISTINCT item_id FROM waitlist_entries WHERE status IN ('WAITING','NOTIFIED','APPLIED') ORDER BY item_id",
   );
   for (const row of items.rows)
-    changed += await db.transaction(async (u) => {
-      await u.lockItems([row.item_id]);
-      return promoteWaitlist(u, row.item_id);
-    }, now);
+    await isolated(() =>
+      db.transaction(async (u) => {
+        await u.lockItems([row.item_id]);
+        return promoteWaitlist(u, row.item_id);
+      }, now),
+    );
   await db.pool.query('DELETE FROM notifications WHERE created_at<$1', [
     new Date(at.getTime() - NOTIFICATION_RETENTION_MS).toISOString(),
   ]);
+  if (firstError) throw firstError;
   return changed;
 }
 

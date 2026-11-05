@@ -12,6 +12,8 @@ import { api, idPath, serverClock } from '../../lib/api.js';
 import { useAction, useNow, useOnline, usePlaces } from '../../lib/hooks.js';
 import { ActionButton, Check, ErrorNotice, ItemHeader, TermsView } from '../../components/ui.js';
 import { PriceField, usePriceQuote } from '../../components/PriceField.js';
+import { availabilityReasonLabels } from '../reservation/data.js';
+import type { AvailabilityReason } from '@sb/contracts';
 
 function CandidateCard({
   candidate,
@@ -85,7 +87,11 @@ function CandidateCard({
         </>
       ) : (
         <p className="unavailable">
-          선택 불가 · {candidate.unavailableReason ?? '이 조건으로 이용하기 어려워요.'}
+          선택 불가 ·{' '}
+          {candidate.unavailableReason
+            ? (availabilityReasonLabels[candidate.unavailableReason as AvailabilityReason] ??
+              candidate.unavailableReason)
+            : '이 조건으로 이용하기 어려워요.'}
         </p>
       )}
     </article>

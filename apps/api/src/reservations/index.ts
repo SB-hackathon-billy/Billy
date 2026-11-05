@@ -112,9 +112,16 @@ export default async function reservationsPlugin(app: FastifyInstance) {
     );
   });
   mutation('DELETE', '/waitlist-entries/:id', 200, (u, request) => {
-    if (request.body !== undefined && request.body !== null)
-      C.ReservationVersionBodySchema.partial().strict().parse(request.body);
-    return cancelWaitlistEntry(u, requireSession(request).userId, param(request));
+    const body =
+      request.body !== undefined && request.body !== null
+        ? C.ReservationVersionBodySchema.partial().strict().parse(request.body)
+        : {};
+    return cancelWaitlistEntry(
+      u,
+      requireSession(request).userId,
+      param(request),
+      body.expectedVersion,
+    );
   });
 
   get('/notifications', async (request) => {
