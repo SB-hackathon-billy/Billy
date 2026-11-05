@@ -397,6 +397,7 @@ export async function buildApi(options: ApiOptions = {}): Promise<FastifyInstanc
     if (register) await app.register(register);
   }
   await app.register((await import('./listings/index.js')).default);
+  await app.register((await import('./intake-approvals/index.js')).default);
   if (!options.db) app.addHook('onClose', async () => db.close());
   return app;
 }

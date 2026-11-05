@@ -8,6 +8,8 @@ test('AT19: a real 30-second hold expires without a payment or reservation mutat
   await enter(page, 'hana');
   await expect(page.getByText('빠른 만료 시연', { exact: true })).toBeVisible();
   await page.getByRole('link', { name: '공유대여', exact: true }).click();
+  // 명세 0003: /rental은 통화 화면, 텍스트 접수는 /rental/classic.
+  await page.getByRole('link', { name: '텍스트로 입력하기', exact: true }).click();
   await page.getByRole('button', { name: '텍스트로 입력' }).click();
   await page
     .getByRole('textbox', { name: '필요한 물품과 사용 계획' })

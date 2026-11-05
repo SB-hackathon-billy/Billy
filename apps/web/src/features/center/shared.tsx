@@ -31,6 +31,8 @@ const InterestContext = createContext<{ ids: Set<string>; toggle: (id: string) =
   null,
 );
 const menu = [
+  ['board', '공지·소식'],
+  ['services', '서비스'],
   ['about', '센터 소개'],
   ['business', '사업 안내'],
   ['programs', '프로그램'],
@@ -67,8 +69,9 @@ export function CenterLayout() {
           <footer className="center-footer">
             <strong>함께 살펴보는 센터 데모</strong>
             <p>
-              센터 콘텐츠·모집·양식은 합성 예시입니다. 실제 신청·예약되지 않습니다. 입력과 관심
-              표시는 현재 탭의 화면에서만 유지되며 새로고침하거나 센터를 벗어나면 초기화됩니다.
+              공지·소식은 공개된 센터 공지·보도를 옮긴 시연 화면이고, 그 밖의 메뉴의 프로그램·양식은
+              합성 예시입니다. 물품대여 외에는 실제 신청·예약되지 않습니다. 입력과 관심 표시는 현재
+              탭의 화면에서만 유지되며 새로고침하거나 센터를 벗어나면 초기화됩니다.
             </p>
             <ExternalLink href="https://sb1in.or.kr/">공식 센터 사이트</ExternalLink>
           </footer>

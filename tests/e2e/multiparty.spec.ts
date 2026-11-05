@@ -45,6 +45,7 @@ test('AT04/07/13/14/19/22: three cookie stores, real server, keyboard journey an
     const hanaEvents = await observeSse(hana);
     const duriEvents = await observeSse(duri);
     await activate(hana, hana.getByRole('link', { name: '공유대여', exact: true }));
+    await activate(hana, hana.getByRole('link', { name: '텍스트로 입력하기', exact: true }));
     await activate(hana, hana.getByRole('button', { name: '텍스트로 입력', exact: true }));
     await type(
       hana,

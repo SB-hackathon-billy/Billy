@@ -11,6 +11,12 @@ import { ResultNotice } from './components/ResultNotice.js';
 const VoicePage = lazy(() =>
   import('./features/rental/VoicePage.js').then((module) => ({ default: module.VoicePage })),
 );
+// 명세 0003: /rental은 캐릭터·체크리스트·승인 바텀시트 통화 화면. 구 화면은 /rental/classic(텍스트 입력).
+const VoiceCallPage = lazy(() =>
+  import('./features/voice-call/VoiceCallPage.js').then((module) => ({
+    default: module.VoiceCallPage,
+  })),
+);
 const InboxPage = lazy(() =>
   import('./features/rental/InboxPage.js').then((module) => ({ default: module.InboxPage })),
 );
@@ -125,6 +131,15 @@ function AppShell() {
     document.getElementById('main-content')?.focus({ preventScroll: true });
   }, [location.pathname]);
   const entry = location.pathname === '/entry';
+  // Approved reservation-tool calls that failed keep retrying in the background, also after a reload.
+  useEffect(() => {
+    if (!session) return;
+    void import('./features/voice-call/reservation-outbox.js').then(
+      ({ hasQueuedReservations, reservationOutbox }) => {
+        if (hasQueuedReservations()) reservationOutbox.resume();
+      },
+    );
+  }, [session]);
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
@@ -199,6 +214,14 @@ export function App() {
         },
         {
           path: '/rental',
+          element: (
+            <Protected>
+              <VoiceCallPage />
+            </Protected>
+          ),
+        },
+        {
+          path: '/rental/classic',
           element: (
             <Protected>
               <VoicePage />

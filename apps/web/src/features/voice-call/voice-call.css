@@ -1,0 +1,653 @@
+/* 음성 접수 통화 화면 (명세 0003). 클래스는 vc- 접두사로 격리해 공통 CSS에 영향을 주지 않는다. */
+.vc-screen {
+  --vc-ink: #20364a;
+  --vc-muted: #5d7183;
+  --vc-green: #3f7a5c;
+  --vc-green-soft: #dcebe0;
+  --vc-bg-top: #eef5ef;
+  --vc-bg-bottom: #f8f7f1;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  max-width: 48rem;
+  margin: 0 auto;
+  /* clip (not hidden): the fixed call screen must never be scrolled by focus or live regions. */
+  overflow: clip;
+  color: var(--vc-ink);
+  background:
+    radial-gradient(120% 60% at 50% 18%, #ffffff 0%, transparent 60%),
+    linear-gradient(180deg, var(--vc-bg-top), var(--vc-bg-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.vc-topbar {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: max(0.6rem, env(safe-area-inset-top)) 1rem 0.4rem;
+}
+.vc-topbar h1 {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.3;
+  letter-spacing: -0.03em;
+}
+.vc-topbar p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--vc-muted);
+}
+.vc-back {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  text-decoration: none;
+  background: #ffffffb3;
+}
+.vc-live {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  color: var(--vc-muted);
+  background: #ffffffb3;
+}
+.vc-live.on {
+  color: #fff;
+  background: #c2524a;
+}
+.vc-live.on::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 0.35rem;
+  border-radius: 50%;
+  background: #fff;
+  vertical-align: middle;
+  animation: vc-blink 1.2s infinite;
+}
+.vc-script-badge {
+  align-self: center;
+  margin: 0.1rem 0 0;
+  padding: 0.15rem 0.7rem;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #7a5a12;
+  background: #fbefcc;
+}
+
+/* Stage: the character sits slightly above centre; the checklist hangs right under it. */
+.vc-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: clamp(0.5rem, 4.5vh, 3rem) 1.25rem 0;
+  overflow: hidden;
+  transition: padding 0.5s ease;
+}
+.vc-screen:not([data-phase='collecting']) .vc-stage {
+  padding-top: 0.25rem;
+}
+.vc-character-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.vc-screen:not([data-phase='collecting']) .vc-character-slot {
+  transform: translateY(-1.25rem) scale(0.74);
+}
+.vc-state {
+  margin: 0 0 0.35rem;
+  padding: 0.12rem 0.65rem;
+  border-radius: 6px;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--vc-green);
+  background: #ffffffcc;
+  border: 1px solid #c9dccd;
+}
+.vc-checklist {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  width: min(100%, 22rem);
+  transition:
+    opacity 0.35s ease,
+    transform 0.45s ease,
+    max-height 0.5s ease;
+  max-height: 30rem;
+}
+.vc-screen:not([data-phase='collecting']) .vc-checklist {
+  opacity: 0;
+  transform: translateY(1rem);
+  max-height: 0;
+  pointer-events: none;
+}
+.vc-check {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.22rem 0;
+  transition: opacity 0.3s ease;
+}
+.vc-check:not([data-done]) {
+  opacity: 0.62;
+}
+.vc-check[data-current] {
+  opacity: 1;
+}
+.vc-check-mark svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+.vc-check-mark circle {
+  fill: none;
+  stroke: #b9c8bf;
+  stroke-width: 2;
+  stroke-dasharray: 63;
+  transition:
+    fill 0.3s ease,
+    stroke 0.3s ease;
+}
+.vc-check-mark path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 16;
+  stroke-dashoffset: 16;
+  transition: stroke-dashoffset 0.35s 0.15s ease;
+}
+.vc-check[data-current] .vc-check-mark circle {
+  stroke: var(--vc-green);
+  stroke-dasharray: 10 6;
+  animation: vc-spin 2.4s linear infinite;
+  transform-origin: 12px 12px;
+}
+.vc-check[data-done] .vc-check-mark circle {
+  fill: var(--vc-green);
+  stroke: var(--vc-green);
+  animation: vc-pop 0.4s ease;
+  transform-origin: 12px 12px;
+}
+.vc-check[data-done] .vc-check-mark path {
+  stroke-dashoffset: 0;
+}
+.vc-check[data-optional]:not([data-done]) .vc-check-mark circle {
+  stroke-dasharray: 3 4;
+}
+.vc-check-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+  min-width: 0;
+}
+.vc-check-text strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.vc-check-text em {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--vc-muted);
+}
+.vc-check-text small {
+  font-size: 0.8rem;
+  color: var(--vc-muted);
+  overflow-wrap: anywhere;
+}
+.vc-check[data-done] .vc-check-text small {
+  color: var(--vc-green);
+  font-weight: 600;
+}
+.vc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.vc-captions {
+  padding: 0 1.25rem;
+  min-height: 3.2rem;
+}
+.vc-caption {
+  margin: 0.25rem 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--vc-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.vc-caption span {
+  margin-right: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--vc-muted);
+}
+.vc-caption.user {
+  color: var(--vc-muted);
+}
+.vc-caption.hint {
+  text-align: center;
+  color: var(--vc-muted);
+}
+.vc-error {
+  margin: 0.3rem 1.25rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  background: #fbe9e6;
+  color: #8a2f25;
+}
+.vc-error p {
+  margin: 0 0 0.3rem;
+}
+.vc-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  padding: 0.5rem 1.25rem 1rem;
+}
+.vc-controls .button {
+  flex: 1 1 8rem;
+}
+.vc-screen:not([data-phase='collecting']) .vc-captions,
+.vc-screen:not([data-phase='collecting']) .vc-controls {
+  visibility: hidden;
+}
+.vc-text-link {
+  font-size: 0.86rem;
+  color: var(--vc-muted);
+}
+
+/* Bottom sheet with the summarised request and the final approval button. */
+.vc-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 66%;
+  overflow-y: auto;
+  padding: 0.6rem 1.25rem calc(1.2rem + env(safe-area-inset-bottom));
+  border-radius: 24px 24px 0 0;
+  background: #fff;
+  box-shadow: 0 -12px 40px #20364a24;
+  transform: translateY(calc(100% + 48px));
+  visibility: hidden;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s 0.55s;
+}
+.vc-sheet[data-open] {
+  transform: translateY(0);
+  visibility: visible;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.vc-sheet-handle {
+  display: block;
+  width: 42px;
+  height: 5px;
+  margin: 0 auto 0.6rem;
+  border-radius: 3px;
+  background: #d6dee4;
+}
+.vc-sheet h2 {
+  margin: 0.2rem 0 0.2rem;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+  outline: none;
+}
+.vc-sheet-lead {
+  margin: 0 0 0.8rem;
+  font-size: 0.88rem;
+  color: var(--vc-muted);
+}
+.vc-summary {
+  margin: 0 0 0.8rem;
+  padding: 0.2rem 0.9rem;
+  border-radius: 14px;
+  background: #f4f7f5;
+}
+.vc-summary div {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.6rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid #e3eae5;
+}
+.vc-summary div:last-child {
+  border-bottom: 0;
+}
+.vc-summary dt {
+  font-size: 0.82rem;
+  color: var(--vc-muted);
+}
+.vc-summary dd {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.vc-policy {
+  margin: 0 0 1rem;
+  padding-left: 1.1rem;
+  font-size: 0.78rem;
+  color: var(--vc-muted);
+}
+.vc-sheet .button {
+  width: 100%;
+  margin: 0.2rem 0;
+  text-align: center;
+}
+.vc-sheet-secondary {
+  display: block;
+  width: 100%;
+  margin-top: 0.3rem;
+  border: 0;
+  background: none;
+  color: var(--vc-muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.vc-progress {
+  height: 6px;
+  margin: 0.4rem 0 1rem;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--vc-green-soft), var(--vc-green), var(--vc-green-soft)) 0
+    0 / 200% 100%;
+  animation: vc-slide 1.2s linear infinite;
+}
+
+/* ---- Placeholder character ---- */
+.vc-character svg {
+  width: clamp(132px, 38vw, 176px);
+  height: auto;
+  overflow: visible;
+}
+.vc-shadow {
+  fill: #20364a1f;
+}
+.vc-blob,
+.vc-ear {
+  fill: url(#vc-body);
+}
+.vc-belly-bg {
+  fill: #eaf4ec;
+}
+.vc-belly-fill {
+  fill: #b8dbc3;
+  transition: y 0.6s ease;
+}
+.vc-eye {
+  fill: #20364a;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: vc-blink-eye 4.5s infinite;
+}
+.vc-happy-eye {
+  fill: none;
+  stroke: #20364a;
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0;
+}
+.vc-cheek {
+  fill: #f2a7a0;
+  opacity: 0.55;
+}
+.vc-mouth {
+  fill: none;
+  stroke: #20364a;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+.vc-mouth-open {
+  fill: #7a3a3a;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.vc-ring circle {
+  fill: none;
+  stroke: var(--vc-green);
+  stroke-width: 2;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.vc-thought circle {
+  fill: #9bb5a5;
+  opacity: 0;
+}
+.vc-sparkles path {
+  fill: #f0c75e;
+  opacity: 0;
+}
+.vc-clipboard {
+  opacity: 0;
+}
+.vc-clipboard rect {
+  fill: #fff;
+  stroke: #20364a;
+  stroke-width: 2.5;
+}
+.vc-clipboard path {
+  stroke: #9bb5a5;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.vc-body {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: vc-breathe 3.6s ease-in-out infinite;
+}
+.vc-ear {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+[data-state='CONNECTING'] .vc-ring circle {
+  opacity: 0.6;
+  animation: vc-pulse 1.4s ease-out infinite;
+}
+[data-state='GREETING'] .vc-body,
+[data-state='DONE'] .vc-body {
+  animation: vc-hop 0.9s ease-in-out infinite;
+}
+[data-state='GREETING'] .vc-mouth,
+[data-state='SPEAKING'] .vc-mouth {
+  opacity: 0;
+}
+[data-state='GREETING'] .vc-mouth-open,
+[data-state='SPEAKING'] .vc-mouth-open {
+  opacity: 1;
+  animation: vc-talk 0.32s ease-in-out infinite alternate;
+}
+[data-state='LISTENING'] .vc-ear-left {
+  animation: vc-ear-l 1.6s ease-in-out infinite;
+}
+[data-state='LISTENING'] .vc-ear-right {
+  animation: vc-ear-r 1.6s ease-in-out infinite;
+}
+[data-state='LISTENING'] .vc-body {
+  animation: vc-lean 2.4s ease-in-out infinite;
+}
+[data-state='THINKING'] .vc-thought circle {
+  animation: vc-dots 1.2s ease-in-out infinite;
+}
+[data-state='THINKING'] .vc-thought circle:nth-child(2) {
+  animation-delay: 0.2s;
+}
+[data-state='THINKING'] .vc-thought circle:nth-child(3) {
+  animation-delay: 0.4s;
+}
+[data-state='THINKING'] .vc-eyes {
+  transform: translate(4px, -4px);
+}
+[data-state='WAITING_APPROVAL'] .vc-clipboard {
+  opacity: 1;
+}
+[data-state='WAITING_APPROVAL'] .vc-body {
+  animation: vc-sway 2.8s ease-in-out infinite;
+}
+[data-state='RESERVING'] .vc-ring circle {
+  opacity: 0.9;
+  stroke-dasharray: 60 500;
+  animation: vc-spin 1s linear infinite;
+}
+[data-state='DONE'] .vc-eye {
+  opacity: 0;
+}
+[data-state='DONE'] .vc-happy-eye {
+  opacity: 1;
+}
+[data-state='DONE'] .vc-sparkles path {
+  opacity: 1;
+  animation: vc-twinkle 1.2s ease-in-out infinite alternate;
+}
+[data-state='RETRYING'] .vc-ring circle {
+  opacity: 0.5;
+  stroke-dasharray: 8 10;
+  animation: vc-spin 3s linear infinite;
+}
+[data-state='ERROR'] .vc-body {
+  animation: none;
+  transform: rotate(-6deg);
+}
+[data-state='ERROR'] .vc-mouth {
+  transform: translateY(8px) scaleY(-1);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+[data-state='IDLE'] .vc-body {
+  animation-duration: 5s;
+}
+.vc-character[data-reduced-motion] *,
+.vc-character[data-reduced-motion] {
+  animation: none !important;
+  transition: none !important;
+}
+
+@keyframes vc-breathe {
+  50% {
+    transform: scale(1.02, 0.98);
+  }
+}
+@keyframes vc-hop {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes vc-lean {
+  50% {
+    transform: rotate(3deg);
+  }
+}
+@keyframes vc-sway {
+  25% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+}
+@keyframes vc-talk {
+  to {
+    transform: scaleY(0.35);
+  }
+}
+@keyframes vc-ear-l {
+  50% {
+    transform: rotate(-10deg);
+  }
+}
+@keyframes vc-ear-r {
+  50% {
+    transform: rotate(10deg);
+  }
+}
+@keyframes vc-dots {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+@keyframes vc-pulse {
+  from {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.1);
+    opacity: 0;
+  }
+}
+@keyframes vc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes vc-twinkle {
+  to {
+    opacity: 0.35;
+  }
+}
+@keyframes vc-blink-eye {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+@keyframes vc-blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+@keyframes vc-pop {
+  50% {
+    transform: scale(1.18);
+  }
+}
+@keyframes vc-slide {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vc-screen *,
+  .vc-screen *::before {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -6,6 +6,8 @@ import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 
 export default defineConfig({
+  // 3D call character (spec 0003 §8): model/texture formats are served as hashed static assets.
+  assetsInclude: ['**/*.glb', '**/*.gltf', '**/*.ktx2', '**/*.hdr'],
   plugins: [
     {
       name: 'development-mock-worker',
@@ -51,6 +53,16 @@ export default defineConfig({
             urlPattern: ({ url }) => /^\/api(?:\/|$)/.test(url.pathname),
             handler: 'NetworkOnly',
             method: 'GET',
+          },
+          {
+            // Large character models are not precached; they are cached on first call-screen use.
+            urlPattern: ({ url }) =>
+              url.origin === self.location.origin && /^\/models\/character\//.test(url.pathname),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'call-character-models',
+              expiration: { maxEntries: 10, maxAgeSeconds: 86_400 * 30 },
+            },
           },
           {
             urlPattern: ({ url }) =>

@@ -40,7 +40,8 @@ with sync_playwright() as p:
 
     try:
         visit('/center')
-        expect(page).to_have_url(re.compile('/center/about$'))
+        expect(page).to_have_url(re.compile('/center/board$'))
+        page.goto(BASE + '/center/about', wait_until='networkidle')
         shot('C01-intro')
         page.get_by_role('tab', name='이용안내', exact=True).click()
         shot('C01-guide')

@@ -5,8 +5,17 @@ import * as entities from './entities.js';
 import * as ai from './ai.js';
 import * as http from './http.js';
 import * as listing from './listing.js';
+import * as intake from './intake.js';
 
-const namedSchemas = { ...enums, ...primitives, ...entities, ...ai, ...http, ...listing };
+const namedSchemas = {
+  ...enums,
+  ...primitives,
+  ...entities,
+  ...ai,
+  ...http,
+  ...listing,
+  ...intake,
+};
 const schemas: Record<string, z.ZodType> = {};
 for (const [name, schema] of Object.entries(namedSchemas)) {
   if (name.endsWith('Schema') && schema instanceof z.ZodType) schemas[name.slice(0, -6)] = schema;
@@ -36,6 +45,7 @@ const responses = {
   UploadedImage: http.successEnvelopeSchema(listing.UploadedImageSchema),
   Listing: http.successEnvelopeSchema(listing.ListingSchema),
   Listings: http.successEnvelopeSchema(http.listDataSchema(listing.ListingSchema)),
+  IntakeApproval: http.successEnvelopeSchema(intake.IntakeApprovalSchema),
 };
 for (const [name, schema] of Object.entries(responses)) schemas[`${name}Response`] = schema;
 
@@ -392,6 +402,23 @@ export const API_OPERATIONS: readonly Operation[] = [
     status: 200,
     response: 'Listing',
     body: 'ListingVersionBody',
+  },
+  {
+    method: 'post',
+    path: '/intake-approvals',
+    operationId: 'createIntakeApproval',
+    summary: '사람이 승인한 통화 신청서로 예약 신청 도구 실행(백그라운드 재시도)',
+    status: 202,
+    response: 'IntakeApproval',
+    body: 'CreateIntakeApprovalBody',
+  },
+  {
+    method: 'get',
+    path: '/intake-approvals/{id}',
+    operationId: 'getIntakeApproval',
+    summary: '예약 신청 도구 실행 상태',
+    status: 200,
+    response: 'IntakeApproval',
   },
 ];
 export function buildOpenApi() {

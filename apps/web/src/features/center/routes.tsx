@@ -1,5 +1,6 @@
 import { Navigate, type RouteObject } from 'react-router-dom';
 import { CenterLayout } from './shared.js';
+import { BoardPage, PostPage, ServicePage, ServicesPage } from '../center-board/pages.js';
 import {
   AboutPage,
   BusinessPage,
@@ -18,7 +19,12 @@ export const centerRoutes: RouteObject[] = [
     path: '/center',
     element: <CenterLayout />,
     children: [
-      { index: true, element: <Navigate to="about" replace /> },
+      // 명세 0003: 첫 화면은 실제 공지·소식(center-board), 센터 서비스 탭을 함께 연결한다.
+      { index: true, element: <Navigate to="board" replace /> },
+      { path: 'board', element: <BoardPage /> },
+      { path: 'board/:id', element: <PostPage /> },
+      { path: 'services', element: <ServicesPage /> },
+      { path: 'services/:id', element: <ServicePage /> },
       { path: 'about', element: <AboutPage /> },
       { path: 'business', element: <BusinessPage /> },
       { path: 'business/:id', element: <ProgramDetail business /> },
