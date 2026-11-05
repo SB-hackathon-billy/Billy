@@ -5,6 +5,8 @@ import { useAction, useOnline } from '../../lib/hooks.js';
 import { ActionButton, ErrorNotice, Ink, Loading, Status } from '../../components/ui.js';
 import { formatSeoulDateTime } from '../../lib/api.js';
 import { illustrations } from '../../assets/illustrations/manifest.js';
+import { useReservations } from '../reservation/data.js';
+import { ReservationCard } from '../reservation/parts.js';
 
 export function EntryPage() {
   const { session, loading, signIn } = useSession();
@@ -84,7 +86,7 @@ export function EntryPage() {
           같은 아이디를 입력하면 같은 합성 계정을 사용합니다. 함께 시연할 때는 서로 다른 아이디와
           기기·브라우저 프로필을 사용해 주세요.
         </p>
-        <p>실제 결제와 예약이 이루어지지 않습니다.</p>
+        <p>실제 결제와 기관 예약은 이루어지지 않습니다. 예약은 앱 안의 데모 상태예요.</p>
       </aside>
       <Link to="/center">센터 안내 먼저 보기 →</Link>
     </section>
@@ -97,6 +99,14 @@ export function HomePage() {
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
     .slice(0, 3);
   const offered = sync.data?.requestSummaries.reduce((sum, r) => sum + r.offeredCount, 0) ?? 0;
+  // 명세 0004: 다가오는 확정 예약.
+  const reservations = useReservations('REQUESTER');
+  const upcoming = (reservations.data?.items ?? [])
+    .filter(
+      (v) => v.reservation.status === 'CONFIRMED' && Date.parse(v.reservation.endAt) > Date.now(),
+    )
+    .sort((a, b) => a.reservation.startAt.localeCompare(b.reservation.startAt))
+    .slice(0, 2);
   return (
     <section>
       <p className="eyebrow">우리 동네, 필요한 만큼 함께</p>
@@ -136,6 +146,21 @@ export function HomePage() {
           눌러서 말하거나 글로 알려 주세요 <b aria-hidden="true">→</b>
         </span>
       </Link>
+      <Link className="catalog-teaser" to="/catalog">
+        <strong>물품 둘러보기</strong>
+        <span>공공·이웃 물품을 기간별로 찾아 바로 신청해요 →</span>
+      </Link>
+      {upcoming.length > 0 && (
+        <>
+          <div className="section-heading">
+            <h2>다가오는 예약</h2>
+            <Link to="/inbox">모두 보기</Link>
+          </div>
+          {upcoming.map((view) => (
+            <ReservationCard key={view.reservation.id} view={view} />
+          ))}
+        </>
+      )}
       {offered > 0 && (
         <Link className="new-offers" to="/inbox">
           ✦ 새로운 조건 {offered}개가 기다리고 있어요 <span>확인하기 →</span>
@@ -220,7 +245,9 @@ export function ProfilePage() {
         </ActionButton>
         <ErrorNotice action={action} />
       </div>
-      <p className="demo-notice">실제 결제와 예약이 이루어지지 않습니다.</p>
+      <p className="demo-notice">
+        실제 결제와 기관 예약은 이루어지지 않습니다. 예약은 앱 안의 데모 상태예요.
+      </p>
     </section>
   );
 }

@@ -32,14 +32,17 @@ import {
   ImageSchema,
   KrwSchema,
   NegotiationIdSchema,
+  NotificationIdSchema,
   OfferIdSchema,
   QuoteIdSchema,
   RequestIdSchema,
+  ReservationIdSchema,
   TaskIdSchema,
   textSchema,
   UtcDateTimeSchema,
   VersionSchema,
   VoiceSessionIdSchema,
+  WaitlistEntryIdSchema,
 } from './primitives.js';
 
 export const RequestViewSchema = z
@@ -289,6 +292,9 @@ export const SseEventSchema = z
     negotiationId: NegotiationIdSchema.optional(),
     negotiationVersion: VersionSchema.optional(),
     taskId: TaskIdSchema.optional(),
+    reservationId: ReservationIdSchema.optional(),
+    waitlistEntryId: WaitlistEntryIdSchema.optional(),
+    notificationId: NotificationIdSchema.optional(),
     reason: textSchema(100).optional(),
   })
   .strict();

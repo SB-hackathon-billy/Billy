@@ -45,6 +45,18 @@ export function toItem(l: C.Listing): C.Item {
   });
 }
 
+/** 3번 카탈로그 상세가 쓰는 2번 읽기 함수: 게시 중인 물품의 설명(없으면 null). */
+export async function publishedListingDescription(
+  u: Commands,
+  itemId: string,
+): Promise<string | null> {
+  const row = await u.c.query("SELECT data FROM listings WHERE id=$1 AND status='PUBLISHED'", [
+    itemId,
+  ]);
+  const listing = row.rows[0]?.data as C.Listing | undefined;
+  return listing?.description.trim() ? listing.description : null;
+}
+
 export default async function listingsPlugin(app: FastifyInstance) {
   const { db, envelope, requireSession, mutation } = app.demo;
   let drafter: ListingDrafter | undefined;

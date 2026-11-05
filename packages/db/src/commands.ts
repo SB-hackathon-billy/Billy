@@ -25,6 +25,7 @@ import {
 import { Unit, active, terminal, changedFields } from './unit.js';
 import { all, read, put, fail, id, DomainError } from './storage.js';
 import { quoteFor } from './pricing.js';
+import { notifyNegotiation } from './reservations.js';
 export class Commands extends Unit {
   async create(actor: string, need: NeedDraft) {
     NeedDraftSchema.parse(need);
@@ -244,6 +245,8 @@ export class Commands extends Unit {
       await put(this.c, 'negotiations', n, true);
       await this.history(n, actor, 'SUBMITTED');
       created.push(n);
+      if (item.source === 'RESIDENT')
+        await notifyNegotiation(this, 'NEGOTIATION_REQUESTED', r.id, r.requesterId, n);
       if (item.source === 'PUBLIC')
         await this.enqueue(
           'PUBLIC_SUBMIT',

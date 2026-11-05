@@ -57,6 +57,6 @@
 
 ## 교체 시 경계 충돌 처리
 
-그림의 `/requests/{id}/messages`, `/requests/{id}/voice-sessions`, `/catalog`, `/reservations`, `/item-drafts`는 **연동 API 초안**이다. 현재 구현됐다고 가정하거나 1번의 기존 경로를 바로 바꾸지 않는다. 특히 현재 `/requests`에는 접수 초안과 후속 대여 상태가 섞여 있다. 모듈 소유권을 먼저 분리하고 2·3번 쪽 호환 계층으로 기존 접수 호출을 유지한다.
+3번의 `/catalog`, `/reservations`, `/waitlist-entries`, `/notifications`는 [0004](../specs/0004-reservations-waitlist-notifications.md)로 구현됐다. 2번 등록은 `/item-drafts` 대신 `/listings`로 구현됐다([0002](../specs/0002-item-registration.md)). 그림의 `/requests/{id}/messages`, `/requests/{id}/voice-sessions`는 여전히 **연동 API 초안**이다. 현재 구현됐다고 가정하거나 1번의 기존 경로를 바로 바꾸지 않는다. 특히 현재 `/requests`에는 접수 초안과 후속 대여 상태가 섞여 있다. 모듈 소유권을 먼저 분리하고 2·3번 쪽 호환 계층으로 기존 접수 호출을 유지한다.
 
 [연동 준비 초안](../specs/0001-module-integration.md)에 겹치는 부분과 미결정을 정리했다. 1번의 기능 변경이 불가피하면 그 변경만 제안으로 남긴다. 2·3번의 독립 구현과 명세 작성은 계속할 수 있다.

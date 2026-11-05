@@ -398,6 +398,8 @@ export async function buildApi(options: ApiOptions = {}): Promise<FastifyInstanc
   }
   await app.register((await import('./listings/index.js')).default);
   await app.register((await import('./intake-approvals/index.js')).default);
+  // 3번 탐색·예약·대기·알림(명세 0004)
+  await app.register((await import('./reservations/index.js')).default);
   if (!options.db) app.addHook('onClose', async () => db.close());
   return app;
 }

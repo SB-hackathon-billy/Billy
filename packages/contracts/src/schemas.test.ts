@@ -217,8 +217,12 @@ describe('semantic boundaries', () => {
     ).toBe(false);
   });
   it('uses the exact error mapping and contract voice state', () => {
-    expect(ErrorCodeSchema.options).toHaveLength(20);
+    // 20 MVP codes + 3 reservation/waitlist codes (명세 0004).
+    expect(ErrorCodeSchema.options).toHaveLength(23);
     expect(ERROR_HTTP_STATUS.NOT_FOUND).toBe(404);
+    expect(ERROR_HTTP_STATUS.DUPLICATE_RESERVATION).toBe(409);
+    expect(ERROR_HTTP_STATUS.ALREADY_WAITLISTED).toBe(409);
+    expect(ERROR_HTTP_STATUS.NOT_WAITLISTABLE).toBe(409);
     expect(ERROR_HTTP_STATUS.OFFER_EXPIRED).toBe(410);
     expect(VoiceStatusSchema.safeParse('CONNECTED').success).toBe(false);
   });

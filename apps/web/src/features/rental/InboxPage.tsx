@@ -6,6 +6,8 @@ import { api, formatSeoulDateTime, idPath } from '../../lib/api.js';
 import { useAction, useOnline, usePlaces } from '../../lib/hooks.js';
 import { useSync } from '../../lib/session.js';
 import { reasonLabels } from '../../lib/presentation.js';
+import { useReservations, useWaitlist } from '../reservation/data.js';
+import { OwnerResponse, ReservationCard, WaitlistCard } from '../reservation/parts.js';
 import {
   ActionButton,
   ErrorNotice,
@@ -138,6 +140,14 @@ export function InboxPage() {
   const cards = [...(sync.data?.ownerCards ?? [])].sort((a, b) =>
     b.negotiation.updatedAt.localeCompare(a.negotiation.updatedAt),
   );
+  // 명세 0004: 3번 예약·대기를 같은 요청함에 모은다.
+  const reservations = useReservations(owner ? 'OWNER' : 'REQUESTER');
+  const waitlist = useWaitlist(!owner);
+  const bookings = reservations.data?.items ?? [];
+  const waiting = (waitlist.data?.items ?? []).filter((entry) =>
+    ['WAITING', 'NOTIFIED', 'APPLIED'].includes(entry.status),
+  );
+  const hasThreeContent = bookings.length > 0 || (!owner && waiting.length > 0);
   return (
     <section>
       <p className="eyebrow">서로의 필요가 만나는 곳</p>
@@ -155,7 +165,30 @@ export function InboxPage() {
         </ActionButton>
       </div>
       <ErrorNotice error={sync.error} />
+      <ErrorNotice error={reservations.error} />
       {sync.isPending && <Loading />}
+      {bookings.length > 0 && (
+        <>
+          <h2 className="inbox-section-title">{owner ? '예약 신청' : '내 예약'}</h2>
+          {bookings.map((view) => (
+            <div key={view.reservation.id}>
+              <ReservationCard view={view} />
+              {owner && <OwnerResponse view={view} />}
+            </div>
+          ))}
+        </>
+      )}
+      {!owner && waiting.length > 0 && (
+        <>
+          <h2 className="inbox-section-title">대기 중</h2>
+          {waiting.map((entry) => (
+            <WaitlistCard key={entry.id} entry={entry} />
+          ))}
+        </>
+      )}
+      {hasThreeContent && (owner ? cards.length : requests.length) > 0 && (
+        <h2 className="inbox-section-title">{owner ? '조건 협상 요청' : '상담·조건 요청'}</h2>
+      )}
       {owner
         ? cards.map((card) => <OwnerRequestCard key={card.negotiation.id} card={card} />)
         : requests.map((request) => (
@@ -195,7 +228,7 @@ export function InboxPage() {
               <Status value={request.status} />
             </Link>
           ))}
-      {!sync.isPending && !(owner ? cards.length : requests.length) && (
+      {!sync.isPending && !hasThreeContent && !(owner ? cards.length : requests.length) && (
         <div className="empty-card">
           <h2>{owner ? '아직 도착한 요청이 없어요' : '아직 요청이 없어요'}</h2>
           <p>
@@ -204,9 +237,14 @@ export function InboxPage() {
               : '필요한 물건이 생기면 함께 찾아볼게요.'}
           </p>
           {!owner && (
-            <Link className="button" to="/rental">
-              새 요청 시작하기
-            </Link>
+            <>
+              <Link className="button" to="/rental">
+                새 요청 시작하기
+              </Link>
+              <Link className="button secondary" to="/catalog">
+                물품 둘러보기
+              </Link>
+            </>
           )}
         </div>
       )}

@@ -3,7 +3,7 @@
 // (patchDraft → confirmAndSearch → issueQuote → submit)만 호출하고 타 모듈 테이블에 직접 쓰지 않는다.
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import * as C from '@sb/contracts';
-import { DomainError, fail, id, read, type Commands, type Database } from '@sb/db';
+import { DomainError, fail, id, notify, read, type Commands, type Database } from '@sb/db';
 
 const TABLE = 'intake_approvals';
 const MAX_SELECTIONS = 3;
@@ -125,6 +125,30 @@ async function advance(u: Commands, db: Database, job: Job): Promise<Job> {
 }
 const soon = (u: Commands) => new Date(u.now.getTime() + SEARCH_POLL_MS).toISOString();
 
+/**
+ * 명세 0004: 계속 실패하거나(연속 10회) 승인 후 30분이 지나도 끝나지 않으면 재시도를 멈추고
+ * 요청자에게 앱 알림으로 직접 진행을 안내한다. 도구가 호출하는 예약 계약은 바꾸지 않는다.
+ */
+async function giveUp(u: Commands, job: Job, code: string, attempts: number): Promise<Job> {
+  await notify(u, job.requesterId, {
+    type: 'INTAKE_FAILED',
+    title: '예약 신청을 마치지 못했어요',
+    body: '승인한 신청서로 예약을 신청하지 못했어요. 요청함에서 신청서를 확인하고 직접 진행해 주세요.',
+    link: `/requests/${job.requestId}`,
+    requestId: job.requestId,
+  });
+  return {
+    ...job,
+    status: 'FAILED',
+    attempts,
+    lastErrorCode: code,
+    nextAttemptAt: null,
+    updatedAt: u.iso,
+  };
+}
+const expiredJob = (u: Commands, job: Job) =>
+  u.now.getTime() - Date.parse(job.createdAt) >= C.INTAKE_APPROVAL_MAX_AGE_MS;
+
 /** Run one step inside a savepoint so a failed tool call never rolls back the job record. */
 async function attempt(u: Commands, db: Database, job: Job): Promise<Job> {
   const events = u.events.length;
@@ -132,6 +156,9 @@ async function attempt(u: Commands, db: Database, job: Job): Promise<Job> {
   try {
     const next = await advance(u, db, job);
     await u.c.query('RELEASE SAVEPOINT intake_tool');
+    // A search that never finishes (e.g. no worker) stops after the same time budget as failures.
+    if (!C.INTAKE_APPROVAL_TERMINAL.includes(next.status) && expiredJob(u, job))
+      return giveUp(u, { ...next, attempts: 0 }, 'APPROVAL_TIMEOUT', 0);
     // attempts counts consecutive failures; a successful step resets the backoff.
     return { ...next, attempts: 0, updatedAt: u.iso };
   } catch (error) {
@@ -139,6 +166,8 @@ async function attempt(u: Commands, db: Database, job: Job): Promise<Job> {
     u.events.length = events;
     const attempts = job.attempts + 1;
     const code = error instanceof DomainError ? error.code : 'INTERNAL_ERROR';
+    if (attempts >= C.INTAKE_APPROVAL_MAX_ATTEMPTS || expiredJob(u, job))
+      return giveUp(u, job, code, attempts);
     return {
       ...job,
       status: 'RETRYING',

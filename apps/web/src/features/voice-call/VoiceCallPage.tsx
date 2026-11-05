@@ -43,6 +43,8 @@ const reservationLabels: Record<IntakeApproval['status'], string> = {
   SUBMITTED: '예약 신청을 보냈어요',
   NO_MATCH: '지금 빌릴 수 있는 물품이 없어요',
   CLOSED: '신청이 종료됐어요',
+  // 명세 0004: 계속 실패하면 재시도를 멈추고 알림으로 안내한다.
+  FAILED: '예약 신청을 마치지 못했어요. 요청함에서 직접 진행해 주세요',
 };
 
 export function VoiceCallPage() {
@@ -66,6 +68,8 @@ export function VoiceCallPage() {
   const [phase, setPhase] = useState<ApprovalPhase>('collecting');
   const [dismissedTaskId, setDismissedTaskId] = useState<string | null>(null);
   const [reservation, setReservation] = useState<IntakeApproval | null>(null);
+  // 명세 0004: 백그라운드 재전송을 멈춘 경우(재시도할 수 없는 응답·횟수 상한).
+  const [outboxFailed, setOutboxFailed] = useState(false);
   const [request, setRequest] = useState<RequestView | null>(null);
   const requestRef = useRef<RequestView | null>(null);
   const creating = useRef<Promise<RequestView> | null>(null);
@@ -167,11 +171,12 @@ export function VoiceCallPage() {
   // Background retries report back here while the page is open.
   useEffect(
     () =>
-      reservationOutbox.subscribe((requestId, result) => {
-        if (result && requestId === requestRef.current?.request.id) {
+      reservationOutbox.subscribe((requestId, result, _error, final) => {
+        if (requestId !== requestRef.current?.request.id) return;
+        if (result) {
           setReservation(result);
           setPhase('done');
-        }
+        } else if (final) setOutboxFailed(true);
       }),
     [],
   );
@@ -364,6 +369,7 @@ export function VoiceCallPage() {
         phase={phase}
         checklist={checklist}
         reservation={reservationState}
+        outboxFailed={outboxFailed}
         scripted={scripted}
         onApprove={() => void approve()}
         onEdit={() => {
@@ -406,6 +412,7 @@ function ApprovalSheet({
   phase,
   checklist,
   reservation,
+  outboxFailed,
   scripted,
   onApprove,
   onEdit,
@@ -414,6 +421,7 @@ function ApprovalSheet({
   phase: ApprovalPhase;
   checklist: ChecklistItem[];
   reservation: IntakeApproval | null;
+  outboxFailed: boolean;
   scripted: boolean;
   onApprove: () => void;
   onEdit: () => void;
@@ -493,7 +501,21 @@ function ApprovalSheet({
           )}
         </>
       )}
-      {phase === 'retrying' && (
+      {phase === 'retrying' && outboxFailed && (
+        <>
+          <h2 id="vc-sheet-title" ref={heading} tabIndex={-1}>
+            예약 신청을 보내지 못했어요
+          </h2>
+          <p className="vc-sheet-lead">
+            여러 번 다시 보냈지만 신청을 마치지 못했어요. 요청함에서 신청서를 확인하고 직접 진행해
+            주세요.
+          </p>
+          <Link className="button" to="/inbox?role=REQUESTER">
+            요청함에서 이어서 하기
+          </Link>
+        </>
+      )}
+      {phase === 'retrying' && !outboxFailed && (
         <>
           <h2 id="vc-sheet-title" ref={heading} tabIndex={-1}>
             통화를 종료하고 다시 시도하고 있어요

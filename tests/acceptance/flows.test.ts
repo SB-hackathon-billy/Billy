@@ -540,9 +540,11 @@ describe('AT01–AT20 real HTTP, PostgreSQL and pg-boss acceptance', () => {
   it('AT19/AT20 registered routes contain no payments or center application/booking mutation', async () => {
     h = await harness();
     const routes = h.app.printRoutes({ commonPrefix: false });
+    // 명세 0004: 앱 안의 데모 예약(/reservations)은 3번 기능이다. 결제·센터 신청/예약 연동은 계속 금지.
     expect(routes).not.toMatch(
-      /payments|webhook|programs|clubs|spaces|bookings|applications|reservations|memberships|reset/,
+      /payments|webhook|programs|clubs|spaces|bookings|applications|memberships|reset/,
     );
+    expect(routes).not.toMatch(/center\/[^\n]*reserv/);
     for (const path of [
       '/payments',
       '/payment-tokens',

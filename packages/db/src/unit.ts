@@ -30,6 +30,7 @@ import {
 } from '@sb/contracts';
 import { type SeedTiming } from '@sb/demo-data';
 import { all, read, put, fail, id } from './storage.js';
+import { notifyNegotiation, occupancyReason } from './reservations.js';
 export type Session = {
   id: string;
   userId: string;
@@ -330,6 +331,7 @@ export class Unit {
     item: Item,
     requesterId: string,
     terms: Pick<Terms, 'startAt' | 'endAt' | 'placeId'>,
+    options: { ignoreHoldRequestId?: string } = {},
   ): Promise<string | null> {
     if (!item.enabled) return 'ITEM_DISABLED';
     if (item.ownerId === requesterId) return 'OWN_ITEM';
@@ -347,10 +349,12 @@ export class Unit {
     )
       return 'PERIOD_UNAVAILABLE';
     const found = await this.c.query(
-      "SELECT 1 FROM demo_holds WHERE item_id=$1 AND status='ACTIVE' AND expires_at>$4 AND tstzrange(start_at,end_at,'[)') && tstzrange($2,$3,'[)') LIMIT 1",
-      [item.id, terms.startAt, terms.endAt, this.iso],
+      "SELECT 1 FROM demo_holds WHERE item_id=$1 AND status='ACTIVE' AND expires_at>$4 AND tstzrange(start_at,end_at,'[)') && tstzrange($2,$3,'[)') AND request_id IS DISTINCT FROM $5 LIMIT 1",
+      [item.id, terms.startAt, terms.endAt, this.iso, options.ignoreHoldRequestId ?? null],
     );
-    return found.rowCount ? 'ACTIVE_HOLD' : null;
+    if (found.rowCount) return 'ACTIVE_HOLD';
+    // 3번 예약 원장(명세 0004): 확정 예약 겹침, 다른 사용자의 대기 우선권.
+    return occupancyReason(this, item.id, requesterId, terms.startAt, terms.endAt);
   }
   deadline(ms: number, r: RentalRequest, terms: Terms) {
     return new Date(
@@ -377,6 +381,7 @@ export class Unit {
       validUntil: this.deadline(timing.offerMs, r, n.terms),
     };
     await put(this.c, 'offers', n.offer, true);
+    await notifyNegotiation(this, 'OFFER_RECEIVED', r.id, r.requesterId, n);
   }
   async enqueue(
     kind: AgentTaskKind,

@@ -1,8 +1,13 @@
 // 승인된 예약 신청 도구 호출의 백그라운드 재시도. 명세: docs/specs/0003-voice-call-reservation.md
 // 통화는 결과와 무관하게 종료되고, 실패한 호출은 이 대기열이 앱이 열려 있는 동안(재시작 후 포함) 다시 보낸다.
 // 서버는 요청당 1건만 만들므로 응답을 잃은 뒤의 재전송도 같은 도구 실행을 돌려준다.
-import { IntakeApprovalSchema, RequestViewSchema, type IntakeApproval } from '@sb/contracts';
-import { ActionScope, api, idPath } from '../../lib/api.js';
+import {
+  INTAKE_APPROVAL_MAX_ATTEMPTS,
+  IntakeApprovalSchema,
+  RequestViewSchema,
+  type IntakeApproval,
+} from '@sb/contracts';
+import { ActionScope, ApiError, api, idPath } from '../../lib/api.js';
 
 export interface OutboxEntry {
   requestId: string;
@@ -11,7 +16,13 @@ export interface OutboxEntry {
   attempts: number;
   nextAt: number;
 }
-type Listener = (requestId: string, result: IntakeApproval | null, error: unknown) => void;
+/** final: 재시도를 멈췄다(재시도할 수 없는 응답이거나 횟수 상한). 명세 0004. */
+type Listener = (
+  requestId: string,
+  result: IntakeApproval | null,
+  error: unknown,
+  final: boolean,
+) => void;
 export interface OutboxStorage {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
@@ -21,6 +32,19 @@ export interface OutboxStorage {
 const KEY = 'sb-intake-approval-outbox-v1';
 export const retryDelayMs = (attempts: number) =>
   Math.min(60_000, 2_000 * 2 ** Math.max(0, attempts - 1));
+// 연결·일시 장애와 최신 버전 재조회로 풀리는 충돌만 다시 보낸다. 그 밖의 4xx는 같은 본문으로 다시 보내도 같다.
+const RETRYABLE = new Set([
+  'NETWORK',
+  'PROTOCOL',
+  'TEMPORARILY_UNAVAILABLE',
+  'RATE_LIMITED',
+  'AI_UNAVAILABLE',
+  'CSRF_REJECTED',
+  'SESSION_EXPIRED',
+  'VERSION_CONFLICT',
+]);
+export const isRetryable = (error: unknown) =>
+  !(error instanceof ApiError) || RETRYABLE.has(error.code);
 
 export class ReservationOutbox {
   private entries = new Map<string, OutboxEntry>();
@@ -97,16 +121,21 @@ export class ReservationOutbox {
       this.entries.delete(entry.requestId);
       this.scopes.delete(entry.requestId);
       this.persist();
-      this.emit(entry.requestId, result, null);
+      this.emit(entry.requestId, result, null, true);
       return result;
     } catch (error) {
       const current = this.entries.get(entry.requestId);
+      let final = false;
       if (current) {
         current.attempts++;
-        current.nextAt = this.clock() + retryDelayMs(current.attempts);
+        final = !isRetryable(error) || current.attempts >= INTAKE_APPROVAL_MAX_ATTEMPTS;
+        if (final) {
+          this.entries.delete(entry.requestId);
+          this.scopes.delete(entry.requestId);
+        } else current.nextAt = this.clock() + retryDelayMs(current.attempts);
         this.persist();
       }
-      this.emit(entry.requestId, null, error);
+      this.emit(entry.requestId, null, error, final);
       if (rethrow) throw error;
       return null;
     } finally {
@@ -131,8 +160,8 @@ export class ReservationOutbox {
     );
   }
 
-  private emit(requestId: string, result: IntakeApproval | null, error: unknown) {
-    for (const listener of this.listeners) listener(requestId, result, error);
+  private emit(requestId: string, result: IntakeApproval | null, error: unknown, final: boolean) {
+    for (const listener of this.listeners) listener(requestId, result, error, final);
   }
   private load() {
     if (this.loaded) return;

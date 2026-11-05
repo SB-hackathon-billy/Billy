@@ -891,7 +891,66 @@ async function dispatch(request: Request): Promise<Response> {
         ? success(C.OwnerCardSchema, ownerCard(view, branch))
         : success(C.RequestViewSchema, shape(view));
     } else throw new MockError('NOT_FOUND', '지원하지 않는 명령이에요.');
-  } else if (path === '/voice-sessions')
+  } else if (path === '/notifications' && method === 'GET') {
+    // 명세 0004의 3번 화면이 개발용 모의 API에서도 열리도록 읽기만 흉내 낸다.
+    return success(C.NotificationListSchema, { items: [], nextCursor: null, unreadCount: 0 });
+  } else if ((path === '/reservations' || path === '/waitlist-entries') && method === 'GET') {
+    return path === '/reservations'
+      ? success(C.listDataSchema(C.ReservationViewSchema), { items: [], nextCursor: null })
+      : success(C.listDataSchema(C.WaitlistEntrySchema), { items: [], nextCursor: null });
+  } else if (path.startsWith('/catalog') && method === 'GET') {
+    const startAt = url.searchParams.get('startAt');
+    const endAt = url.searchParams.get('endAt');
+    const catalogItem = (item: C.Item): C.CatalogItem => ({
+      id: item.id,
+      title: item.title,
+      category: item.category,
+      source: item.source,
+      image: item.image,
+      ownerDisplayName: itemSummary(item).ownerDisplayName,
+      dailyRateKrw: item.dailyRateKrw,
+      allowedPlaceIds: item.allowedPlaceIds,
+      mine: item.ownerId === user.id,
+      availability:
+        startAt && endAt
+          ? {
+              status: 'AVAILABLE',
+              reason: null,
+              ...C.reservationFee(item.dailyRateKrw, startAt, endAt, item.source),
+            }
+          : null,
+    });
+    const [, , itemId, sub] = path.split('/');
+    if (!itemId)
+      return success(C.listDataSchema(C.CatalogItemSchema), {
+        items: seed.items.filter((item) => item.enabled).map(catalogItem),
+        nextCursor: null,
+      });
+    const item = findItem(itemId);
+    if (sub === 'availability')
+      return success(C.ItemAvailabilitySchema, {
+        itemId: item.id,
+        startAt,
+        endAt,
+        status: 'AVAILABLE',
+        reason: null,
+        ...C.reservationFee(item.dailyRateKrw, startAt!, endAt!, item.source),
+        waitlistable: false,
+        waitingCount: 0,
+      });
+    return success(C.CatalogItemDetailSchema, {
+      ...catalogItem(item),
+      availability: null,
+      description: null,
+      occupied: [],
+      waitingCount: 0,
+    });
+  } else if (path === '/reservations' || path === '/waitlist-entries')
+    throw new MockError(
+      'TEMPORARILY_UNAVAILABLE',
+      '개발용 모의 API에서는 예약·대기를 만들지 않습니다. 실제 API로 실행해 주세요.',
+    );
+  else if (path === '/voice-sessions')
     throw new MockError(
       'AI_UNAVAILABLE',
       '개발용 모의 API에서는 실제 음성 연결을 만들지 않습니다. 텍스트로 입력해 주세요.',

@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   PaymentPreviewSchema,
   RequestViewSchema,
+  ReservationViewSchema,
   SelectOfferDataSchema,
   type RequestView,
 } from '@sb/contracts';
@@ -25,6 +26,8 @@ import { NeedEditor } from './NeedEditor.js';
 import { Candidates } from './Candidates.js';
 import { illustrations } from '../../assets/illustrations/manifest.js';
 import { TaskExplanation } from '../../components/TaskExplanation.js';
+import { useReservations } from '../reservation/data.js';
+import { ReservationStatusBadge } from '../reservation/parts.js';
 
 function Comparison({ view }: { view: RequestView }) {
   const [diff, setDiff] = useState(false);
@@ -328,11 +331,36 @@ export function PaymentPage() {
       api.get(`/requests/${idPath(requestId)}/payment-preview`, PaymentPreviewSchema, signal),
   });
   const [method, setMethod] = useState('demo-card');
+  // 명세 0004: 선택한 제안을 앱 안의 데모 예약(CONFIRMED)으로 확정한다. 결제는 없다.
+  const reservations = useReservations('REQUESTER', requestId);
+  const confirmAction = useAction();
+  const online = useOnline();
+  const navigate = useNavigate();
+  const query = useQueryClient();
   const data = preview.data;
   if (preview.isPending) return <Loading />;
   if (!data) return <ErrorNotice error={preview.error} />;
   const seconds = secondsRemaining(data.demoHoldExpiresAt, now);
   const active = data.demoHoldStatus === 'ACTIVE' && seconds > 0;
+  const booked = reservations.data?.items[0];
+  const confirm = () =>
+    confirmAction.run(async (scope) => {
+      const created = await api.execute(
+        scope.command('/reservations', 'POST', {
+          itemId: data.itemSummary.id,
+          startAt: data.terms.startAt,
+          endAt: data.terms.endAt,
+          placeId: data.terms.placeId,
+          requestId: data.requestId,
+          negotiationId: data.negotiationId,
+        }),
+        ReservationViewSchema,
+      );
+      query.setQueryData(['reservation', created.reservation.id], created);
+      void query.invalidateQueries({ queryKey: ['reservations'] });
+      void query.invalidateQueries({ queryKey: ['payment', requestId] });
+      navigate(`/reservations/${created.reservation.id}`);
+    });
   return (
     <section>
       <p className="eyebrow">05 결제 미리보기</p>
@@ -354,15 +382,48 @@ export function PaymentPage() {
           <strong>{formatKrw(data.totalFeeKrw)}</strong>
         </div>
       </div>
-      <div className={`hold-notice ${active ? '' : 'expired'}`}>
-        <strong>{active ? '데모 선택 유효시간' : '데모 선택 유효시간 종료'}</strong>
-        {active && <span>{durationLabel(seconds)}</span>}
-        <p>
-          {active
-            ? '중복 선택을 막기 위한 임시 점유이며 실제 예약이 아닙니다.'
-            : '요약은 계속 볼 수 있어요. 다른 거래를 시험하려면 새 요청을 시작해 주세요.'}
-        </p>
-      </div>
+      {booked ? (
+        <div className="content-card">
+          <h2>앱 안의 데모 예약</h2>
+          <ReservationStatusBadge status={booked.reservation.status} />
+          <p>
+            {booked.reservation.status === 'CONFIRMED'
+              ? '이 조건으로 예약을 확정했어요. 기간이 점유되어 다른 이웃이 신청할 수 없어요.'
+              : '이 조건으로 만든 예약은 종료됐어요.'}
+          </p>
+          <Link className="button" to={`/reservations/${booked.reservation.id}`}>
+            예약 보기
+          </Link>
+        </div>
+      ) : (
+        <>
+          <div className={`hold-notice ${active ? '' : 'expired'}`}>
+            <strong>{active ? '데모 선택 유효시간' : '데모 선택 유효시간 종료'}</strong>
+            {active && <span>{durationLabel(seconds)}</span>}
+            <p>
+              {active
+                ? '중복 선택을 막기 위한 임시 점유이며 실제 예약이 아닙니다.'
+                : '요약은 계속 볼 수 있어요. 다른 거래를 시험하려면 새 요청을 시작해 주세요.'}
+            </p>
+          </div>
+          {active && (
+            <div className="content-card">
+              <h2>예약 확정</h2>
+              <p>
+                유효시간 안에 확정하면 앱 안의 데모 예약이 만들어지고 이 기간이 점유돼요. 결제는
+                청구되지 않아요.
+              </p>
+              <ActionButton
+                onPress={confirm}
+                isDisabled={confirmAction.pending || confirmAction.canRetry || !online}
+              >
+                {confirmAction.pending ? '확정하는 중…' : '예약 확정하기 (결제 없음)'}
+              </ActionButton>
+              <ErrorNotice action={confirmAction} />
+            </div>
+          )}
+        </>
+      )}
       <fieldset className="content-card">
         <legend>가상 결제수단</legend>
         <label className="radio">

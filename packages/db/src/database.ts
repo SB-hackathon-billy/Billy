@@ -26,6 +26,7 @@ import { Commands } from './commands.js';
 import { changedFields, type Session } from './unit.js';
 import { createPool, read, all, put, fail, id, DomainError } from './storage.js';
 import { quoteFor } from './pricing.js';
+import { sweepReservations } from './reservations.js';
 export type DatabaseOptions = {
   pool?: Pool;
   connectionString?: string;
@@ -590,6 +591,8 @@ export class Database {
     await this.pool.query('DELETE FROM idempotency_records WHERE expires_at<=$1', [
       now.toISOString(),
     ]);
+    // 3번(명세 0004): 응답 기한 만료, 공공 모의 응답, 대기 우선권 만료·승계.
+    await sweepReservations(this, now);
     return rows.rowCount ?? 0;
   }
   async sync(actor: string): Promise<SyncData> {

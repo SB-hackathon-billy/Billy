@@ -212,6 +212,20 @@ h2 {
 .new-offers span {
   color: var(--green-700);
 }
+.catalog-teaser {
+  display: grid;
+  gap: 0.2rem;
+  margin: 1rem 0;
+  padding: 1rem 1.1rem;
+  border-radius: 16px;
+  border: 1px solid var(--navy-100);
+  background: var(--surface);
+  text-decoration: none;
+}
+.catalog-teaser span {
+  font-size: 0.88rem;
+  color: var(--green-700);
+}
 .section-heading {
   display: flex;
   align-items: center;
@@ -285,6 +299,47 @@ h2 {
   width: min(100%, 48rem);
   z-index: 20;
   box-shadow: 0 -4px 20px #253c5205;
+  /* 탭 6개(홈·둘러보기·공유대여·요청함·빌려주기·센터). 내 정보는 머리말로 옮김(명세 0004). */
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.header-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: var(--navy-800);
+  text-decoration: none;
+}
+.header-icon svg {
+  width: 24px;
+  height: 24px;
+}
+.header-icon[aria-current='page'] {
+  color: var(--green-700);
+  background: var(--green-100);
+}
+.header-badge {
+  position: absolute;
+  top: 3px;
+  right: 1px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #b9542f;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
 }
 .bottom-tabs a {
   flex-direction: column;

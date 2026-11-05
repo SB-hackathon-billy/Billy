@@ -9,6 +9,10 @@ export const OfferIdSchema = IdSchema.regex(/^offer_[A-Za-z0-9_-]+$/);
 export const QuoteIdSchema = IdSchema.regex(/^quote_[A-Za-z0-9_-]+$/);
 export const TaskIdSchema = IdSchema.regex(/^task_[A-Za-z0-9_-]+$/);
 export const VoiceSessionIdSchema = IdSchema.regex(/^voice_[A-Za-z0-9_-]+$/);
+// 3번 예약·대기·알림 ID (명세 0004). SSE 이벤트와 예약 계약이 함께 쓴다.
+export const ReservationIdSchema = IdSchema.regex(/^rsv_[A-Za-z0-9_-]+$/);
+export const WaitlistEntryIdSchema = IdSchema.regex(/^wl_[A-Za-z0-9_-]+$/);
+export const NotificationIdSchema = IdSchema.regex(/^ntf_[A-Za-z0-9_-]+$/);
 export const UtcDateTimeSchema = z.iso.datetime({ offset: false });
 export const VersionSchema = z.number().int().positive().max(Number.MAX_SAFE_INTEGER);
 export const CountSchema = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);

@@ -36,6 +36,9 @@ const messages: Partial<Record<ErrorCode, string>> = {
   AVAILABILITY_CONFLICT: '다른 요청에서 물품을 선택했습니다.',
   INVALID_STATE: '현재 상태에서는 실행할 수 없습니다.',
   PRICE_OUT_OF_RANGE: '허용된 금액 범위와 500원 단위를 확인해 주세요.',
+  DUPLICATE_RESERVATION: '이미 같은 기간에 신청한 예약이 있어요.',
+  ALREADY_WAITLISTED: '이미 같은 기간을 기다리고 있어요.',
+  NOT_WAITLISTABLE: '대기할 수 없는 기간이에요. 가용 여부를 다시 확인해 주세요.',
 };
 export async function read<T>(c: Pool | PoolClient, table: string, key: string): Promise<T | null> {
   const r = await c.query(`SELECT data FROM ${table} WHERE id=$1`, [key]);

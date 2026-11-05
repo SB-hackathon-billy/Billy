@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import {
   createEmptyNeed,
+  INTAKE_APPROVAL_MAX_ATTEMPTS as MAX_INTAKE_ATTEMPTS,
   IntakeApprovalSchema,
   RequestViewSchema,
   type ExtractNeedResult,
@@ -189,6 +190,41 @@ describe('request_reservation tool after human approval', () => {
     await app.intakeApprovals.tick();
     expect(spy).toHaveBeenCalledTimes(2);
     expect(await status(job.id)).toMatchObject({ status: 'SEARCHING', attempts: 0 });
+  });
+
+  it('stops retrying after the attempt limit and tells the requester to continue manually', async () => {
+    const { view, extractionTaskId } = await collected();
+    vi.spyOn(Commands.prototype, 'confirmAndSearch').mockRejectedValue(
+      new DomainError('TEMPORARILY_UNAVAILABLE'),
+    );
+    const job = IntakeApprovalSchema.parse((await approve(view, extractionTaskId)).json().data);
+    expect(job.status).toBe('RETRYING');
+    // 명세 0004: 연속 실패 상한 직전으로 맞춘 뒤 한 번 더 실패하면 FAILED + 알림.
+    await db.pool.query(
+      `UPDATE intake_approvals SET data=jsonb_set(data,'{attempts}',to_jsonb($2::int)), next_attempt_at=now() - interval '1 second' WHERE id=$1`,
+      [job.id, MAX_INTAKE_ATTEMPTS - 1],
+    );
+    await app.intakeApprovals.tick();
+    const failed = await status(job.id);
+    expect(failed).toMatchObject({
+      status: 'FAILED',
+      attempts: MAX_INTAKE_ATTEMPTS,
+      lastErrorCode: 'TEMPORARILY_UNAVAILABLE',
+      nextAttemptAt: null,
+    });
+    const notifications = (await call(hana, 'GET', '/notifications')).json().data;
+    expect(notifications.items[0]).toMatchObject({
+      type: 'INTAKE_FAILED',
+      requestId: view.request.id,
+      link: `/requests/${view.request.id}`,
+    });
+    // 종료 상태는 더 이상 재시도하지 않는다.
+    await db.pool.query(
+      "UPDATE intake_approvals SET next_attempt_at=now() - interval '1 second' WHERE id=$1",
+      [job.id],
+    );
+    await app.intakeApprovals.tick();
+    expect((await status(job.id)).attempts).toBe(MAX_INTAKE_ATTEMPTS);
   });
 
   it('rejects incomplete collections, foreign requests, and non-extraction tasks', async () => {

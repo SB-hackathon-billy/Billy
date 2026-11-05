@@ -24,6 +24,8 @@ export const INTAKE_APPROVAL_STATUS_VALUES = [
   'NO_MATCH',
   'CLOSED',
   'RETRYING',
+  // 명세 0004: 계속 실패하면 재시도를 멈추고 요청자에게 알린다(종료 상태).
+  'FAILED',
 ] as const;
 export const IntakeApprovalStatusSchema = z.enum(INTAKE_APPROVAL_STATUS_VALUES);
 export type IntakeApprovalStatus = z.infer<typeof IntakeApprovalStatusSchema>;
@@ -31,7 +33,11 @@ export const INTAKE_APPROVAL_TERMINAL: readonly IntakeApprovalStatus[] = [
   'SUBMITTED',
   'NO_MATCH',
   'CLOSED',
+  'FAILED',
 ];
+/** 연속 실패 횟수 또는 승인 후 경과 시간이 이 값을 넘으면 도구 실행을 FAILED로 끝낸다. */
+export const INTAKE_APPROVAL_MAX_ATTEMPTS = 10;
+export const INTAKE_APPROVAL_MAX_AGE_MS = 30 * 60 * 1000;
 
 export const IntakeApprovalIdSchema = IdSchema.regex(/^iap_[A-Za-z0-9_-]+$/);
 export const IntakeApprovalSchema = z

@@ -2,7 +2,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createEmptyNeed, type ExtractNeedResult, type Place } from '@sb/contracts';
 import { CharacterState, deriveCharacterState } from './character.js';
 import { buildChecklist, checklistProgress, readyForApproval } from './checklist.js';
-import { ReservationOutbox, retryDelayMs, type OutboxStorage } from './reservation-outbox.js';
+import {
+  ReservationOutbox,
+  isRetryable,
+  retryDelayMs,
+  type OutboxStorage,
+} from './reservation-outbox.js';
 import { buildDemoScript } from './demo-script.js';
 
 const places: Place[] = [
@@ -195,6 +200,40 @@ describe('reservation outbox', () => {
       extractionTaskId: 'task_1',
       expectedRequestVersion: 3,
     });
+  });
+
+  it('stops retrying on a non-retryable answer and reports the final failure', async () => {
+    vi.useFakeTimers();
+    const storage = memory();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: string, init: RequestInit) =>
+        init.method === 'GET'
+          ? new Response(JSON.stringify({ data: view(3), meta: meta() }), { status: 200 })
+          : new Response(
+              JSON.stringify({
+                error: {
+                  code: 'INVALID_STATE',
+                  message: 'x',
+                  retryable: false,
+                  details: {},
+                },
+                meta: meta(),
+              }),
+              { status: 409 },
+            ),
+      ),
+    );
+    const outbox = new ReservationOutbox(() => storage);
+    const finals: boolean[] = [];
+    outbox.subscribe((_id, _result, _error, final) => finals.push(final));
+    await expect(
+      outbox.submit({ requestId: 'req_1', extractionTaskId: 'task_1', voiceSessionId: null }),
+    ).rejects.toThrow();
+    expect(finals).toEqual([true]);
+    expect(outbox.pending('req_1')).toBeNull();
+    expect(storage.data.size).toBe(0);
+    expect(isRetryable(new TypeError('offline'))).toBe(true);
   });
 
   it('resumes entries saved by a previous page load and clears on session end', () => {

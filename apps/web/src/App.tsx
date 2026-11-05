@@ -7,6 +7,7 @@ import { useSession } from './lib/session.js';
 import { useOnline } from './lib/hooks.js';
 import { ActionButton, Loading } from './components/ui.js';
 import { ResultNotice } from './components/ResultNotice.js';
+import { NotificationBell } from './features/reservation/NotificationBell.js';
 
 const VoicePage = lazy(() =>
   import('./features/rental/VoicePage.js').then((module) => ({ default: module.VoicePage })),
@@ -41,6 +42,25 @@ const NewListingPage = lazy(() =>
 const ListingEditPage = lazy(() =>
   import('./features/listing/pages.js').then((module) => ({ default: module.ListingEditPage })),
 );
+// 명세 0004: 3번 물품 탐색·예약·대기·알림
+const CatalogPage = lazy(() =>
+  import('./features/reservation/pages.js').then((module) => ({ default: module.CatalogPage })),
+);
+const CatalogItemPage = lazy(() =>
+  import('./features/reservation/pages.js').then((module) => ({
+    default: module.CatalogItemPage,
+  })),
+);
+const ReservationPage = lazy(() =>
+  import('./features/reservation/pages.js').then((module) => ({
+    default: module.ReservationPage,
+  })),
+);
+const NotificationsPage = lazy(() =>
+  import('./features/reservation/pages.js').then((module) => ({
+    default: module.NotificationsPage,
+  })),
+);
 
 function Protected({ children }: { children: ReactNode }) {
   const { session, loading } = useSession();
@@ -53,7 +73,7 @@ function PwaUpdate() {
   } = useRegisterSW();
   const location = useLocation();
   const stable =
-    ['/', '/inbox', '/me', '/entry'].includes(location.pathname) ||
+    ['/', '/inbox', '/me', '/entry', '/catalog', '/notifications'].includes(location.pathname) ||
     location.pathname.startsWith('/center');
   return refresh && stable ? (
     <div className="update-notice" role="status">
@@ -99,6 +119,12 @@ function TabIcon({ name }: { name: string }) {
       <>
         <path d="M3 8h4l2-3h6l2 3h4v12H3z" />
         <circle cx="12" cy="13" r="3.5" />
+      </>
+    ),
+    catalog: (
+      <>
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path d="m15.5 15.5 5 5M8 10.5h5M10.5 8v5" />
       </>
     ),
     me: (
@@ -150,7 +176,17 @@ function AppShell() {
           <img src="/icon.svg" alt="" />
           성북 공유대여
         </Link>
-        <span className="demo-badge">DEMO</span>
+        <div className="header-actions">
+          <span className="demo-badge">DEMO</span>
+          {session && !entry && (
+            <>
+              <NotificationBell />
+              <NavLink className="header-icon" to="/me" aria-label="내 정보">
+                <TabIcon name="me" />
+              </NavLink>
+            </>
+          )}
+        </div>
       </header>
       {session?.demoScenario === 'expiry-fast' && (
         <div className="scenario-banner">빠른 만료 시연</div>
@@ -182,11 +218,11 @@ function AppShell() {
         <nav className="bottom-tabs" aria-label="주 메뉴">
           {[
             ['/', '홈', 'home'],
+            ['/catalog', '둘러보기', 'catalog'],
             ['/rental', '공유대여', 'rental'],
             ['/inbox', '요청함', 'inbox'],
             ['/listings', '빌려주기', 'lend'],
             ['/center', '센터', 'center'],
-            ['/me', '내 정보', 'me'],
           ].map(([to, label, icon]) => (
             <NavLink key={to} to={to!} end={to === '/'}>
               <TabIcon name={icon!} />
@@ -292,6 +328,14 @@ export function App() {
             </Protected>
           ),
         },
+        ...(
+          [
+            ['/catalog', <CatalogPage />],
+            ['/catalog/:itemId', <CatalogItemPage />],
+            ['/reservations/:reservationId', <ReservationPage />],
+            ['/notifications', <NotificationsPage />],
+          ] as const
+        ).map(([path, page]) => ({ path, element: <Protected>{page}</Protected> })),
         ...(
           [
             ['/listings', <ListingsPage />],
