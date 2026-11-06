@@ -3,7 +3,10 @@
 //
 // 잠금 순서(교착 방지): 접수 요청 → 협상 → 물품(items) → 예약 → 대기. 예약·대기 행은 항상
 // 해당 물품 행을 잠근 뒤에 잠근다. 최종 보증은 DB 배타 제약(확정 예약 기간 겹침 금지)이다.
+import { randomBytes } from 'node:crypto';
 import {
+  HANDOVER_CODE_ALPHABET,
+  HUB_MANAGER_ID,
   NotificationSchema,
   ReservationSchema,
   WaitlistEntrySchema,
@@ -19,6 +22,10 @@ import {
   type CatalogQuery,
   type CreateReservationBody,
   type CreateWaitlistEntryBody,
+  type Handover,
+  type HandoverPhotoBody,
+  type HandoverView,
+  type InspectBody,
   type Item,
   type ItemAvailability,
   type Negotiation,
@@ -30,6 +37,7 @@ import {
   type ReservationEvent,
   type ReservationView,
   type RespondReservationBody,
+  type ReturnComparison,
   type WaitlistEntry,
   type WaitlistStatus,
 } from '@sb/contracts';
@@ -281,7 +289,10 @@ function allowedActions(u: Unit, r: Reservation, role: 'REQUESTER' | 'OWNER') {
       (!r.responseDueAt || Date.parse(r.responseDueAt) > now)
     )
       actions.push('OWNER_APPROVE', 'OWNER_DECLINE');
-  } else if (r.status === 'PENDING' || (r.status === 'CONFIRMED' && Date.parse(r.startAt) > now))
+  } else if (
+    r.status === 'PENDING' ||
+    (r.status === 'CONFIRMED' && Date.parse(r.startAt) > now && notHandedOver(r))
+  )
     actions.push('CANCEL');
   return actions;
 }
@@ -301,8 +312,12 @@ export async function reservationView(
         )
       ).rows.map((row) => row.data as ReservationEvent)
     : [];
+  const handover = r.handover ?? null;
   return {
-    reservation: r,
+    reservation: {
+      ...r,
+      handover: handover && role === 'OWNER' ? withoutCode(handover) : handover,
+    },
     role,
     requesterDisplayName: (await u.user(r.requesterId)).displayName,
     allowedActions: allowedActions(u, r, role),
@@ -469,6 +484,7 @@ async function requestReservation(u: Commands, actor: string, body: CreateReserv
       Math.min(u.now.getTime() + timing.responseMs, Date.parse(body.startAt)),
     ).toISOString(),
     closedReason: null,
+    handover: newHandover(),
     createdAt: u.iso,
     updatedAt: u.iso,
   };
@@ -555,6 +571,7 @@ async function confirmFromPreview(
     item: await u.itemSummary(item),
     responseDueAt: null,
     closedReason: null,
+    handover: newHandover(),
     createdAt: u.iso,
     updatedAt: u.iso,
   };
@@ -646,7 +663,10 @@ export async function cancelReservation(
   }
   if (r.version !== expectedVersion) fail('VERSION_CONFLICT', { currentVersion: r.version });
   const confirmed = r.status === 'CONFIRMED';
-  if (!(r.status === 'PENDING' || (confirmed && Date.parse(r.startAt) > u.now.getTime())))
+  if (!(
+    r.status === 'PENDING' ||
+    (confirmed && Date.parse(r.startAt) > u.now.getTime() && notHandedOver(r))
+  ))
     fail('INVALID_STATE');
   r.status = 'CANCELLED';
   r.closedReason = 'REQUESTER_CANCELLED';
@@ -667,6 +687,177 @@ export async function cancelReservation(
   // 확정 취소는 점유를 풀기 때문에 대기 1순위를 바로 검토한다.
   await promoteWaitlist(u, r.itemId);
   return reservationView(u, actor, r, true);
+}
+
+// ---------------------------------------------------------------------------------------------
+// 거점 인계·반납(명세 0007): 관리자만 진행한다. 예약 status는 CONFIRMED로 둔다.
+
+export type HandoverPhoto = { contentType: string; bytes: Buffer };
+export type ReturnCompare = (
+  before: HandoverPhoto,
+  after: HandoverPhoto,
+) => Promise<ReturnComparison>;
+
+// ponytail: 31자 중 randomBytes % 31의 미세한 치우침은 무시한다. 코드가 보안 비밀이 되면 rejection sampling으로.
+const handoverCode = () =>
+  Array.from(randomBytes(8), (b) => HANDOVER_CODE_ALPHABET[b % HANDOVER_CODE_ALPHABET.length]).join(
+    '',
+  );
+function newHandover(): Handover {
+  return {
+    code: handoverCode(),
+    stage: 'READY',
+    pickedUpAt: null,
+    pickupPhotoId: null,
+    returnedAt: null,
+    returnPhotoId: null,
+    comparison: null,
+    inspection: null,
+  };
+}
+function withoutCode({ code: _code, ...rest }: Handover): Handover {
+  return rest;
+}
+const notHandedOver = (r: Reservation) => !r.handover || r.handover.stage === 'READY';
+
+async function handoverView(u: Unit, r: Reservation): Promise<HandoverView> {
+  return {
+    reservation: { ...r, handover: r.handover ?? null },
+    requesterDisplayName: (await u.user(r.requesterId)).displayName,
+    ownerDisplayName: r.item.ownerDisplayName ?? null,
+    placeLabel: await placeLabel(u, r.placeId),
+  };
+}
+
+async function reservationIdByCode(u: Unit, actor: string, code: string): Promise<string> {
+  if (actor !== HUB_MANAGER_ID) fail('NOT_FOUND');
+  const row = await u.c.query("SELECT id FROM reservations WHERE data->'handover'->>'code'=$1", [
+    code,
+  ]);
+  return (row.rows[0]?.id as string | undefined) ?? fail('NOT_FOUND');
+}
+
+export async function getHandover(u: Unit, actor: string, code: string) {
+  const r = await read<Reservation>(u.c, 'reservations', await reservationIdByCode(u, actor, code));
+  return handoverView(u, r!);
+}
+
+/** 코드로 찾아 물품 → 예약 순서로 잠그고, 버전·상태·단계를 확인한다. */
+async function lockHandover(
+  u: Commands,
+  actor: string,
+  code: string,
+  expectedVersion: number,
+  stage: Handover['stage'],
+) {
+  const r = await lockForCommand(u, await reservationIdByCode(u, actor, code), () => true);
+  if (r.version !== expectedVersion) fail('VERSION_CONFLICT', { currentVersion: r.version });
+  if (r.status !== 'CONFIRMED' || r.handover?.stage !== stage) fail('INVALID_STATE');
+  return { r, handover: r.handover };
+}
+
+async function managerPhoto(u: Unit, actor: string, photoId: string): Promise<HandoverPhoto> {
+  const row = await u.c.query(
+    'SELECT content_type, bytes FROM item_images WHERE id=$1 AND owner_id=$2',
+    [photoId, actor],
+  );
+  const photo = row.rows[0] as { content_type: string; bytes: Buffer } | undefined;
+  if (!photo) fail('NOT_FOUND');
+  return { contentType: photo.content_type, bytes: photo.bytes };
+}
+
+async function notifyBoth(
+  u: Unit,
+  r: Reservation,
+  input: Omit<Parameters<typeof notify>[2], 'reservationId' | 'itemId'>,
+) {
+  for (const userId of new Set([r.requesterId, ...(r.ownerId ? [r.ownerId] : [])]))
+    await notify(u, userId, {
+      ...input,
+      link: `/reservations/${r.id}`,
+      reservationId: r.id,
+      itemId: r.itemId,
+    });
+}
+
+export async function recordPickup(
+  u: Commands,
+  actor: string,
+  code: string,
+  body: HandoverPhotoBody,
+) {
+  const { r, handover } = await lockHandover(u, actor, code, body.expectedVersion, 'READY');
+  if (Date.parse(r.endAt) <= u.now.getTime()) fail('INVALID_STATE');
+  await managerPhoto(u, actor, body.photoId);
+  r.handover = { ...handover, stage: 'PICKED_UP', pickedUpAt: u.iso, pickupPhotoId: body.photoId };
+  await updateReservation(u, r);
+  await recordHistory(u, r, 'HUB', 'HANDOVER_PICKED_UP');
+  reservationEvents(u, r, 'HANDOVER_PICKED_UP');
+  await notifyBoth(u, r, {
+    type: 'HANDOVER_PICKED_UP',
+    title: '거점에서 물건을 인계했어요',
+    body: `${r.item.title} · ${await placeLabel(u, r.placeId)}. 반납은 ${formatSeoulDateTime(r.endAt)}까지 같은 거점으로 해 주세요.`,
+  });
+  return handoverView(u, r);
+}
+
+/** 반납 사진을 기록하고 AI 비교 후보를 붙인다. AI 실패는 FAILED로 남기고 관리자 판정으로 넘어간다. */
+export async function recordReturn(
+  u: Commands,
+  actor: string,
+  code: string,
+  body: HandoverPhotoBody,
+  compare: ReturnCompare,
+) {
+  const { r, handover } = await lockHandover(u, actor, code, body.expectedVersion, 'PICKED_UP');
+  const after = await managerPhoto(u, actor, body.photoId);
+  const before = await managerPhoto(u, actor, handover.pickupPhotoId!);
+  // ponytail: AI 비교가 예약 잠금 안에서 수 초 실행된다(2번 등록과 같은 제약). 반납이 몰리면 비동기 작업으로 분리.
+  let comparison: ReturnComparison;
+  try {
+    comparison = await compare(before, after);
+  } catch {
+    comparison = { status: 'FAILED', summary: null, differences: [] };
+  }
+  u.refreshClock();
+  r.handover = {
+    ...handover,
+    stage: 'RETURNED',
+    returnedAt: u.iso,
+    returnPhotoId: body.photoId,
+    comparison,
+  };
+  await updateReservation(u, r);
+  await recordHistory(u, r, 'HUB', 'HANDOVER_RETURNED');
+  reservationEvents(u, r, 'HANDOVER_RETURNED');
+  return handoverView(u, r);
+}
+
+export async function recordInspection(
+  u: Commands,
+  actor: string,
+  code: string,
+  body: InspectBody,
+) {
+  const { r, handover } = await lockHandover(u, actor, code, body.expectedVersion, 'RETURNED');
+  r.handover = {
+    ...handover,
+    stage: 'COMPLETED',
+    inspection: { result: body.result, note: body.note || null, at: u.iso },
+  };
+  await updateReservation(u, r);
+  const reason = body.result === 'OK' ? 'INSPECTED_OK' : 'INSPECTED_DAMAGED';
+  await recordHistory(u, r, 'HUB', reason);
+  reservationEvents(u, r, reason);
+  await notifyBoth(u, r, {
+    type: 'HANDOVER_RETURNED',
+    title: body.result === 'OK' ? '반납이 확인됐어요' : '반납 물품에 파손이 확인됐어요',
+    body:
+      body.result === 'OK'
+        ? `${r.item.title} · 거점 관리자가 상태를 확인했어요. 이용해 주셔서 고마워요.`
+        : `${r.item.title} · ${body.note}. 센터에서 처리 방법을 안내할 예정이에요.`,
+  });
+  return handoverView(u, r);
 }
 
 /** 물품 조건 변경(비활성·불가 기간·장소 등)으로 더 진행할 수 없는 신청을 닫는다. */

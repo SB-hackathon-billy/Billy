@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { HUB_MANAGER_ID } from '@sb/contracts';
 import { useSession, useSync } from '../../lib/session.js';
 import { useAction, useOnline } from '../../lib/hooks.js';
 import { ActionButton, ErrorNotice, Ink, Loading, Status } from '../../components/ui.js';
@@ -73,9 +74,9 @@ export function EntryPage() {
       <ErrorNotice action={action} />
       <p className="field-hint">준비된 아이디를 골라도 좋아요</p>
       <div className="handle-options">
-        {['hana', 'duri', 'seul', 'jun'].map((name, i) => (
+        {['hana', 'duri', 'seul', 'jun', 'hub'].map((name, i) => (
           <ActionButton secondary key={name} onPress={() => setHandle(`demo-${name}`)}>
-            {['하나', '두리', '슬', '준'][i]} · demo-{name}
+            {['하나', '두리', '슬', '준', '거점 관리자'][i]} · demo-{name}
           </ActionButton>
         ))}
       </div>
@@ -114,6 +115,11 @@ export function HomePage() {
         <br />
         필요하세요?
       </h1>
+      {session?.user.id === HUB_MANAGER_ID && (
+        <Link className="button" to="/hub">
+          거점 관리 · 인계·반납 기록하기
+        </Link>
+      )}
       <Link className="voice-hero" to="/rental">
         <img
           className="home-illustration"

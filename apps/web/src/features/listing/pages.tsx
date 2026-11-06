@@ -18,24 +18,13 @@ import { useAction, usePlaces } from '../../lib/hooks.js';
 import { categories } from '../../lib/presentation.js';
 import { ActionButton, ErrorNotice, Loading } from '../../components/ui.js';
 import { PeriodFields } from '../../components/PeriodFields.js';
+import { shrink } from '../../lib/photo.js';
 
 const statusText: Record<Listing['status'], string> = {
   DRAFT: '작성 중',
   PUBLISHED: '게시됨',
   INACTIVE: '비활성',
 };
-
-/** 휴대폰 원본 사진을 긴 변 1280px JPEG로 줄인다. */
-async function shrink(file: File): Promise<{ contentType: string; dataBase64: string }> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, 1280 / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-  return { contentType: 'image/jpeg', dataBase64: dataUrl.slice(dataUrl.indexOf(',') + 1) };
-}
 
 export function ListingsPage() {
   const query = useQuery({

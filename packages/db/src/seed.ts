@@ -38,8 +38,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const now = args.includes('--now') ? option('--now') : new Date();
   const pool = createPool();
   try {
-    await seed(pool, buildSeed({ scenario, now: now! }));
-    console.log(`Seeded ${scenario}: 4 users, 3 places, 10 items.`);
+    const fixture = buildSeed({ scenario, now: now! });
+    await seed(pool, fixture);
+    console.log(`Seeded ${scenario}: ${fixture.users.length} users, 3 places, 10 items.`);
   } finally {
     await pool.end();
   }

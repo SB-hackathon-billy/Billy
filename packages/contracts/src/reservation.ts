@@ -160,6 +160,52 @@ export const RESERVATION_STATUS_VALUES = [
 ] as const;
 export const ReservationStatusSchema = z.enum(RESERVATION_STATUS_VALUES);
 export type ReservationStatus = z.infer<typeof ReservationStatusSchema>;
+/** 거점 인계·반납(명세 0007). 예약 status는 CONFIRMED로 두고 이 단계만 진행한다. */
+export const HANDOVER_STAGE_VALUES = ['READY', 'PICKED_UP', 'RETURNED', 'COMPLETED'] as const;
+export const HandoverStageSchema = z.enum(HANDOVER_STAGE_VALUES);
+export type HandoverStage = z.infer<typeof HandoverStageSchema>;
+/** 거점 관리자 데모 계정(명세 0007). ponytail: 관리자 1명이 모든 장소를 맡는다. 거점별 배정은 TBD. */
+export const HUB_MANAGER_ID = 'u_hub';
+/** 인계 코드: 혼동 문자(0·O·1·I·L) 없는 8자리. */
+export const HANDOVER_CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+export const HandoverCodeSchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .regex(/^[2-9A-HJKMNP-Z]{8}$/);
+export const ReturnComparisonSchema = z
+  .object({
+    status: z.enum(['DONE', 'FAILED']),
+    summary: textSchema(200).nullable(),
+    /** AI가 찾은 달라진 부분 후보. 판정이 아니다. */
+    differences: z.array(textSchema(120)).max(5),
+  })
+  .strict();
+export type ReturnComparison = z.infer<typeof ReturnComparisonSchema>;
+export const INSPECTION_RESULT_VALUES = ['OK', 'DAMAGED'] as const;
+export const InspectionResultSchema = z.enum(INSPECTION_RESULT_VALUES);
+export const HandoverSchema = z
+  .object({
+    /** 빌리는 사람과 관리자에게만 내려간다. 빌려준 이웃 화면에서는 빠진다. */
+    code: HandoverCodeSchema.optional(),
+    stage: HandoverStageSchema,
+    pickedUpAt: UtcDateTimeSchema.nullable(),
+    pickupPhotoId: IdSchema.nullable(),
+    returnedAt: UtcDateTimeSchema.nullable(),
+    returnPhotoId: IdSchema.nullable(),
+    comparison: ReturnComparisonSchema.nullable(),
+    inspection: z
+      .object({
+        result: InspectionResultSchema,
+        note: textSchema(300).nullable(),
+        at: UtcDateTimeSchema,
+      })
+      .strict()
+      .nullable(),
+  })
+  .strict();
+export type Handover = z.infer<typeof HandoverSchema>;
+
 export const RESERVATION_ORIGIN_VALUES = ['CATALOG', 'REQUEST'] as const;
 export const ReservationOriginSchema = z.enum(RESERVATION_ORIGIN_VALUES);
 export type ReservationOrigin = z.infer<typeof ReservationOriginSchema>;
@@ -189,13 +235,21 @@ export const ReservationSchema = z
     item: ItemSummarySchema,
     responseDueAt: UtcDateTimeSchema.nullable(),
     closedReason: textSchema(100).nullable(),
+    /** 거점 인계·반납 진행(명세 0007). migration 005 이전 행은 null로 읽힌다. */
+    handover: HandoverSchema.nullable().default(null),
     createdAt: UtcDateTimeSchema,
     updatedAt: UtcDateTimeSchema,
   })
   .strict();
 export type Reservation = z.infer<typeof ReservationSchema>;
 
-export const RESERVATION_ACTOR_VALUES = ['REQUESTER', 'OWNER', 'PUBLIC_DEMO', 'SYSTEM'] as const;
+export const RESERVATION_ACTOR_VALUES = [
+  'REQUESTER',
+  'OWNER',
+  'PUBLIC_DEMO',
+  'SYSTEM',
+  'HUB',
+] as const;
 export const ReservationEventSchema = z
   .object({
     at: UtcDateTimeSchema,
@@ -257,6 +311,33 @@ export const RespondReservationBodySchema = z.discriminatedUnion('action', [
 ]);
 export type RespondReservationBody = z.infer<typeof RespondReservationBodySchema>;
 export const ReservationVersionBodySchema = z.object({ expectedVersion: VersionSchema }).strict();
+
+export const HandoverPhotoBodySchema = z
+  .object({ expectedVersion: VersionSchema, photoId: IdSchema })
+  .strict();
+export type HandoverPhotoBody = z.infer<typeof HandoverPhotoBodySchema>;
+export const InspectBodySchema = z
+  .object({
+    expectedVersion: VersionSchema,
+    result: InspectionResultSchema,
+    note: z.string().trim().max(300).optional(),
+  })
+  .strict()
+  .superRefine((body, ctx) => {
+    if (body.result === 'DAMAGED' && !body.note)
+      ctx.addIssue({ code: 'custom', path: ['note'], message: '파손 내용을 적어 주세요.' });
+  });
+export type InspectBody = z.infer<typeof InspectBodySchema>;
+/** 거점 관리자 화면. */
+export const HandoverViewSchema = z
+  .object({
+    reservation: ReservationSchema,
+    requesterDisplayName: textSchema(40),
+    ownerDisplayName: textSchema(40).nullable(),
+    placeLabel: textSchema(100),
+  })
+  .strict();
+export type HandoverView = z.infer<typeof HandoverViewSchema>;
 
 export const ReservationsQuerySchema = PaginationQuerySchema.extend({
   role: ReservationRoleSchema.default('REQUESTER'),
@@ -320,6 +401,8 @@ export const NOTIFICATION_TYPE_VALUES = [
   'NEGOTIATION_REQUESTED',
   'OFFER_RECEIVED',
   'INTAKE_FAILED',
+  'HANDOVER_PICKED_UP',
+  'HANDOVER_RETURNED',
 ] as const;
 export const NotificationTypeSchema = z.enum(NOTIFICATION_TYPE_VALUES);
 export type NotificationType = z.infer<typeof NotificationTypeSchema>;

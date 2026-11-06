@@ -163,12 +163,17 @@ export const historyLabels: Record<string, string> = {
   REQUESTER_CANCELLED: '신청자 취소',
   RESPONSE_EXPIRED: '응답 기한 지남',
   PERIOD_TAKEN: '다른 예약 확정으로 종료',
+  HANDOVER_PICKED_UP: '거점에서 인계',
+  HANDOVER_RETURNED: '거점에 반납',
+  INSPECTED_OK: '반납 확인 · 문제 없음',
+  INSPECTED_DAMAGED: '반납 확인 · 파손 있음',
 };
 export const actorLabels = {
   REQUESTER: '신청자',
   OWNER: '소유자',
   PUBLIC_DEMO: '센터(시연)',
   SYSTEM: '자동 처리',
+  HUB: '거점 관리자',
 } as const;
 
 /** 30분 단위로 올림한 내일 10시~16시(서울) 기본 기간. */

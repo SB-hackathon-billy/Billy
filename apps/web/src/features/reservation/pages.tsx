@@ -18,6 +18,7 @@ import { useAction, useNow, useOnline, usePlaces } from '../../lib/hooks.js';
 import { categories, durationLabel, secondsRemaining } from '../../lib/presentation.js';
 import { ActionButton, Check, ErrorNotice, Ink, Loading } from '../../components/ui.js';
 import { PeriodFields } from '../../components/PeriodFields.js';
+import { HandoverCard } from './handover.js';
 import {
   actorLabels,
   availabilityReasonLabels,
@@ -513,6 +514,7 @@ export function ReservationPage() {
           </Link>
         )}
       </div>
+      <HandoverCard view={view} {...(place ? { placeLabel: place.label } : {})} />
       <p className="demo-notice">실제 결제와 기관 예약은 없어요. 앱 안의 데모 예약이에요.</p>
       {owner ? <OwnerResponse view={view} /> : <CancelReservation view={view} />}
       {view.history.length > 0 && (

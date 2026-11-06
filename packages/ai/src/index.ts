@@ -39,6 +39,11 @@ export {
   type ListingPhoto,
 } from './registration.js';
 export {
+  createReturnInspector,
+  RETURN_COMPARISON_FIXTURE,
+  type ReturnInspector,
+} from './inspection.js';
+export {
   createPolicyMatcher,
   parsePolicyMatchOutput,
   POLICY_MATCH_INSTRUCTIONS,

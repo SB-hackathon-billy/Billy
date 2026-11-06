@@ -59,6 +59,7 @@ const responses = {
   WaitlistEntries: http.successEnvelopeSchema(http.listDataSchema(reservation.WaitlistEntrySchema)),
   Notifications: http.successEnvelopeSchema(reservation.NotificationListSchema),
   ReadNotifications: http.successEnvelopeSchema(reservation.ReadNotificationsDataSchema),
+  HandoverView: http.successEnvelopeSchema(reservation.HandoverViewSchema),
   PolicyMatch: http.successEnvelopeSchema(policy.PolicyMatchSchema),
 };
 for (const [name, schema] of Object.entries(responses)) schemas[`${name}Response`] = schema;
@@ -560,6 +561,41 @@ export const API_OPERATIONS: readonly Operation[] = [
     response: 'ReadNotifications',
     body: 'ReadNotificationsBody',
   },
+  {
+    method: 'get',
+    path: '/handovers/{code}',
+    operationId: 'getHandover',
+    summary: '거점 관리자: 인계 코드로 예약·인계 단계 조회(명세 0007)',
+    status: 200,
+    response: 'HandoverView',
+  },
+  {
+    method: 'post',
+    path: '/handovers/{code}/pickup',
+    operationId: 'recordPickup',
+    summary: '거점 관리자: 대여 전 사진과 함께 인계 기록',
+    status: 200,
+    response: 'HandoverView',
+    body: 'HandoverPhotoBody',
+  },
+  {
+    method: 'post',
+    path: '/handovers/{code}/return',
+    operationId: 'recordReturn',
+    summary: '거점 관리자: 반납 사진 기록과 AI 비교 후보(판정 아님)',
+    status: 200,
+    response: 'HandoverView',
+    body: 'HandoverPhotoBody',
+  },
+  {
+    method: 'post',
+    path: '/handovers/{code}/inspect',
+    operationId: 'recordInspection',
+    summary: '거점 관리자: 반납 최종 판정(문제 없음·파손)',
+    status: 200,
+    response: 'HandoverView',
+    body: 'InspectBody',
+  },
 ];
 export function buildOpenApi() {
   const componentSchemas = Object.fromEntries(
@@ -578,6 +614,8 @@ export function buildOpenApi() {
     const parameters: Record<string, unknown>[] = [];
     if (operation.path.includes('{id}'))
       parameters.push({ name: 'id', in: 'path', required: true, schema: ref('Id') });
+    if (operation.path.includes('{code}'))
+      parameters.push({ name: 'code', in: 'path', required: true, schema: ref('HandoverCode') });
     if (mutation && !operation.public)
       parameters.push(
         {

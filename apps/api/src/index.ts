@@ -400,6 +400,8 @@ export async function buildApi(options: ApiOptions = {}): Promise<FastifyInstanc
   await app.register((await import('./intake-approvals/index.js')).default);
   // 3번 탐색·예약·대기·알림(명세 0004)
   await app.register((await import('./reservations/index.js')).default);
+  // 3번 거점 인계·반납(명세 0007)
+  await app.register((await import('./handovers/index.js')).default);
   // 통화 신청완료 화면의 상황별 정책 안내(명세 0005)
   await app.register((await import('./policy-matches/index.js')).default);
   if (!options.db) app.addHook('onClose', async () => db.close());
