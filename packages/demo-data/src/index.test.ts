@@ -59,10 +59,12 @@ describe('contract §14 fixtures', () => {
     ).toBe(true);
     for (const item of seed.items) {
       expect(ItemSchema.safeParse(item).success).toBe(true);
-      expect(item.image).toMatchObject({
-        url: `/assets/items/${item.id}.svg`,
-        isIllustration: true,
-      });
+      // 센터 사진이 있으면 사진, 없으면 물품별 일러스트(명세 0007 시연 데이터).
+      expect(item.image.url).toMatch(
+        item.image.isIllustration
+          ? new RegExp(`^/assets/items/${item.id}\\.svg$`)
+          : /^\/assets\/items\/center\/cat-type-\d+\.webp$/,
+      );
       expect(item.allowedPlaceIds.every((id) => seed.places.some((place) => place.id === id))).toBe(
         true,
       );

@@ -51,6 +51,19 @@ function SourceLabel({
   );
 }
 
+/** 물품 사진 출처(공공누리 제1유형: 출처표시). */
+function PhotoCredit() {
+  return (
+    <p className="field-hint photo-credit">
+      물품 사진 출처:{' '}
+      <a href="https://sb1in.or.kr/online/rental" target="_blank" rel="noreferrer">
+        성북구1인가구지원센터
+      </a>{' '}
+      · 공공누리 제1유형
+    </p>
+  );
+}
+
 function CatalogCard({ item, period }: { item: CatalogItem; period: string }) {
   const a = item.availability;
   return (
@@ -215,6 +228,7 @@ export function CatalogPage() {
           더 보기
         </ActionButton>
       )}
+      <PhotoCredit />
     </section>
   );
 }
@@ -434,6 +448,7 @@ export function CatalogItemPage() {
       <Link className="text-link" to="/catalog">
         ← 목록으로
       </Link>
+      {!item.image.isIllustration && <PhotoCredit />}
     </section>
   );
 }

@@ -3,7 +3,7 @@
 // 테스트 fixture(@sb/demo-data)는 바꾸지 않는다. seed를 다시 하면 이 데이터도 지워진다.
 import { pathToFileURL } from 'node:url';
 import { formatSeoulDateTime, type Item, type Place, type ReservationView } from '@sb/contracts';
-import { seoulCalendarDate, seoulDateTimeToUtc } from '@sb/demo-data';
+import { centerPhotoUrl, seoulCalendarDate, seoulDateTimeToUtc } from '@sb/demo-data';
 import { Database } from './database.js';
 import {
   createReservation,
@@ -37,30 +37,56 @@ const places: Place[] = [
   },
 ];
 
+/** 사진: 성북구1인가구지원센터 물품대여 페이지(공공누리 제1유형). `CENTER_PHOTO_CREDIT` 참고. */
 const item = (
   itemId: string,
   title: string,
   category: Item['category'],
   dailyRateKrw: number,
-  ownerId: string,
+  ownerId: string | null,
   allowedPlaceIds: string[],
-  image: string,
+  photo: number,
 ): Item => ({
   id: itemId,
   title,
   category,
   dailyRateKrw,
   ownerId,
-  source: 'RESIDENT',
-  image: { url: `/assets/items/${image}.svg`, alt: `${title} 일러스트`, isIllustration: true },
+  source: ownerId ? 'RESIDENT' : 'PUBLIC',
+  image: { url: centerPhotoUrl(photo), alt: `${title} 사진`, isIllustration: false },
   enabled: true,
   allowedPlaceIds,
   pricingFacts: { registeredExtraEffort: false },
   unavailableIntervals: [],
-  publicScenario: null,
+  publicScenario: ownerId ? null : 'APPROVE',
 });
-/** 같은 청소기라도 가격이 달라 조건을 비교할 수 있다(기존 1,000원 청소기와 함께). */
-const items: Item[] = [
+const CENTER = ['place-center'];
+/** 센터 1인가구 물품대여소 품목(센터 앞에서 수령). */
+const publicItems: Item[] = [
+  item('pub-humidifier', '가습기 위닉스 4L', 'CLEANING', 500, null, CENTER, 28),
+  item('pub-airwrap', '다이슨 에어랩 멀티 스타일러', 'HOBBY', 2_000, null, CENTER, 23),
+  item('pub-windowbot', '로봇 창문청소기 파워윈도우봇', 'CLEANING', 1_500, null, CENTER, 10),
+  item('pub-massagegun', '마사지건 제스파 바디볼트', 'HOBBY', 1_000, null, CENTER, 11),
+  item('pub-speaker', '블루투스 스피커 JBL Charge 5', 'HOBBY', 1_000, null, CENTER, 22),
+  item('pub-sewing', '미니 재봉틀 혼스', 'TOOLS', 1_000, null, CENTER, 40),
+  item('pub-cart', '접이식 카트 스탠리', 'TOOLS', 500, null, CENTER, 4),
+  item('pub-badminton', '배드민턴 라켓 2세트 요넥스', 'HOBBY', 500, null, CENTER, 34),
+  item('pub-iron', '핸디형 스팀다리미 보만', 'CLEANING', 500, null, CENTER, 35),
+  item('pub-bedcleaner', '침구살균청소기 하우쎈', 'CLEANING', 1_000, null, CENTER, 24),
+  item('pub-dehumidifier', '미니 제습기 보아르', 'CLEANING', 1_000, null, CENTER, 37),
+  item('pub-icebox', '캠핑용 아이스박스 21L', 'TRAVEL', 500, null, CENTER, 48),
+  item('pub-lantern', 'LED 캠핑 랜턴', 'TRAVEL', 500, null, CENTER, 47),
+  item('pub-camptable', '캠핑 테이블 MMT-600', 'TRAVEL', 1_000, null, CENTER, 46),
+  item('pub-campchair', '접이식 캠핑의자 2세트', 'TRAVEL', 1_000, null, CENTER, 45),
+  item('pub-polaroid', '폴라로이드 카메라 무케 나우 플러스', 'HOBBY', 1_500, null, CENTER, 14),
+  item('pub-laptop', '노트북 LG 15U50P', 'HOBBY', 2_000, null, CENTER, 1),
+  item('pub-heater', '전기히터 신일전자', 'CLEANING', 1_000, null, CENTER, 27),
+  item('pub-induction', '포터블 인덕션 LG 디오스', 'CLEANING', 1_000, null, CENTER, 31),
+  item('pub-gopro', '고프로 액션캠', 'HOBBY', 2_000, null, CENTER, 44),
+  item('pub-case24', '캐리어 24인치 내셔널지오그래픽', 'TRAVEL', 1_000, null, CENTER, 17),
+];
+/** 이웃 물품. 같은 청소기라도 가격이 달라 조건을 비교할 수 있다(기존 1,000원 청소기와 함께). */
+const residentItems: Item[] = [
   item(
     'res-cleaner-jun',
     '준의 무선 청소기',
@@ -68,7 +94,7 @@ const items: Item[] = [
     2_500,
     'u_jun',
     ['place-hansung', 'place-korea'],
-    'res-cleaner-duri',
+    30,
   ),
   item(
     'res-cleaner-seul',
@@ -77,18 +103,65 @@ const items: Item[] = [
     1_800,
     'u_seul',
     ['place-sungshin', 'place-hansung'],
-    'pub-cleaner',
+    15,
+  ),
+  item('res-ladder-jun', '준의 접이식 사다리', 'TOOLS', 1_200, 'u_jun', ['place-hansung'], 41),
+  item(
+    'res-speaker-seul',
+    '슬의 블루투스 스피커',
+    'HOBBY',
+    1_000,
+    'u_seul',
+    ['place-sungshin', 'place-hansung'],
+    8,
   ),
   item(
-    'res-ladder-jun',
-    '준의 접이식 사다리',
-    'TOOLS',
-    1_200,
+    'res-headset-jun',
+    '준의 노이즈캔슬링 헤드셋',
+    'HOBBY',
+    1_500,
     'u_jun',
-    ['place-hansung'],
-    'pub-ladder',
+    ['place-hansung', 'place-korea'],
+    2,
+  ),
+  item(
+    'res-waffle-duri',
+    '두리의 와플 메이커',
+    'HOBBY',
+    800,
+    'u_duri',
+    ['place-center', 'place-hansung'],
+    39,
+  ),
+  item(
+    'res-polaroid-duri',
+    '두리의 인스탁스 미니12',
+    'HOBBY',
+    1_500,
+    'u_duri',
+    ['place-hansung', 'place-library'],
+    25,
+  ),
+  item(
+    'res-dryer-hana',
+    '하나의 휴대용 의류·신발 건조기',
+    'CLEANING',
+    1_200,
+    'u_hana',
+    ['place-hansung', 'place-center'],
+    38,
+  ),
+  item(
+    'res-mic-seul',
+    '슬의 블루투스 무선마이크',
+    'HOBBY',
+    1_000,
+    'u_seul',
+    ['place-sungshin'],
+    43,
   ),
 ];
+const items: Item[] = [...publicItems, ...residentItems];
 /** 기존 물품도 캠퍼스 거점에서 주고받게 한다(장소는 최대 3곳). */
 const addHansung = ['res-cleaner-duri', 'res-projector-duri', 'res-tool-hana', 'res-case-hana'];
 
@@ -255,7 +328,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   try {
     await showcase(db);
     console.log(
-      'Showcase: 캠퍼스 거점 3곳, 물품 3개, 예약 5건(인계 대기·응답 대기·반납 완료·승인 대기·대여 중).',
+      `Showcase: 캠퍼스 거점 3곳, 물품 ${items.length}개, 예약 5건(인계 대기·응답 대기·반납 완료·승인 대기·대여 중).`,
     );
   } finally {
     await db.close();

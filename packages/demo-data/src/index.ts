@@ -76,6 +76,25 @@ export function defaultRequestPeriod(now: Date | string | number = new Date()): 
     endAt: new Date(midnight + (3 * 24 + 16) * 3_600_000).toISOString(),
   };
 }
+/**
+ * 물품 사진: 성북구1인가구지원센터 물품대여 페이지(https://sb1in.or.kr/online/rental)의 사진.
+ * 공공누리 제1유형(출처표시). 파일은 apps/web/public/assets/items/center/cat-type-N.webp.
+ */
+export const CENTER_PHOTO_CREDIT =
+  '물품 사진 출처: 성북구1인가구지원센터(sb1in.or.kr) · 공공누리 제1유형';
+export const centerPhotoUrl = (n: number) => `/assets/items/center/cat-type-${n}.webp`;
+/** 기본 물품과 같은 종류의 센터 사진 번호. 맞는 사진이 없는 물품은 일러스트를 쓴다. */
+const CENTER_PHOTOS: Record<string, number> = {
+  'pub-projector': 7,
+  'pub-cleaner': 3,
+  'pub-ladder': 41,
+  'pub-case': 26,
+  'res-projector-duri': 6,
+  'res-cleaner-duri': 3,
+  'res-projector-seul': 7,
+  'res-case-seul': 16,
+  'res-case-hana': 13,
+};
 export function buildSeed({
   scenario = 'default',
   now = new Date(),
@@ -127,7 +146,9 @@ export function buildSeed({
     dailyRateKrw,
     ownerId,
     source: ownerId === null ? 'PUBLIC' : 'RESIDENT',
-    image: { url: `/assets/items/${id}.svg`, alt: `${title} 데모 일러스트`, isIllustration: true },
+    image: CENTER_PHOTOS[id]
+      ? { url: centerPhotoUrl(CENTER_PHOTOS[id]), alt: `${title} 사진`, isIllustration: false }
+      : { url: `/assets/items/${id}.svg`, alt: `${title} 일러스트`, isIllustration: true },
     enabled: true,
     allowedPlaceIds,
     pricingFacts: { registeredExtraEffort: false },
