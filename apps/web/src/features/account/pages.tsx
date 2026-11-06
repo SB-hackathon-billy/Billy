@@ -9,6 +9,7 @@ import { illustrations } from '../../assets/illustrations/manifest.js';
 import { isEmptyRequest } from '../../lib/presentation.js';
 import { useReservations } from '../reservation/data.js';
 import { ReservationCard } from '../reservation/parts.js';
+import { NearbyHubs } from '../reservation/NearbyHubs.js';
 
 export function EntryPage() {
   const { session, loading, signIn } = useSession();
@@ -167,6 +168,7 @@ export function HomePage() {
           ))}
         </>
       )}
+      <NearbyHubs />
       {offered > 0 && (
         <Link className="new-offers" to="/inbox">
           새로운 조건 {offered}개가 기다리고 있어요 <span>확인하기 →</span>

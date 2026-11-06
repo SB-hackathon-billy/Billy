@@ -546,3 +546,120 @@
   font-size: 0.75rem;
   font-weight: 700;
 }
+
+/* 가까운 캠퍼스 대여소·물품별 대여소 */
+.nearby-hubs,
+.item-places-list {
+  margin: 1.25rem 0;
+  padding: 1rem 1.1rem;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: var(--shadow-soft);
+}
+.nearby-head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.nearby-head h2 {
+  margin: 0 0 0.2rem;
+  font-size: 1.0625rem;
+}
+.nearby-head p {
+  margin: 0;
+}
+.nearby-head > div,
+.nearby-head > h2 {
+  flex: 1;
+  min-width: 0;
+}
+.nearby-head .button {
+  flex: none;
+  width: auto;
+  white-space: nowrap;
+  min-height: 40px;
+  padding: 0 0.9rem;
+  font-size: 0.875rem;
+}
+.nearby-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.nearby-list li {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.8rem;
+  border-radius: 14px;
+  background: var(--color-sunken);
+}
+.nearby-list li.nearest {
+  background: var(--color-primary-subtle);
+  box-shadow: inset 0 0 0 1.5px var(--color-primary);
+}
+.nearby-list li > div:first-child {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.nearby-list strong {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 0.9375rem;
+}
+.nearby-list span {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+.nearby-badge {
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-strong);
+  color: var(--color-on-strong) !important;
+  font-size: 0.6875rem !important;
+  font-weight: 700;
+}
+.nearby-meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.1rem;
+  flex: none;
+  text-align: right;
+}
+.nearby-meta b {
+  font-size: 0.9375rem;
+}
+.nearby-meta a,
+.nearby-meta button {
+  font-size: 0.8125rem;
+}
+.nearby-more {
+  margin-top: 0.5rem;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.nearby-note {
+  margin: 0.5rem 0 0;
+}
+.item-places {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+.nearby-meta button {
+  background: none;
+  border: 0;
+  padding: 0;
+  min-height: 0;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--color-primary-text);
+}

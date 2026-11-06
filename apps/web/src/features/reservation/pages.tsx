@@ -19,6 +19,7 @@ import { categories, durationLabel, secondsRemaining } from '../../lib/presentat
 import { ActionButton, Check, ErrorNotice, Ink, Loading } from '../../components/ui.js';
 import { PeriodFields } from '../../components/PeriodFields.js';
 import { HandoverCard, HandoverTicket } from './handover.js';
+import { ItemPlacesLine, ItemPlacesList, NearbyHubs } from './NearbyHubs.js';
 import {
   actorLabels,
   availabilityReasonLabels,
@@ -76,6 +77,7 @@ function CatalogCard({ item, period }: { item: CatalogItem; period: string }) {
           <span className="muted">
             {categories[item.category]} · 하루 {formatKrw(item.dailyRateKrw)}
           </span>
+          <ItemPlacesLine placeIds={item.allowedPlaceIds} />
           {a && (
             <span className={`availability ${a.status === 'AVAILABLE' ? 'is-available' : ''}`}>
               {a.status === 'AVAILABLE'
@@ -200,6 +202,7 @@ export function CatalogPage() {
           </ActionButton>
         )}
       </details>
+      <NearbyHubs />
       {page.isPending && !items.length ? (
         <Loading />
       ) : page.error ? (
@@ -318,10 +321,14 @@ export function CatalogItemPage() {
       <SourceLabel item={item} />
       <h1 className="catalog-title">{item.title}</h1>
       <p className="muted">
-        {categories[item.category]} · 하루 {formatKrw(item.dailyRateKrw)} · 주고받는 곳{' '}
-        {item.allowedPlaceIds.map(placeLabel).join(', ')}
+        {categories[item.category]} · 하루 {formatKrw(item.dailyRateKrw)}
       </p>
       {item.description && <p className="catalog-description">{item.description}</p>}
+      <ItemPlacesList
+        placeIds={item.allowedPlaceIds}
+        selected={placeId}
+        {...(item.mine ? {} : { onSelect: setPlaceId })}
+      />
       {priority?.priorityUntil && (
         <p className="priority-note" role="status">
           기다리던 기간이 비었어요. {formatSeoulDateTime(priority.priorityUntil)}까지 먼저 신청할 수

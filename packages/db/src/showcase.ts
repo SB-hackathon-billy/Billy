@@ -79,30 +79,40 @@ const item = (
   unavailableIntervals: [],
   publicScenario: ownerId ? null : 'APPROVE',
 });
-const CENTER = ['place-center'];
+const HUBS = [
+  'place-hansung',
+  'place-sungshin',
+  'place-korea',
+  'place-kookmin',
+  'place-dongduk',
+  'place-seokyeong',
+];
+let hubTurn = 0;
+/** 센터 물품도 센터 앞과 캠퍼스 거점 2곳에 나눠 둔다(장소는 최대 3곳). 거점을 돌아가며 배치한다. */
+const center = () => ['place-center', HUBS[hubTurn++ % 6]!, HUBS[hubTurn++ % 6]!];
 /** 센터 1인가구 물품대여소 품목(센터 앞에서 수령). */
 const publicItems: Item[] = [
-  item('pub-humidifier', '가습기 위닉스 4L', 'CLEANING', 500, null, CENTER, 28),
-  item('pub-airwrap', '다이슨 에어랩 멀티 스타일러', 'HOBBY', 2_000, null, CENTER, 23),
-  item('pub-windowbot', '로봇 창문청소기 파워윈도우봇', 'CLEANING', 1_500, null, CENTER, 10),
-  item('pub-massagegun', '마사지건 제스파 바디볼트', 'HOBBY', 1_000, null, CENTER, 11),
-  item('pub-speaker', '블루투스 스피커 JBL Charge 5', 'HOBBY', 1_000, null, CENTER, 22),
-  item('pub-sewing', '미니 재봉틀 혼스', 'TOOLS', 1_000, null, CENTER, 40),
-  item('pub-cart', '접이식 카트 스탠리', 'TOOLS', 500, null, CENTER, 4),
-  item('pub-badminton', '배드민턴 라켓 2세트 요넥스', 'HOBBY', 500, null, CENTER, 34),
-  item('pub-iron', '핸디형 스팀다리미 보만', 'CLEANING', 500, null, CENTER, 35),
-  item('pub-bedcleaner', '침구살균청소기 하우쎈', 'CLEANING', 1_000, null, CENTER, 24),
-  item('pub-dehumidifier', '미니 제습기 보아르', 'CLEANING', 1_000, null, CENTER, 37),
-  item('pub-icebox', '캠핑용 아이스박스 21L', 'TRAVEL', 500, null, CENTER, 48),
-  item('pub-lantern', 'LED 캠핑 랜턴', 'TRAVEL', 500, null, CENTER, 47),
-  item('pub-camptable', '캠핑 테이블 MMT-600', 'TRAVEL', 1_000, null, CENTER, 46),
-  item('pub-campchair', '접이식 캠핑의자 2세트', 'TRAVEL', 1_000, null, CENTER, 45),
-  item('pub-polaroid', '폴라로이드 카메라 무케 나우 플러스', 'HOBBY', 1_500, null, CENTER, 14),
-  item('pub-laptop', '노트북 LG 15U50P', 'HOBBY', 2_000, null, CENTER, 1),
-  item('pub-heater', '전기히터 신일전자', 'CLEANING', 1_000, null, CENTER, 27),
-  item('pub-induction', '포터블 인덕션 LG 디오스', 'CLEANING', 1_000, null, CENTER, 31),
-  item('pub-gopro', '고프로 액션캠', 'HOBBY', 2_000, null, CENTER, 44),
-  item('pub-case24', '캐리어 24인치 내셔널지오그래픽', 'TRAVEL', 1_000, null, CENTER, 17),
+  item('pub-humidifier', '가습기 위닉스 4L', 'CLEANING', 500, null, center(), 28),
+  item('pub-airwrap', '다이슨 에어랩 멀티 스타일러', 'HOBBY', 2_000, null, center(), 23),
+  item('pub-windowbot', '로봇 창문청소기 파워윈도우봇', 'CLEANING', 1_500, null, center(), 10),
+  item('pub-massagegun', '마사지건 제스파 바디볼트', 'HOBBY', 1_000, null, center(), 11),
+  item('pub-speaker', '블루투스 스피커 JBL Charge 5', 'HOBBY', 1_000, null, center(), 22),
+  item('pub-sewing', '미니 재봉틀 혼스', 'TOOLS', 1_000, null, center(), 40),
+  item('pub-cart', '접이식 카트 스탠리', 'TOOLS', 500, null, center(), 4),
+  item('pub-badminton', '배드민턴 라켓 2세트 요넥스', 'HOBBY', 500, null, center(), 34),
+  item('pub-iron', '핸디형 스팀다리미 보만', 'CLEANING', 500, null, center(), 35),
+  item('pub-bedcleaner', '침구살균청소기 하우쎈', 'CLEANING', 1_000, null, center(), 24),
+  item('pub-dehumidifier', '미니 제습기 보아르', 'CLEANING', 1_000, null, center(), 37),
+  item('pub-icebox', '캠핑용 아이스박스 21L', 'TRAVEL', 500, null, center(), 48),
+  item('pub-lantern', 'LED 캠핑 랜턴', 'TRAVEL', 500, null, center(), 47),
+  item('pub-camptable', '캠핑 테이블 MMT-600', 'TRAVEL', 1_000, null, center(), 46),
+  item('pub-campchair', '접이식 캠핑의자 2세트', 'TRAVEL', 1_000, null, center(), 45),
+  item('pub-polaroid', '폴라로이드 카메라 무케 나우 플러스', 'HOBBY', 1_500, null, center(), 14),
+  item('pub-laptop', '노트북 LG 15U50P', 'HOBBY', 2_000, null, center(), 1),
+  item('pub-heater', '전기히터 신일전자', 'CLEANING', 1_000, null, center(), 27),
+  item('pub-induction', '포터블 인덕션 LG 디오스', 'CLEANING', 1_000, null, center(), 31),
+  item('pub-gopro', '고프로 액션캠', 'HOBBY', 2_000, null, center(), 44),
+  item('pub-case24', '캐리어 24인치 내셔널지오그래픽', 'TRAVEL', 1_000, null, center(), 17),
 ];
 /** 이웃 물품. 같은 청소기라도 가격이 달라 조건을 비교할 수 있다(기존 1,000원 청소기와 함께). */
 const residentItems: Item[] = [
@@ -221,6 +231,12 @@ export async function showcase(db: Database, now = new Date()) {
       `UPDATE items SET data = jsonb_set(data, '{enabled}', 'false') WHERE id = ANY($1::text[])`,
       [hidden],
     );
+    // 기본 seed의 공공 물품도 거점 2곳에 더 둔다.
+    for (const itemId of ['pub-projector', 'pub-cleaner', 'pub-ladder', 'pub-case'])
+      await u.c.query(
+        `UPDATE items SET data = jsonb_set(data, '{allowedPlaceIds}', $2) WHERE id = $1`,
+        [itemId, JSON.stringify(center())],
+      );
   });
 
   const photo = (imageUrl: string) =>
