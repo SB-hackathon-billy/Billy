@@ -95,7 +95,7 @@ function Comparison({ view }: { view: RequestView }) {
               <p className="field-hint">소유자가 직접 응답할 때까지 기다려 주세요.</p>
             )}
             {row.status === 'PENDING_PUBLIC' && (
-              <p className="field-hint">센터 데모 어댑터가 확인 중이에요. 실제 접수가 아닙니다.</p>
+              <p className="field-hint">센터에서 확인 중이에요.</p>
             )}
             {selectable && view.allowedActions.includes('SELECT_OFFER') && (
               <Link
@@ -286,10 +286,7 @@ export function SelectPage() {
       </div>
       <div className="demo-notice">
         <strong>다른 후보 요청은 종료됩니다.</strong>
-        <p>
-          선택 후 10분 동안 데모 점유가 생깁니다. 결제 미리보기에서 확정하면 앱 안의 데모 예약이
-          되고, 실제 결제와 기관 예약은 이루어지지 않습니다.
-        </p>
+        <p>선택 후 10분 동안 이 기간을 잡아 둡니다. 결제 미리보기에서 확정하면 예약이 돼요.</p>
       </div>
       <Check isSelected={confirmed} onChange={setConfirmed}>
         물품·기간·장소·총액을 확인했고, 다른 활성 후보 요청을 종료하는 데 동의합니다.
@@ -379,22 +376,20 @@ export function PaymentPage() {
       </h1>
       <Status value="PAYMENT_PREVIEW_READY" />
       <p className="demo-notice">
-        <strong>실제 결제와 예약이 이루어지지 않습니다.</strong>
-        <br />
-        결제 정보를 입력하거나 비용을 청구하지 않아요. 아래에서 예약을 확정하면 앱 안의 데모 예약만
-        만들어져요.
+        아래에서 예약을 확정하면 이 기간이 내 예약으로 잡혀요. 앱에서 결제 정보를 받거나 비용을
+        청구하지 않아요.
       </p>
       <div className="content-card">
         <ItemHeader item={data.itemSummary} />
         <TermsView terms={data.terms} places={places.data?.items ?? []} />
         <div className="payment-total">
-          <span>데모 총 대여료</span>
+          <span>총 대여료</span>
           <strong>{formatKrw(data.totalFeeKrw)}</strong>
         </div>
       </div>
       {booked ? (
         <div className="content-card">
-          <h2>앱 안의 데모 예약</h2>
+          <h2>내 예약</h2>
           <ReservationStatusBadge status={booked.reservation.status} />
           <p>
             {booked.reservation.status === 'CONFIRMED'
@@ -420,8 +415,7 @@ export function PaymentPage() {
             <div className="content-card">
               <h2>예약 확정</h2>
               <p>
-                유효시간 안에 확정하면 앱 안의 데모 예약이 만들어지고 이 기간이 점유돼요. 결제는
-                청구되지 않아요.
+                유효시간 안에 확정하면 예약이 만들어지고 이 기간이 점유돼요. 결제는 청구되지 않아요.
               </p>
               <ActionButton
                 onPress={confirm}

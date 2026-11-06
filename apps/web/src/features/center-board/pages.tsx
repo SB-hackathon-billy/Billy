@@ -160,7 +160,7 @@ export function ServicesPage() {
               <span>
                 <strong>{service.title}</strong>
                 <span>{service.summary}</span>
-                <em>{service.connectedTo ? '앱에서 바로 신청' : '시연 화면'}</em>
+                <em>{service.connectedTo ? '앱에서 바로 신청' : '자세히 보기'}</em>
               </span>
             </Link>
           </li>

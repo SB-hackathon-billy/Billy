@@ -72,7 +72,7 @@ function CandidateCard({
           />
           <p className="field-hint">
             {candidate.itemSummary.source === 'PUBLIC'
-              ? '센터 데모 신청 · 실제 기관 접수 아님'
+              ? '센터 신청'
               : '이웃이 직접 응답하면 조건을 비교할 수 있어요.'}
           </p>
           <Check
@@ -169,7 +169,7 @@ export function Candidates({ view }: { view: RequestView }) {
         <h2>요청 전 마지막 확인</h2>
         <p>{selected.length}개 후보 선택 · 물품마다 독립적으로 응답해요.</p>
         <Check isSelected={confirmed} onChange={setConfirmed}>
-          선택한 주민에게 조건을 보내고, 공공 물품에는 센터 데모 신청을 보냅니다.
+          선택한 주민에게 조건을 보내고, 공공 물품에는 센터 신청을 보냅니다.
         </Check>
         <p className="field-hint">여러 소유자가 응답해도 마지막에는 하나만 선택해요.</p>
         {validation && <p role="alert">{validation}</p>}

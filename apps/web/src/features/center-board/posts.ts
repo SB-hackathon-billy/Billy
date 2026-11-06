@@ -62,7 +62,7 @@ export const centerPosts: CenterPost[] = [
     ],
     artwork: 'rental',
     source: { label: '청년개발자신문 보도', url: 'https://www.devtimes.co.kr/news/424966' },
-    action: { label: '상담 통화로 대여 신청하기', to: '/rental' },
+    action: { label: '앱에서 물품 빌리기', to: '/' },
   },
   {
     id: 'mind-check-2026',
@@ -169,7 +169,7 @@ export const centerPosts: CenterPost[] = [
       label: '서울신문 보도',
       url: 'https://go.seoul.co.kr/news/newsView.php?id=20240208010006',
     },
-    action: { label: '상담 통화로 대여 신청하기', to: '/rental' },
+    action: { label: '앱에서 물품 빌리기', to: '/' },
   },
   {
     id: 'club-2024',
@@ -225,13 +225,13 @@ export const centerServices: CenterService[] = [
   {
     id: 'rental',
     title: '물품대여',
-    summary: '센터 1층 대여소의 생활용품을 빌려요. 상담 도우미와 통화로 신청해요.',
+    summary: '센터 1층 대여소의 생활용품을 빌려요. 앱에서 둘러보거나 말로 요청해요.',
     current: [
       '성북구 주민등록 1인가구 대상, 1회 7일(1회 연장 가능), 물품별 1개·최대 2개.',
       '평일 09:30–17:30 센터 1층에서 수령·반납합니다.',
     ],
     artwork: 'rental',
-    connectedTo: '/rental',
+    connectedTo: '/',
   },
   {
     id: 'mind-check',

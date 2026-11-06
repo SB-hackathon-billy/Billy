@@ -25,7 +25,7 @@ test('AT19: a real 30-second hold expires without a payment or reservation mutat
   await activate(
     page,
     page.getByRole('checkbox', {
-      name: '선택한 주민에게 조건을 보내고, 공공 물품에는 센터 데모 신청을 보냅니다.',
+      name: '선택한 주민에게 조건을 보내고, 공공 물품에는 센터 신청을 보냅니다.',
     }),
     'Space',
   );

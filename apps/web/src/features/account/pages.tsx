@@ -6,6 +6,7 @@ import { useAction, useOnline } from '../../lib/hooks.js';
 import { ActionButton, ErrorNotice, Ink, Loading, Status } from '../../components/ui.js';
 import { formatSeoulDateTime } from '../../lib/api.js';
 import { illustrations } from '../../assets/illustrations/manifest.js';
+import { isEmptyRequest } from '../../lib/presentation.js';
 import { useReservations } from '../reservation/data.js';
 import { ReservationCard } from '../reservation/parts.js';
 
@@ -96,6 +97,7 @@ export function HomePage() {
   const { session } = useSession();
   const sync = useSync();
   const recent = [...(sync.data?.requestSummaries ?? [])]
+    .filter((request) => !isEmptyRequest(request, sync.data?.tasks))
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
     .slice(0, 3);
   const offered = sync.data?.requestSummaries.reduce((sum, r) => sum + r.offeredCount, 0) ?? 0;

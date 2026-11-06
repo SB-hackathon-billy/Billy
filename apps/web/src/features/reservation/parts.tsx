@@ -18,6 +18,14 @@ import { ActionButton, Check, ErrorNotice } from '../../components/ui.js';
 import { closedReasonLabel, reservationStatusLabels, waitlistStatusLabels } from './data.js';
 import './reservation.css';
 
+/** 확정 예약의 인계 단계(명세 0007). */
+export const handoverStageLabels = {
+  READY: '인계 대기',
+  PICKED_UP: '대여 중',
+  RETURNED: '반납 확인 중',
+  COMPLETED: '반납 완료',
+} as const;
+
 export function ReservationStatusBadge({ status }: { status: ReservationStatus }) {
   return (
     <span className={`status status-r-${status.toLowerCase()}`}>
@@ -54,7 +62,11 @@ export function ReservationCard({ view }: { view: ReservationView }) {
         )}
         {r.closedReason && <span>{closedReasonLabel(r.closedReason)}</span>}
       </div>
-      <ReservationStatusBadge status={r.status} />
+      {r.status === 'CONFIRMED' && r.handover && r.handover.stage !== 'READY' ? (
+        <span className="status status-r-confirmed">{handoverStageLabels[r.handover.stage]}</span>
+      ) : (
+        <ReservationStatusBadge status={r.status} />
+      )}
     </Link>
   );
 }

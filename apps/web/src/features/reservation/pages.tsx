@@ -45,7 +45,7 @@ function SourceLabel({
       {item.mine
         ? '내 물품'
         : item.source === 'PUBLIC'
-          ? '공공 · 센터 데모'
+          ? '공공 · 센터'
           : `이웃 · ${item.ownerDisplayName ?? '주민'}`}
     </span>
   );
@@ -380,13 +380,13 @@ export function CatalogItemPage() {
               <div className="payment-total">
                 <span>
                   총 대여료 ({a.billingDays}일)
-                  {item.source === 'PUBLIC' ? ' · 센터 데모 요금' : ''}
+                  {item.source === 'PUBLIC' ? ' · 센터 요금' : ''}
                 </span>
                 <strong>{formatKrw(a.totalFeeKrw)}</strong>
               </div>
               <p className="field-hint">
                 {item.source === 'PUBLIC'
-                  ? '센터(시연)가 곧 자동으로 응답해요. 실제 센터 접수와 결제는 없어요.'
+                  ? '센터가 곧 응답해요.'
                   : `${item.ownerDisplayName ?? '소유자'}님이 승인하면 이 기간이 확정돼요. 실제 결제는 없어요.`}
               </p>
               <Check isSelected={agreed} onChange={setAgreed}>
@@ -469,7 +469,7 @@ export function ReservationPage() {
           <div>
             <span className="source-label">
               {r.source === 'PUBLIC'
-                ? '공공 · 센터 데모'
+                ? '공공 · 센터'
                 : `이웃 · ${r.item.ownerDisplayName ?? '주민'}`}
             </span>
             <h2>{r.item.title}</h2>
@@ -505,7 +505,7 @@ export function ReservationPage() {
           </p>
         )}
         {r.status === 'PENDING' && r.source === 'PUBLIC' && (
-          <p className="field-hint">센터(시연)가 곧 자동으로 응답해요.</p>
+          <p className="field-hint">센터가 곧 응답해요.</p>
         )}
         {r.closedReason && <p className="field-hint">{closedReasonLabel(r.closedReason)}</p>}
         {r.origin === 'REQUEST' && r.requestId && !owner && (
@@ -515,7 +515,6 @@ export function ReservationPage() {
         )}
       </div>
       <HandoverCard view={view} {...(place ? { placeLabel: place.label } : {})} />
-      <p className="demo-notice">실제 결제와 기관 예약은 없어요. 앱 안의 데모 예약이에요.</p>
       {owner ? <OwnerResponse view={view} /> : <CancelReservation view={view} />}
       {view.history.length > 0 && (
         <div className="page-section">

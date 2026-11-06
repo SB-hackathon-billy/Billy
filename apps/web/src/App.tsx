@@ -180,7 +180,6 @@ function AppShell() {
           성북 공유대여
         </Link>
         <div className="header-actions">
-          <span className="demo-badge">DEMO</span>
           {session && !entry && (
             <>
               <NotificationBell />

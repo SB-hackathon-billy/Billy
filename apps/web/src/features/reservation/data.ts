@@ -134,7 +134,7 @@ export const availabilityReasonLabels: Record<AvailabilityReason, string> = {
 };
 export const closedReasonLabels: Record<string, string> = {
   PERIOD_TAKEN: '같은 기간에 다른 예약이 확정됐어요.',
-  PUBLIC_DEMO_DECLINED: '센터(시연)에서 신청을 받지 못했어요.',
+  PUBLIC_DEMO_DECLINED: '센터에서 신청을 받지 못했어요.',
   RESPONSE_EXPIRED: '응답 기한이 지났어요.',
   REQUESTER_CANCELLED: '신청한 이웃이 취소했어요.',
   SCHEDULE_ADJUSTMENT: '소유자 일정 조정이 필요해요.',
@@ -159,7 +159,7 @@ export const historyLabels: Record<string, string> = {
   REQUESTED: '대여 신청',
   OWNER_APPROVED: '소유자 승인',
   PREVIEW_CONFIRMED: '결제 미리보기에서 확정',
-  PUBLIC_DEMO_APPROVED: '센터(시연) 승인',
+  PUBLIC_DEMO_APPROVED: '센터 승인',
   REQUESTER_CANCELLED: '신청자 취소',
   RESPONSE_EXPIRED: '응답 기한 지남',
   PERIOD_TAKEN: '다른 예약 확정으로 종료',
@@ -171,7 +171,7 @@ export const historyLabels: Record<string, string> = {
 export const actorLabels = {
   REQUESTER: '신청자',
   OWNER: '소유자',
-  PUBLIC_DEMO: '센터(시연)',
+  PUBLIC_DEMO: '센터',
   SYSTEM: '자동 처리',
   HUB: '거점 관리자',
 } as const;

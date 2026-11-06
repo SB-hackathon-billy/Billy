@@ -44,7 +44,7 @@ export function PriceField({
             {quote.recommendationSource === 'AI'
               ? '✦ AI 추천'
               : quote.recommendationSource === 'PUBLIC_FIXED'
-                ? '센터 데모 고정 요금'
+                ? '센터 고정 요금'
                 : '기준 요금'}{' '}
             · {formatKrw(quote.recommendedKrw)}
           </span>

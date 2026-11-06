@@ -1,4 +1,14 @@
-import type { ComparisonRow, RequestView } from '@sb/contracts';
+import type { ComparisonRow, RequestSummary, RequestView, SyncData } from '@sb/contracts';
+/**
+ * 통화를 걸었다가 아무 내용 없이 끊은 요청. 물품을 말하지 않았고 신청서 정리도 진행 중이 아니면
+ * 요청함·홈 목록에서 뺀다(데이터는 그대로 두고 표시만 거른다).
+ */
+export function isEmptyRequest(request: RequestSummary, tasks: SyncData['tasks'] = []) {
+  return (
+    !request.needSummary.queryText?.trim() &&
+    !tasks.some((t) => t.requestId === request.id && ['QUEUED', 'RUNNING'].includes(t.status))
+  );
+}
 export const categories = {
   CLEANING: '청소',
   TOOLS: '생활 공구',
@@ -17,7 +27,7 @@ export const statusLabels: Record<string, string> = {
   CANCELLED: '요청 취소됨',
   EXPIRED: '유효시간 종료',
   AWAITING_OWNER: '소유자 응답 대기',
-  PENDING_PUBLIC: '센터 데모 확인 중',
+  PENDING_PUBLIC: '센터 확인 중',
   OFFERED: '조건 도착',
   SELECTED: '선택됨',
   DECLINED: '거절됨',

@@ -358,7 +358,7 @@ export function HubPage() {
                 <div>
                   <span className="source-label">
                     {r.source === 'PUBLIC'
-                      ? '공공 · 센터 데모'
+                      ? '공공 · 센터'
                       : `이웃 · ${view.ownerDisplayName ?? '주민'}`}
                   </span>
                   <h2>{r.item.title}</h2>
@@ -390,7 +390,6 @@ export function HubPage() {
             <HubActions view={view} code={code} />
           </>
         ))}
-      <p className="demo-notice">시연용 거점이에요. 실제 캠퍼스 거점 운영과 연동되지 않아요.</p>
     </section>
   );
 }

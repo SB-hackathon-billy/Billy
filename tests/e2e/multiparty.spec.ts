@@ -74,7 +74,7 @@ test('AT04/07/13/14/19/22: three cookie stores, real server, keyboard journey an
     await activate(
       hana,
       hana.getByRole('checkbox', {
-        name: '선택한 주민에게 조건을 보내고, 공공 물품에는 센터 데모 신청을 보냅니다.',
+        name: '선택한 주민에게 조건을 보내고, 공공 물품에는 센터 신청을 보냅니다.',
       }),
       'Space',
     );
@@ -176,7 +176,7 @@ test('AT04/07/13/14/19/22: three cookie stores, real server, keyboard journey an
     expect(
       result.data.request.negotiations.map((branch: { status: string }) => branch.status).sort(),
     ).toEqual(['SELECTED', 'SUPERSEDED', 'SUPERSEDED']);
-    await expect(hana.locator('.payment-total')).toHaveText('데모 총 대여료4,500원');
+    await expect(hana.locator('.payment-total')).toHaveText('총 대여료4,500원');
     await expect(
       hana.getByText('실제 결제와 예약이 이루어지지 않습니다.', { exact: true }),
     ).toBeVisible();

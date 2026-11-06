@@ -144,9 +144,7 @@ export function ItemHeader({ item }: { item: ItemSummary }) {
       <img src={item.image.url} alt={item.image.alt} width="92" height="80" />
       <div>
         <span className="source-label">
-          {item.source === 'PUBLIC'
-            ? '공공 · 센터 데모'
-            : `주민 · ${item.ownerDisplayName ?? '이웃'}`}
+          {item.source === 'PUBLIC' ? '공공 · 센터' : `주민 · ${item.ownerDisplayName ?? '이웃'}`}
         </span>
         <h2>{item.title}</h2>
       </div>

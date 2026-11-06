@@ -5,7 +5,7 @@ import { OwnerCardSchema, type OwnerCard } from '@sb/contracts';
 import { api, formatSeoulDateTime, idPath } from '../../lib/api.js';
 import { useAction, useOnline, usePlaces } from '../../lib/hooks.js';
 import { useSync } from '../../lib/session.js';
-import { reasonLabels } from '../../lib/presentation.js';
+import { isEmptyRequest, reasonLabels } from '../../lib/presentation.js';
 import { useReservations, useWaitlist } from '../reservation/data.js';
 import { OwnerResponse, ReservationCard, WaitlistCard } from '../reservation/parts.js';
 import {
@@ -134,9 +134,9 @@ export function InboxPage() {
   const [params, setParams] = useSearchParams();
   const owner = params.get('role') === 'OWNER';
   const sync = useSync();
-  const requests = [...(sync.data?.requestSummaries ?? [])].sort((a, b) =>
-    b.updatedAt.localeCompare(a.updatedAt),
-  );
+  const requests = [...(sync.data?.requestSummaries ?? [])]
+    .filter((request) => !isEmptyRequest(request, sync.data?.tasks))
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   const cards = [...(sync.data?.ownerCards ?? [])].sort((a, b) =>
     b.negotiation.updatedAt.localeCompare(a.negotiation.updatedAt),
   );

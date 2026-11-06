@@ -39,7 +39,7 @@ npm run seed -- --scenario default
 | `worker`   | `infra/runtime.Dockerfile`                | `npm run -w @sb/worker start`                                                                             |
 | `Postgres` | Railway 관리형                            | 외부 공개 없음. 각 서비스는 `DATABASE_URL=${{Postgres.DATABASE_URL}}` 참조                                |
 
-서비스 설정은 Railway 대시보드(Settings)에 있습니다. 데모 데이터 재적재는 api의 배포 전 명령을 `sh -c 'npm run -w @sb/db migrate && npm run -w @sb/db seed -- --scenario default'`로 바꿔 한 번 배포한 뒤 원래대로 되돌립니다. seed는 업무 데이터를 초기화합니다.
+서비스 설정은 Railway 대시보드(Settings)에 있습니다. 데모 데이터 재적재는 api의 배포 전 명령을 `sh -c 'npm run -w @sb/db migrate && npm run -w @sb/db seed -- --scenario default && npm run -w @sb/db showcase'`로 바꿔 한 번 배포한 뒤 원래대로 되돌립니다. seed는 업무 데이터를 초기화합니다. `showcase`는 시연용 진행 데이터(캠퍼스 거점 3곳, 인계 대기·응답 대기·반납 완료·승인 대기·대여 중 예약)를 더합니다. 응답 대기 신청은 24시간 뒤 만료됩니다.
 
 ## 구조와 검증
 
