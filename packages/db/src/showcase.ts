@@ -205,7 +205,12 @@ export async function showcase(db: Database, now = new Date()) {
   const when = (offset: number, time: string) => new Date(at(offset, time));
 
   await db.transaction(async (u) => {
-    for (const place of places) await put(u.c, 'places', place, true);
+    // migration 006이 넣은 거점과 겹쳐도 된다.
+    for (const place of places)
+      await u.c.query(
+        'INSERT INTO places(id,data) VALUES($1,$2) ON CONFLICT (id) DO UPDATE SET data=EXCLUDED.data',
+        [place.id, place],
+      );
     for (const it of items) await put(u.c, 'items', it, true);
     await u.c.query(
       `UPDATE items SET data = jsonb_set(data, '{allowedPlaceIds}', (data->'allowedPlaceIds') || '"place-hansung"')
