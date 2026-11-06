@@ -184,24 +184,6 @@ export function CatalogPage() {
           </select>
         </label>
       </div>
-      <details className="period-filter" open={!!filters.startAt}>
-        <summary>기간으로 빌릴 수 있는지 보기</summary>
-        <PeriodFields
-          startAt={filters.startAt}
-          endAt={filters.endAt}
-          onChange={(startAt, endAt) => update({ startAt, endAt })}
-        />
-        {filters.startAt && filters.endAt && !periodValid && (
-          <p role="alert" className="field-hint">
-            30분 단위, 1시간 이상 7일 이하, 지금 이후의 기간을 골라 주세요.
-          </p>
-        )}
-        {filters.startAt && (
-          <ActionButton secondary onPress={() => update({ startAt: null, endAt: null })}>
-            기간 지우기
-          </ActionButton>
-        )}
-      </details>
       <NearbyHubs />
       {page.isPending && !items.length ? (
         <Loading />

@@ -1,25 +1,25 @@
 // 캠퍼스 대여소 화면: 거점 위치도·거리(/hubs), 대여소별 물품(/hubs/:placeId).
 // 위치는 브라우저 안에서만 계산하고 서버로 보내지 않는다.
-import { Link, useParams } from 'react-router-dom';
+import { lazy, Suspense, useMemo } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { CAMPUS_HUB_PLACE_IDS, CatalogItemSchema, listDataSchema } from '@sb/contracts';
 import { api } from '../../lib/api.js';
 import { usePlaces } from '../../lib/hooks.js';
 import {
-  CENTER_SPOT,
   HUB_SPOTS,
-  SEONGBUK_MAP,
   formatDistance,
   locate,
   mapUrl,
   metersTo,
-  project,
+  insideSeongbuk,
   useHere,
   walkMinutes,
   type Here,
 } from '../../lib/campus.js';
 import { ActionButton, ErrorNotice, Loading } from '../../components/ui.js';
 import { CatalogCard, PhotoCredit } from './pages.js';
+import type { MapHub } from './HubsMap.js';
 import './reservation.css';
 
 // ponytail: 물품 수는 카탈로그 첫 50개로 센다. 물품이 50개를 넘으면 대여소별 count API를 둔다.
@@ -44,20 +44,9 @@ function useHubs() {
   return { hubs, here, loading: places.isPending };
 }
 
-/** 학교 이름표 위치(점 기준). 가까운 학교끼리 겹치지 않게 방향만 정한다. */
-const LABEL_SIDE: Record<string, 'up' | 'down' | 'left' | 'right'> = {
-  'place-korea': 'right',
-  'place-sungshin': 'up',
-  'place-hansung': 'left',
-  'place-kookmin': 'up',
-  'place-seokyeong': 'up',
-  'place-dongduk': 'down',
-};
+const LeafletMap = lazy(() => import('./HubsMap.js'));
 
-/**
- * 성북구 지도: 실제 행정경계 위에 캠퍼스 거점 6곳과 장위동 물품대여소만 찍는다.
- * 모든 점(거점·내 위치)은 같은 투영(project)을 쓴다.
- */
+/** 거리 지도(Leaflet) + 범례·출처. 지도 라이브러리는 이 화면에서만 받는다. */
 function HubsMap({
   hubs,
   here,
@@ -67,82 +56,30 @@ function HubsMap({
   here: Here;
   selected?: string;
 }) {
-  const me = here.status === 'ready' ? project(here) : null;
-  const meInside =
-    me && me.x > 0 && me.y > 0 && me.x < SEONGBUK_MAP.width && me.y < SEONGBUK_MAP.height;
-  const nearest = hubs[0]?.meters != null ? hubs[0].place.id : null;
-  const center = project(CENTER_SPOT);
-  const label = (side: string, x: number, y: number) =>
-    side === 'up'
-      ? { x, y: y - 14, anchor: 'middle' as const }
-      : side === 'down'
-        ? { x, y: y + 22, anchor: 'middle' as const }
-        : side === 'left'
-          ? { x: x - 13, y: y + 4, anchor: 'end' as const }
-          : { x: x + 13, y: y + 4, anchor: 'start' as const };
+  const navigate = useNavigate();
+  const key = hubs
+    .map((h) => `${h.place.id}:${h.meters === null ? '' : Math.round(h.meters)}`)
+    .join('|');
+  // 같은 거점·거리면 같은 배열을 넘겨 지도 표시를 다시 그리지 않는다.
+  const mapHubs = useMemo<MapHub[]>(
+    () =>
+      hubs.map((h) => ({ id: h.place.id, label: h.place.label, spot: h.spot, meters: h.meters })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [key],
+  );
+  const outside = here.status === 'ready' && !insideSeongbuk(here);
   return (
     <figure className="hubs-map">
-      <svg
-        className="hubs-map-svg"
-        viewBox={`0 0 ${SEONGBUK_MAP.width} ${SEONGBUK_MAP.height}`}
-        role="img"
-        aria-label="성북구 캠퍼스 대여소 지도"
+      <Suspense
+        fallback={<div className="hubs-leaflet hubs-leaflet-loading">지도를 불러오고 있어요…</div>}
       >
-        <defs>
-          <filter id="hubs-shadow" x="-10%" y="-10%" width="120%" height="130%">
-            <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#2b2a4a" floodOpacity="0.12" />
-          </filter>
-        </defs>
-        <path d={SEONGBUK_MAP.path} className="sb-land" filter="url(#hubs-shadow)" />
-        <text x="22" y="34" className="sb-title">
-          성북구
-        </text>
-        <g className="sb-center">
-          <rect
-            x={center.x - 7}
-            y={center.y - 7}
-            width="14"
-            height="14"
-            rx="2"
-            transform={`rotate(45 ${center.x} ${center.y})`}
-          />
-          <text x={center.x + 13} y={center.y - 10}>
-            장위동 물품대여소
-          </text>
-        </g>
-        {hubs.map((h) => {
-          const { x, y } = project(h.spot);
-          const state =
-            selected === h.place.id
-              ? 'selected'
-              : !selected && nearest === h.place.id
-                ? 'nearest'
-                : '';
-          const l = label(LABEL_SIDE[h.place.id] ?? 'up', x, y);
-          return (
-            <Link
-              key={h.place.id}
-              to={`/hubs/${h.place.id}`}
-              aria-label={`${h.place.label}${h.meters !== null ? ` · ${formatDistance(h.meters)}` : ''} 물품 보기`}
-            >
-              <g className={`sb-pin ${state}`}>
-                <circle cx={x} cy={y} r="16" className="halo" />
-                <circle cx={x} cy={y} r="7" className="dot" />
-                <text x={l.x} y={l.y} textAnchor={l.anchor} className="name">
-                  {h.place.label.replace(' 거점', '')}
-                  {h.meters !== null && <tspan className="dist"> {formatDistance(h.meters)}</tspan>}
-                </text>
-              </g>
-            </Link>
-          );
-        })}
-        {meInside && (
-          <g className="sb-me">
-            <circle cx={me.x} cy={me.y} r="13" className="halo" />
-            <circle cx={me.x} cy={me.y} r="5.5" />
-          </g>
-        )}
-      </svg>
+        <LeafletMap
+          hubs={mapHubs}
+          here={here}
+          {...(selected ? { selected } : {})}
+          onPick={(id) => navigate(`/hubs/${id}`)}
+        />
+      </Suspense>
       <figcaption className="hubs-legend">
         <span>
           <i className="dot hub" /> 캠퍼스 대여소
@@ -150,14 +87,13 @@ function HubsMap({
         <span>
           <i className="dot center" /> 1인가구 물품대여소(장위로 82)
         </span>
-        {meInside && (
+        {here.status === 'ready' && (
           <span>
-            <i className="dot me" /> 내 위치
+            <i className="dot me" /> 내 위치{outside ? ' (성북구 밖)' : ''}
           </span>
         )}
-        {me && !meInside && <span>지금 위치는 성북구 밖이에요</span>}
       </figcaption>
-      <p className="hubs-source">지도: 통계청 행정구역 경계(2013) · 학교 위치 OpenStreetMap</p>
+      <p className="hubs-source">학교 위치는 지도 표시용 대략값이에요. 지도·경계 © OpenStreetMap</p>
     </figure>
   );
 }
@@ -264,8 +200,6 @@ export function HubDetailPage() {
     ) : (
       <Loading />
     );
-  const { lat, lng } = hub.spot;
-  const bbox = [lng - 0.006, lat - 0.0035, lng + 0.006, lat + 0.0035].join(',');
   return (
     <section className="hubs-page">
       <Link className="text-link" to="/hubs">
@@ -287,13 +221,6 @@ export function HubDetailPage() {
           카카오맵에서 길찾기 →
         </a>
       </div>
-      <iframe
-        className="hub-map-frame"
-        title={`${hub.place.label} 지도`}
-        src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`}
-        loading="lazy"
-        referrerPolicy="no-referrer"
-      />
       <HubsMap hubs={hubs} here={here} selected={hub.place.id} />
       <h2 className="hub-items-title">
         이 대여소에서 빌릴 수 있어요{items.data ? ` · ${items.data.items.length}개` : ''}

@@ -3,10 +3,9 @@ import { CAMPUS_HUB_PLACE_IDS } from '@sb/contracts';
 import {
   CENTER_SPOT,
   HUB_SPOTS,
-  SEONGBUK_MAP,
   distanceMeters,
   formatDistance,
-  project,
+  insideSeongbuk,
   walkMinutes,
 } from './campus.js';
 
@@ -26,13 +25,9 @@ describe('캠퍼스 거점 거리', () => {
     expect(walkMinutes(670)).toBe(13);
     expect(walkMinutes(10)).toBe(1);
   });
-  it('거점을 성북구 지도 안쪽에 찍는다', () => {
-    for (const spot of [...Object.values(HUB_SPOTS), CENTER_SPOT]) {
-      const p = project(spot);
-      expect(p.x).toBeGreaterThan(0);
-      expect(p.y).toBeGreaterThan(0);
-      expect(p.x).toBeLessThan(SEONGBUK_MAP.width);
-      expect(p.y).toBeLessThan(SEONGBUK_MAP.height);
-    }
+  it('거점 6곳과 장위동 물품대여소는 모두 성북구 경계 안이다', () => {
+    for (const spot of [...Object.values(HUB_SPOTS), CENTER_SPOT])
+      expect(insideSeongbuk(spot), spot.mapQuery).toBe(true);
+    expect(insideSeongbuk({ lat: 37.5665, lng: 126.978 })).toBe(false); // 서울시청
   });
 });
