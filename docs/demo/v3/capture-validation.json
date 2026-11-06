@@ -1,0 +1,24 @@
+{
+  "screenshots": 27,
+  "errors": [],
+  "policyPath": "/center/board/rental-guide",
+  "buttonLayout": [
+    {
+      "text": "네, 이 물품이에요",
+      "buttonWidth": 321.21875,
+      "textWidth": 121.15625,
+      "lines": 1,
+      "fits": true
+    },
+    {
+      "text": "아니요, 다시 말할게요",
+      "buttonWidth": 321.21875,
+      "textWidth": 151.75,
+      "lines": 1,
+      "fits": true
+    }
+  ],
+  "authenticatedDemo": "demo-hana",
+  "mutations": "로그인 외 게시·예약·데이터 수정 없음. 통화는 제품 시연 스크립트.",
+  "viewport": "390x844 @3x"
+}

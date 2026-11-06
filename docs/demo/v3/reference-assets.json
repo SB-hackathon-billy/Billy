@@ -1,0 +1,44 @@
+[
+  {
+    "id": "region-donam-market",
+    "xref": 3145,
+    "title": "성북구 돈암시장",
+    "credit": "성북문화원 · 성북마을아카이브 · 공공누리 제2유형",
+    "url": "https://web-production-968e50.up.railway.app/hubs"
+  },
+  {
+    "id": "center-rental-items",
+    "xref": 51,
+    "title": "센터 물품 대여 사진",
+    "credit": "사진 ©황진희 · 서울시 내 손안에 서울 2026.9.23 · 공공누리 제4유형",
+    "url": "https://web-production-968e50.up.railway.app/catalog"
+  },
+  {
+    "id": "mascot-listening",
+    "xref": 2185,
+    "title": "듣는 중",
+    "credit": "원본 PDF 12쪽의 감탄이 상태 이미지",
+    "url": "https://web-production-968e50.up.railway.app/rental?demo=script"
+  },
+  {
+    "id": "mascot-thinking",
+    "xref": 2190,
+    "title": "정리 중",
+    "credit": "원본 PDF 12쪽의 감탄이 상태 이미지",
+    "url": "https://web-production-968e50.up.railway.app/rental?demo=script"
+  },
+  {
+    "id": "mascot-speaking",
+    "xref": 2192,
+    "title": "답하는 중",
+    "credit": "원본 PDF 12쪽의 감탄이 상태 이미지",
+    "url": "https://web-production-968e50.up.railway.app/rental?demo=script"
+  },
+  {
+    "id": "mascot-done",
+    "xref": 2194,
+    "title": "신청 완료",
+    "credit": "원본 PDF 12쪽의 감탄이 상태 이미지",
+    "url": "https://web-production-968e50.up.railway.app/rental?demo=script"
+  }
+]
