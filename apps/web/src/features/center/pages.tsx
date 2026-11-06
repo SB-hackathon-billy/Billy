@@ -48,7 +48,7 @@ export function AboutPage() {
   return (
     <section>
       <div className="center-hero">
-        <PageHeading eyebrow="센터 소개" title="혼자여도, 함께하는 일상">
+        <PageHeading title="혼자여도, 함께하는 일상">
           동네에서 만나는 작은 연결.
           <br />
           나에게 맞는 시간을 찾아보세요.
@@ -88,7 +88,7 @@ export function AboutPage() {
                 </Link>
               ))}
             </div>
-            <Link className="center-button center-wide" to="/rental">
+            <Link className="button" to="/rental">
               공공·이웃 물품 공유대여 살펴보기
             </Link>
           </>
@@ -161,18 +161,15 @@ export function BusinessPage() {
   };
   return (
     <section>
-      <PageHeading eyebrow="사업 안내" title="일상에 더하는 연결">
-        마음 돌봄부터 생활의 작은 배움까지.
-      </PageHeading>
+      <PageHeading title="일상에 더하는 연결">마음 돌봄부터 생활의 작은 배움까지.</PageHeading>
       <DemoNotice>2026년 11월의 합성 일정입니다. 실제 모집·운영 일정이 아닙니다.</DemoNotice>
-      <div className="center-category-grid" aria-label="사업 분류">
-        {categories.map((value, index) => (
+      <div className="center-chips" aria-label="사업 분류">
+        {categories.map((value) => (
           <Button
             key={value}
             aria-pressed={category === value}
             onPress={() => setCategory(category === value ? '' : value)}
           >
-            <span aria-hidden="true">0{index + 1}</span>
             {value}
           </Button>
         ))}
@@ -248,7 +245,7 @@ export function BusinessPage() {
               ))}
             </select>
           </label>
-          <Button className="center-button center-primary" onPress={() => setFilterOpen(false)}>
+          <Button className="button" onPress={() => setFilterOpen(false)}>
             필터 적용
           </Button>
         </div>
@@ -262,9 +259,7 @@ export function ProgramsPage() {
   const filtered = filterCenterContent(programs, query);
   return (
     <section>
-      <PageHeading eyebrow="프로그램" title="나를 위한 작은 시간">
-        함께 배우고, 만나고, 쉬어가는 프로그램.
-      </PageHeading>
+      <PageHeading title="나를 위한 작은 시간">함께 배우고, 만나고, 쉬어가는 프로그램.</PageHeading>
       <DemoNotice />
       <Search value={query} onChange={setQuery} label="프로그램 검색" />
       <p className="center-result-count" role="status">
@@ -317,10 +312,10 @@ export function ProgramDetail({ business = false }: { business?: boolean }) {
       </dl>
       <ContentBody item={item} />
       <div className="center-actions">
-        <InterestButton item={item} />
-        <Button className="center-button center-primary" onPress={() => setPreview(true)}>
+        <Button className="button" onPress={() => setPreview(true)}>
           신청 양식 살펴보기
         </Button>
+        <InterestButton item={item} />
       </div>
       {preview && <FormPreview item={item} kind="program" onClose={() => setPreview(false)} />}
     </section>
@@ -337,9 +332,7 @@ export function ClubsPage() {
   );
   return (
     <section>
-      <PageHeading eyebrow="동아리" title="좋아하는 일을, 함께">
-        작은 관심사가 이웃과 만나는 시간.
-      </PageHeading>
+      <PageHeading title="좋아하는 일을, 함께">작은 관심사가 이웃과 만나는 시간.</PageHeading>
       <DemoNotice />
       <Search value={query} onChange={setQuery} label="동아리 검색" />
       <ChoiceTabs
@@ -401,13 +394,13 @@ export function ClubDetail() {
           않습니다.
         </p>
         <div className="center-stacked-actions">
-          <Button className="center-button center-primary" onPress={() => setKind('leader')}>
+          <Button className="button" onPress={() => setKind('leader')}>
             리더 참여 양식
           </Button>
-          <Button className="center-button" onPress={() => setKind('member')}>
+          <Button className="button secondary" onPress={() => setKind('member')}>
             팀원 참여 양식
           </Button>
-          <Button className="center-button" onPress={() => setKind('report')}>
+          <Button className="button secondary" onPress={() => setKind('report')}>
             활동보고 양식
           </Button>
         </div>
@@ -425,9 +418,7 @@ export function SpacesPage() {
   );
   return (
     <section>
-      <PageHeading eyebrow="공간" title="같이 머무는 공간">
-        잠깐 모여 이야기하고, 배움을 나눠요.
-      </PageHeading>
+      <PageHeading title="같이 머무는 공간">잠깐 모여 이야기하고, 배움을 나눠요.</PageHeading>
       <DemoNotice>공간·수용 인원은 예시입니다. 실제 신청·예약되지 않습니다.</DemoNotice>
       <Search value={query} onChange={setQuery} label="공간 검색" />
       <p className="center-result-count" role="status">
@@ -536,7 +527,7 @@ export function SpaceDetail() {
           </p>
         )}
         <Button
-          className="center-button center-primary"
+          className="button"
           onPress={() => {
             const message = validateSpaceDraft(draft);
             setError(message);
@@ -560,9 +551,7 @@ export function NewsPage() {
   );
   return (
     <section>
-      <PageHeading eyebrow="소식" title="우리 동네의 이야기">
-        센터에서 이어지는 소소한 일상을 만나요.
-      </PageHeading>
+      <PageHeading title="우리 동네의 이야기">센터에서 이어지는 소소한 일상을 만나요.</PageHeading>
       <DemoNotice />
       <Search value={query} onChange={setQuery} label="소식 제목 검색" />
       <ChoiceTabs
@@ -629,9 +618,9 @@ export function NewsDetail() {
             alt={selectedImage.alt}
           />
           <p>{selectedImage.alt}</p>
-          <div className="center-actions">
+          <div className="center-actions center-actions-row">
             <Button
-              className="center-button"
+              className="button secondary"
               onPress={() =>
                 setImageIndex(((imageIndex ?? 0) + item.images.length - 1) % item.images.length)
               }
@@ -639,13 +628,13 @@ export function NewsDetail() {
               이전 그림
             </Button>
             <Button
-              className="center-button"
+              className="button secondary"
               onPress={() => setImageIndex(((imageIndex ?? 0) + 1) % item.images.length)}
             >
               다음 그림
             </Button>
           </div>
-          <Button className="center-button center-wide" onPress={() => setImageIndex(null)}>
+          <Button className="button secondary center-wide" onPress={() => setImageIndex(null)}>
             미리보기 닫기
           </Button>
         </Sheet>

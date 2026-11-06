@@ -31,6 +31,8 @@ const InterestContext = createContext<{ ids: Set<string>; toggle: (id: string) =
   null,
 );
 const menu = [
+  ['board', '공지·소식'],
+  ['services', '서비스'],
   ['about', '센터 소개'],
   ['business', '사업 안내'],
   ['programs', '프로그램'],
@@ -54,7 +56,6 @@ export function CenterLayout() {
         <div className="center-feature">
           <div className="center-masthead">
             <Link to="/center">성북구 1인가구지원센터</Link>
-            <span>동네의 연결</span>
           </div>
           <nav className="center-nav" aria-label="센터 메뉴">
             {menu.map(([path, title]) => (
@@ -67,8 +68,9 @@ export function CenterLayout() {
           <footer className="center-footer">
             <strong>함께 살펴보는 센터 데모</strong>
             <p>
-              센터 콘텐츠·모집·양식은 합성 예시입니다. 실제 신청·예약되지 않습니다. 입력과 관심
-              표시는 현재 탭의 화면에서만 유지되며 새로고침하거나 센터를 벗어나면 초기화됩니다.
+              공지·소식은 공개된 센터 공지·보도를 옮긴 시연 화면이고, 그 밖의 메뉴의 프로그램·양식은
+              합성 예시입니다. 물품대여 외에는 실제 신청·예약되지 않습니다. 입력과 관심 표시는 현재
+              탭의 화면에서만 유지되며 새로고침하거나 센터를 벗어나면 초기화됩니다.
             </p>
             <ExternalLink href="https://sb1in.or.kr/">공식 센터 사이트</ExternalLink>
           </footer>
@@ -90,18 +92,9 @@ export function Illustration({ id, className = '' }: { id: IllustrationId; class
     />
   );
 }
-export function PageHeading({
-  eyebrow,
-  title,
-  children,
-}: {
-  eyebrow: string;
-  title: string;
-  children: ReactNode;
-}) {
+export function PageHeading({ title, children }: { title: string; children: ReactNode }) {
   return (
     <header className="center-page-heading">
-      <p className="eyebrow">{eyebrow}</p>
       <h1>{title}</h1>
       <p>{children}</p>
     </header>
@@ -207,7 +200,7 @@ export function InterestButton({ item }: { item: CenterRecord }) {
   const selected = ids.has(item.id);
   return (
     <Button
-      className="center-button center-interest"
+      className="button secondary center-interest"
       aria-pressed={selected}
       onPress={() => toggle(item.id)}
     >
@@ -236,10 +229,7 @@ export function ContentCard({ item, base }: { item: CenterRecord; base: string }
           )}
         </div>
         <h2>
-          <Link to={`${base}/${item.id}`}>
-            {item.title}
-            <span aria-hidden="true"> ↗</span>
-          </Link>
+          <Link to={`${base}/${item.id}`}>{item.title}</Link>
         </h2>
         <p>{item.summary}</p>
         {item.display.startAt && (
@@ -276,9 +266,7 @@ export function DetailHeader({
       <Link className="center-back" to={back}>
         ← {backLabel}
       </Link>
-      <PageHeading eyebrow="센터 · 예시 콘텐츠" title={item.title}>
-        {item.summary}
-      </PageHeading>
+      <PageHeading title={item.title}>{item.summary}</PageHeading>
       <DemoNotice />
     </>
   );
@@ -286,10 +274,10 @@ export function DetailHeader({
 export function NotFoundContent({ back }: { back: string }) {
   return (
     <>
-      <PageHeading eyebrow="센터" title="콘텐츠를 찾을 수 없어요">
+      <PageHeading title="콘텐츠를 찾을 수 없어요">
         주소를 확인하거나 목록에서 다시 골라 주세요.
       </PageHeading>
-      <Link className="center-button" to={back}>
+      <Link className="button" to={back}>
         목록으로 돌아가기
       </Link>
     </>

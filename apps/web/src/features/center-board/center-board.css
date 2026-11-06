@@ -1,0 +1,269 @@
+/* 센터 서비스 시연 (명세 0003 9절). cb- 접두사로 격리. */
+.cb-page {
+  padding-bottom: 1rem;
+}
+.cb-hero {
+  margin: 1.25rem 0 1rem;
+}
+.cb-hero h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.6rem, 6.5vw, 2rem);
+  letter-spacing: -0.03em;
+  line-height: 1.3;
+}
+.cb-hero p:last-child {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+.cb-artwork {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.cb-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 5.6rem;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding: 0.2rem 0 0.8rem;
+  margin: 0 0 0.6rem;
+  scrollbar-width: none;
+}
+.cb-strip a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 650;
+  text-align: center;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+.cb-strip .cb-artwork {
+  width: 4.4rem;
+  height: 4.4rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.cb-filters {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+.cb-filters button {
+  min-height: 44px;
+  padding: 0 1.05rem;
+  border-radius: var(--radius-pill);
+  border: 0;
+  background: var(--color-glass);
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+.cb-filters button[aria-pressed='true'] {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 700;
+}
+.cb-count {
+  margin: 1rem 0 0.6rem;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+.cb-list,
+.cb-services {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.cb-card,
+.cb-service {
+  display: grid;
+  grid-template-columns: 6.2rem 1fr;
+  gap: 0.9rem;
+  align-items: start;
+  padding: 0.85rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+  text-decoration: none;
+}
+.cb-card .cb-artwork,
+.cb-service .cb-artwork {
+  border-radius: var(--radius-md);
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+.cb-card-body,
+.cb-service > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.cb-card strong,
+.cb-service strong {
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+.cb-summary,
+.cb-service span span {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cb-service em {
+  font-style: normal;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-primary-text);
+}
+.cb-meta {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+.cb-tags {
+  display: flex;
+  gap: 0.3rem;
+  margin: 0;
+}
+.cb-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.1rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-sunken);
+  color: var(--color-text);
+}
+.cb-tag.notice {
+  background: var(--color-strong);
+  color: var(--color-on-strong);
+}
+.cb-tag.recruit {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-text);
+}
+.cb-tag.pinned {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+.cb-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 0.2rem 0 0.4rem;
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.cb-article h1 {
+  margin: 0.6rem 0 0.3rem;
+  font-size: clamp(1.5rem, 6vw, 1.9rem);
+  letter-spacing: -0.03em;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+.cb-article h2 {
+  font-size: 1.2rem;
+  margin: 1.75rem 0 0.5rem;
+}
+.cb-article > p {
+  line-height: 1.75;
+}
+.cb-article-art .cb-artwork {
+  border-radius: var(--radius-lg);
+  max-height: 14rem;
+  object-fit: cover;
+}
+.cb-facts {
+  margin: 1.25rem 0;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+.cb-facts div {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 0.6rem;
+  padding: 0.65rem 0;
+}
+.cb-facts dt {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+.cb-facts dd {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.cb-article .button {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 1.5rem 0 0.8rem;
+  text-decoration: none;
+}
+.cb-bullets {
+  padding-left: 1.2rem;
+  line-height: 1.75;
+}
+.cb-source {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+.cb-note {
+  margin-top: 1.6rem;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+}
+.cb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgb(23 35 30 / 0.4);
+}
+.cb-modal {
+  width: min(100%, 48rem);
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 1.5rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-raised);
+}
+.cb-modal [role='dialog'] {
+  outline: none;
+}
+.cb-modal h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+}
+.cb-demo {
+  margin: 0 0 0.75rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+.cb-modal .button {
+  width: 100%;
+  margin-top: 1.25rem;
+}

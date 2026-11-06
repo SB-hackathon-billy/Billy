@@ -5,8 +5,21 @@ import * as entities from './entities.js';
 import * as ai from './ai.js';
 import * as http from './http.js';
 import * as listing from './listing.js';
+import * as intake from './intake.js';
+import * as reservation from './reservation.js';
+import * as policy from './policy.js';
 
-const namedSchemas = { ...enums, ...primitives, ...entities, ...ai, ...http, ...listing };
+const namedSchemas = {
+  ...enums,
+  ...primitives,
+  ...entities,
+  ...ai,
+  ...http,
+  ...listing,
+  ...intake,
+  ...reservation,
+  ...policy,
+};
 const schemas: Record<string, z.ZodType> = {};
 for (const [name, schema] of Object.entries(namedSchemas)) {
   if (name.endsWith('Schema') && schema instanceof z.ZodType) schemas[name.slice(0, -6)] = schema;
@@ -36,6 +49,17 @@ const responses = {
   UploadedImage: http.successEnvelopeSchema(listing.UploadedImageSchema),
   Listing: http.successEnvelopeSchema(listing.ListingSchema),
   Listings: http.successEnvelopeSchema(http.listDataSchema(listing.ListingSchema)),
+  IntakeApproval: http.successEnvelopeSchema(intake.IntakeApprovalSchema),
+  Catalog: http.successEnvelopeSchema(http.listDataSchema(reservation.CatalogItemSchema)),
+  CatalogItemDetail: http.successEnvelopeSchema(reservation.CatalogItemDetailSchema),
+  ItemAvailability: http.successEnvelopeSchema(reservation.ItemAvailabilitySchema),
+  ReservationView: http.successEnvelopeSchema(reservation.ReservationViewSchema),
+  Reservations: http.successEnvelopeSchema(http.listDataSchema(reservation.ReservationViewSchema)),
+  WaitlistEntry: http.successEnvelopeSchema(reservation.WaitlistEntrySchema),
+  WaitlistEntries: http.successEnvelopeSchema(http.listDataSchema(reservation.WaitlistEntrySchema)),
+  Notifications: http.successEnvelopeSchema(reservation.NotificationListSchema),
+  ReadNotifications: http.successEnvelopeSchema(reservation.ReadNotificationsDataSchema),
+  PolicyMatch: http.successEnvelopeSchema(policy.PolicyMatchSchema),
 };
 for (const [name, schema] of Object.entries(responses)) schemas[`${name}Response`] = schema;
 
@@ -51,6 +75,8 @@ type Operation = {
   public?: boolean;
   sse?: boolean;
   binary?: boolean;
+  /** Stateless computation: the Idempotency-Key is checked but the result is not replayed. */
+  recomputed?: boolean;
 };
 /** The method/path pairs in COMMON_CONTRACT §6.1. */
 export const API_OPERATIONS: readonly Operation[] = [
@@ -393,6 +419,147 @@ export const API_OPERATIONS: readonly Operation[] = [
     response: 'Listing',
     body: 'ListingVersionBody',
   },
+  {
+    method: 'post',
+    path: '/intake-approvals',
+    operationId: 'createIntakeApproval',
+    summary: '사람이 승인한 통화 신청서로 예약 신청 도구 실행(백그라운드 재시도)',
+    status: 202,
+    response: 'IntakeApproval',
+    body: 'CreateIntakeApprovalBody',
+  },
+  {
+    method: 'get',
+    path: '/intake-approvals/{id}',
+    operationId: 'getIntakeApproval',
+    summary: '예약 신청 도구 실행 상태',
+    status: 200,
+    response: 'IntakeApproval',
+  },
+  {
+    method: 'post',
+    path: '/policy-matches',
+    operationId: 'matchPolicies',
+    summary: '통화 발화의 대여 상황으로 신청완료 화면에 안내할 센터 정책 선택(저장 없음)',
+    status: 200,
+    response: 'PolicyMatch',
+    body: 'PolicyMatchBody',
+    recomputed: true,
+  },
+  {
+    method: 'get',
+    path: '/catalog',
+    operationId: 'listCatalog',
+    summary: '활성 물품 목록·검색·분류/출처 필터, 기간을 주면 가용성·총액 포함',
+    status: 200,
+    response: 'Catalog',
+    query: 'CatalogQuery',
+  },
+  {
+    method: 'get',
+    path: '/catalog/{id}',
+    operationId: 'getCatalogItem',
+    summary: '물품 상세: 설명·점유 기간·대기 수',
+    status: 200,
+    response: 'CatalogItemDetail',
+  },
+  {
+    method: 'get',
+    path: '/catalog/{id}/availability',
+    operationId: 'getItemAvailability',
+    summary: '기간별 가용 여부·사유·총액·대기 가능 여부',
+    status: 200,
+    response: 'ItemAvailability',
+    query: 'ItemAvailabilityQuery',
+  },
+  {
+    method: 'post',
+    path: '/reservations',
+    operationId: 'createReservation',
+    summary: '바로 신청(PENDING) 또는 결제 미리보기 확정(requestId·negotiationId, CONFIRMED)',
+    status: 201,
+    response: 'ReservationView',
+    body: 'CreateReservationBody',
+  },
+  {
+    method: 'get',
+    path: '/reservations',
+    operationId: 'listReservations',
+    summary: '내 신청(REQUESTER) 또는 내 물품에 온 신청(OWNER)',
+    status: 200,
+    response: 'Reservations',
+    query: 'ReservationsQuery',
+  },
+  {
+    method: 'get',
+    path: '/reservations/{id}',
+    operationId: 'getReservation',
+    summary: '예약 상세와 응답 이력',
+    status: 200,
+    response: 'ReservationView',
+  },
+  {
+    method: 'post',
+    path: '/reservations/{id}/respond',
+    operationId: 'respondReservation',
+    summary: '주민 소유자 승인(기간 점유)·거절',
+    status: 200,
+    response: 'ReservationView',
+    body: 'RespondReservationBody',
+  },
+  {
+    method: 'post',
+    path: '/reservations/{id}/cancel',
+    operationId: 'cancelReservation',
+    summary: '요청자 취소(PENDING 또는 시작 전 CONFIRMED)',
+    status: 200,
+    response: 'ReservationView',
+    body: 'ReservationVersionBody',
+  },
+  {
+    method: 'post',
+    path: '/waitlist-entries',
+    operationId: 'createWaitlistEntry',
+    summary: '점유된 기간 대기 등록(중복 대기 차단)',
+    status: 201,
+    response: 'WaitlistEntry',
+    body: 'CreateWaitlistEntryBody',
+  },
+  {
+    method: 'get',
+    path: '/waitlist-entries',
+    operationId: 'listWaitlistEntries',
+    summary: '내 대기 목록과 순번·우선권',
+    status: 200,
+    response: 'WaitlistEntries',
+    query: 'WaitlistQuery',
+  },
+  {
+    method: 'delete',
+    path: '/waitlist-entries/{id}',
+    operationId: 'cancelWaitlistEntry',
+    summary: '대기 취소(우선권이면 다음 순위로)',
+    status: 200,
+    response: 'WaitlistEntry',
+  },
+  {
+    method: 'get',
+    path: '/notifications',
+    operationId: 'listNotifications',
+    summary: '앱 내 알림(최신순)과 읽지 않은 수',
+    status: 200,
+    response: 'Notifications',
+    query: 'NotificationsQuery',
+  },
+  {
+    method: 'post',
+    path: '/notifications/read',
+    operationId: 'readNotifications',
+    summary: '알림 읽음 처리(선택 또는 전체)',
+    status: 200,
+    response: 'ReadNotifications',
+    body: 'ReadNotificationsBody',
+  },
 ];
 export function buildOpenApi() {
   const componentSchemas = Object.fromEntries(
@@ -424,7 +591,9 @@ export function buildOpenApi() {
           in: 'header',
           required: true,
           schema: { type: 'string', minLength: 1, maxLength: 128 },
-          description: '24시간 동안 같은 세션·실제 경로·body에 최초 결과를 재현합니다.',
+          description: operation.recomputed
+            ? '전역 요청 검사용 필수 헤더. 이 경로는 결과를 저장하지 않아 같은 키로도 다시 계산합니다.'
+            : '24시간 동안 같은 세션·실제 경로·body에 최초 결과를 재현합니다.',
         },
       );
     if (operation.query) {
@@ -500,7 +669,8 @@ export function buildOpenApi() {
     info: {
       title: '성북 공유대여 MVP',
       version: enums.CONTRACT_VERSION,
-      description: '데모 세션은 인증이 아닙니다. 실제 결제와 예약이 이루어지지 않습니다.',
+      description:
+        '데모 세션은 인증이 아닙니다. 실제 결제와 기관 예약은 이루어지지 않으며, 예약은 앱 안의 데모 상태입니다.',
     },
     servers: [{ url: '/api/v1' }],
     paths,

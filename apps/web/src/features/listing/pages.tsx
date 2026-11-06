@@ -45,9 +45,10 @@ export function ListingsPage() {
   });
   return (
     <section>
-      <p className="eyebrow">빌려주기</p>
       <h1>내 물품</h1>
-      <p>사진 한 장이면 AI가 등록글 초안을 써 드려요. 확인하고 고친 뒤 게시하세요.</p>
+      <p className="lead">
+        사진 한 장이면 AI가 등록글 초안을 써 드려요. 확인하고 고친 뒤 게시하세요.
+      </p>
       <Link className="button" to="/listings/new">
         사진으로 등록하기
       </Link>
@@ -60,7 +61,7 @@ export function ListingsPage() {
       ) : (
         <ul className="listing-list">
           {query.data.items.map((l) => (
-            <li key={l.id} className="content-card">
+            <li key={l.id}>
               <Link to={`/listings/${l.id}`} className="listing-row">
                 <img src={`/api/v1/images/${l.imageIds[0]}`} alt="" />
                 <span>
@@ -108,35 +109,36 @@ export function NewListingPage() {
     })();
   return (
     <section>
-      <p className="eyebrow">빌려주기</p>
       <h1>사진으로 등록</h1>
-      <label>
-        물건 사진 (최대 {MAX_LISTING_IMAGES}장)
-        <input
-          type="file"
-          accept={IMAGE_CONTENT_TYPES.join(',')}
-          multiple
-          onChange={(e) => setFiles([...(e.target.files ?? [])].slice(0, MAX_LISTING_IMAGES))}
-          disabled={action.pending}
-        />
-      </label>
-      {!!previews.length && (
-        <div className="listing-photos">
-          {previews.map((src) => (
-            <img key={src} src={src} alt="선택한 사진" />
-          ))}
-        </div>
-      )}
-      <label>
-        메모 (선택)
-        <textarea
-          value={notes}
-          maxLength={500}
-          placeholder="예: 충전기 포함, 1년 사용"
-          onChange={(e) => setNotes(e.target.value)}
-          disabled={action.pending}
-        />
-      </label>
+      <div className="listing-form">
+        <label>
+          물건 사진 (최대 {MAX_LISTING_IMAGES}장)
+          <input
+            type="file"
+            accept={IMAGE_CONTENT_TYPES.join(',')}
+            multiple
+            onChange={(e) => setFiles([...(e.target.files ?? [])].slice(0, MAX_LISTING_IMAGES))}
+            disabled={action.pending}
+          />
+        </label>
+        {!!previews.length && (
+          <div className="listing-photos">
+            {previews.map((src) => (
+              <img key={src} src={src} alt="선택한 사진" />
+            ))}
+          </div>
+        )}
+        <label>
+          메모 (선택)
+          <textarea
+            value={notes}
+            maxLength={500}
+            placeholder="예: 충전기 포함, 1년 사용"
+            onChange={(e) => setNotes(e.target.value)}
+            disabled={action.pending}
+          />
+        </label>
+      </div>
       <ErrorNotice action={action} />
       {action.pending && <Loading>사진을 올리고 AI가 초안을 쓰고 있어요.</Loading>}
       <ActionButton isDisabled={!files.length || action.pending} onPress={() => action.run(create)}>
@@ -225,7 +227,7 @@ export function ListingEditPage() {
 
   return (
     <section>
-      <p className="eyebrow">빌려주기 · {statusText[l.status]}</p>
+      <p className="eyebrow">{statusText[l.status]}</p>
       <h1>등록글 확인</h1>
       <div className="listing-photos">
         {l.imageIds.map((imageId) => (
@@ -233,14 +235,14 @@ export function ListingEditPage() {
         ))}
       </div>
       {l.aiStatus === 'FAILED' ? (
-        <p role="status" className="content-card">
+        <p role="status" className="explanation">
           AI가 사진을 분석하지 못했어요. 내용을 직접 입력해 주세요.
         </p>
       ) : (
         <p className="field-hint">✦ AI가 사진을 보고 쓴 초안이에요. 사실과 다르면 고쳐 주세요.</p>
       )}
       {!!l.unknowns.length && (
-        <div className="content-card">
+        <div className="explanation">
           <h2>사진만으로는 알 수 없어요</h2>
           <ul>
             {l.unknowns.map((u) => (
@@ -250,70 +252,72 @@ export function ListingEditPage() {
           <p className="field-hint">직접 확인한 내용을 설명에 적어 주세요.</p>
         </div>
       )}
-      <label>
-        제목
-        <input
-          value={form.title}
-          maxLength={120}
-          onChange={(e) => set({ title: e.target.value })}
+      <div className="listing-form">
+        <label>
+          제목
+          <input
+            value={form.title}
+            maxLength={120}
+            onChange={(e) => set({ title: e.target.value })}
+          />
+        </label>
+        <label>
+          분류
+          <select
+            value={form.category ?? ''}
+            onChange={(e) => set({ category: (e.target.value || null) as Category | null })}
+          >
+            <option value="">선택</option>
+            {CATEGORY_VALUES.map((c) => (
+              <option key={c} value={c}>
+                {categories[c]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          설명
+          <textarea
+            value={form.description}
+            maxLength={2000}
+            onChange={(e) => set({ description: e.target.value })}
+          />
+        </label>
+        <label>
+          하루 대여료 (원)
+          <input
+            type="number"
+            inputMode="numeric"
+            min={100}
+            max={1_000_000}
+            step={100}
+            value={form.dailyRateKrw ?? ''}
+            onChange={(e) =>
+              set({ dailyRateKrw: e.target.value ? Math.round(Number(e.target.value)) : null })
+            }
+          />
+        </label>
+        <label>
+          주고받을 장소
+          <select
+            value={form.placeId ?? ''}
+            onChange={(e) => set({ placeId: e.target.value || null })}
+          >
+            <option value="">선택</option>
+            {places.data?.items.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="field-hint">대여 가능 기간 (비워 두면 언제나 가능)</p>
+        <PeriodFields
+          startAt={form.availableFrom}
+          endAt={form.availableTo}
+          onChange={(availableFrom, availableTo) => set({ availableFrom, availableTo })}
         />
-      </label>
-      <label>
-        분류
-        <select
-          value={form.category ?? ''}
-          onChange={(e) => set({ category: (e.target.value || null) as Category | null })}
-        >
-          <option value="">선택</option>
-          {CATEGORY_VALUES.map((c) => (
-            <option key={c} value={c}>
-              {categories[c]}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        설명
-        <textarea
-          value={form.description}
-          maxLength={2000}
-          onChange={(e) => set({ description: e.target.value })}
-        />
-      </label>
-      <label>
-        하루 대여료 (원)
-        <input
-          type="number"
-          inputMode="numeric"
-          min={100}
-          max={1_000_000}
-          step={100}
-          value={form.dailyRateKrw ?? ''}
-          onChange={(e) =>
-            set({ dailyRateKrw: e.target.value ? Math.round(Number(e.target.value)) : null })
-          }
-        />
-      </label>
-      <label>
-        주고받을 장소
-        <select
-          value={form.placeId ?? ''}
-          onChange={(e) => set({ placeId: e.target.value || null })}
-        >
-          <option value="">선택</option>
-          {places.data?.items.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.label}
-            </option>
-          ))}
-        </select>
-      </label>
-      <p className="field-hint">대여 가능 기간 (비워 두면 언제나 가능)</p>
-      <PeriodFields
-        startAt={form.availableFrom}
-        endAt={form.availableTo}
-        onChange={(availableFrom, availableTo) => set({ availableFrom, availableTo })}
-      />
+      </div>
       <ErrorNotice action={action} />
       <ActionButton secondary isDisabled={action.pending} onPress={() => action.run(save)}>
         저장

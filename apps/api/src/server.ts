@@ -2,7 +2,13 @@ import { buildApi } from './index.js';
 import { createAiPorts } from '@sb/ai';
 import { Database } from '@sb/db';
 const db = new Database({ feeRecommender: createAiPorts().feeRecommender });
-const app = await buildApi({ db, logger: true });
+// 자동 e2e는 세 데모 사용자를 한 프록시(Caddy) IP로 보내 분당 120회 한도를 함께 쓴다.
+// 그 모드에서만 한도를 높이고, 데모·운영 모드의 한도는 그대로 둔다(명세 0004).
+const app = await buildApi({
+  db,
+  logger: true,
+  ...(process.env.APP_MODE === 'automated-test' ? { rateLimitMax: 1_000 } : {}),
+});
 app.addHook('onClose', async () => db.close());
 const stop = async () => {
   await app.close();

@@ -2,7 +2,9 @@ import { writeFileSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
 import { activate, audit, enter, screenshot, type } from './helpers';
 
-test('AT20: all six center menus and preview forms perform no mutation', async ({ page }, info) => {
+test('AT20: all eight center menus and preview forms perform no mutation', async ({
+  page,
+}, info) => {
   const writes: { method: string; path: string }[] = [];
   page.on('request', (request) => {
     if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method()))
@@ -10,10 +12,15 @@ test('AT20: all six center menus and preview forms perform no mutation', async (
   });
   await page.goto('/center');
   await expect(page.getByRole('navigation', { name: '센터 메뉴' }).getByRole('link')).toHaveCount(
-    6,
+    8,
   );
-  await audit(page, 'center-about', info);
+  await audit(page, 'center-board', info);
   const menu = page.getByRole('navigation', { name: '센터 메뉴' });
+  await menu.getByRole('link', { name: '서비스', exact: true }).click();
+  await page.locator('a[href="/center/services/mind-check"]').click();
+  await page.getByRole('button', { name: '신청하기', exact: true }).click();
+  await expect(page.getByRole('dialog')).toContainText('신청이 접수·저장되지 않아요.');
+  await page.getByRole('button', { name: '닫기', exact: true }).click();
   await menu.getByRole('link', { name: '사업 안내', exact: true }).click();
   await expect(page.getByRole('searchbox', { name: '사업 검색' })).toBeVisible();
   await menu.getByRole('link', { name: '프로그램', exact: true }).click();
@@ -57,7 +64,7 @@ test('AT20: all six center menus and preview forms perform no mutation', async (
   expect(writes).toEqual([]);
   writeFileSync(
     'test-artifacts/e2e/center-network.json',
-    JSON.stringify({ mutations: writes, menus: 6, previews: 5 }, null, 2),
+    JSON.stringify({ mutations: writes, menus: 8, previews: 6 }, null, 2),
   );
 });
 
@@ -84,6 +91,7 @@ test('AT22/PWA: denied microphone, offline controls, public-only caches and inst
   await activate(page, page.getByRole('button', { name: /통화 시작/ }));
   await expect(page.getByRole('alert')).toContainText('마이크 권한이 꺼져 있어요.');
   expect(writes).toEqual([]);
+  await activate(page, page.getByRole('link', { name: '텍스트로 입력하기', exact: true }));
   await activate(page, page.getByRole('button', { name: '텍스트로 입력', exact: true }));
   await type(
     page,

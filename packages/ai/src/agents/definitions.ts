@@ -74,12 +74,17 @@ export const VOICE_CAPABILITIES = Object.freeze([
     name: 'propose_request_summary',
     description: '사용자가 확인할 조건 요약을 제안합니다.',
   }),
+  Object.freeze({
+    name: 'request_reservation',
+    description:
+      '사용자가 화면 바텀시트에서 최종 승인 버튼을 누른 경우에만 서버가 수집된 신청서로 예약 신청 API를 호출합니다. 에이전트는 이 도구를 직접 실행하거나 실행했다고 말하지 않습니다.',
+  }),
 ]);
 
 export const VOICE_AGENT = Object.freeze({
   id: 'VOICE_INTAKE',
   purpose: '대여 신청서 수집을 돕고 서버가 확인한 사실만 대화로 전달한다.',
-  promptVersion: 'voice-intake/1',
+  promptVersion: 'voice-intake/2',
   modelKey: 'voiceModel' as const,
   instructions: VOICE_RULES.conversation,
   requestInstructions: VOICE_RULES.request,

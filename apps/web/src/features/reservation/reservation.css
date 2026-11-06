@@ -1,0 +1,313 @@
+/* 3번 탐색·예약·대기·알림 화면 전용. 명세 0004. 전역 클래스는 바꾸지 않는다. */
+.catalog-search {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0 0 0.75rem;
+}
+.catalog-search input {
+  width: 100%;
+  min-height: 54px;
+  margin-top: 0;
+  padding: 0 1.25rem;
+  border-radius: var(--radius-pill);
+}
+.catalog-search .button {
+  width: auto;
+  min-width: 5.5rem;
+}
+.filter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.filter-row label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.filter-row select,
+.reserve-card select {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 0.9rem;
+  color: var(--color-text);
+}
+.filter-row select {
+  margin-top: 0.35rem;
+}
+.period-filter {
+  margin: 0.75rem 0 0.25rem;
+}
+.period-filter summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 1px var(--neutral-200);
+  font-size: 0.9375rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+.period-filter[open] summary {
+  margin-bottom: 0.75rem;
+  background: var(--color-primary-soft);
+  box-shadow: none;
+}
+.catalog-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  display: grid;
+  gap: 0.5rem;
+}
+/* Borderless rows: the white image tile carries the grouping, whitespace separates items. */
+.catalog-card {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding: 0.4rem 0;
+  text-decoration: none;
+  color: inherit;
+}
+.catalog-card img {
+  width: 92px;
+  height: 92px;
+  object-fit: cover;
+  border-radius: 22px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+.catalog-card > div {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.catalog-card strong {
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+.catalog-card .muted {
+  font-size: 0.875rem;
+}
+.availability {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--warning-text);
+}
+.availability.is-available {
+  color: var(--color-primary-text);
+}
+.catalog-hero img {
+  display: block;
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  border-radius: 28px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+.catalog-hero {
+  margin-bottom: 1.25rem;
+}
+.catalog-title {
+  margin: 0.2rem 0 0.5rem;
+}
+.catalog-description {
+  white-space: pre-line;
+  line-height: 1.7;
+}
+.page-section {
+  margin: 2rem 0;
+}
+.page-section h2 {
+  margin: 0 0 0.6rem;
+}
+.page-section .button {
+  margin-top: 0.75rem;
+}
+.occupied-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.occupied-list li {
+  display: grid;
+  gap: 0.05rem;
+  font-size: 0.9375rem;
+}
+.occupied-list .muted {
+  font-size: 0.8125rem;
+}
+.reserve-card {
+  padding: 1.5rem 1.25rem;
+  box-shadow: var(--shadow-raised);
+}
+.reserve-card h2 {
+  margin: 0 0 1rem;
+}
+.reserve-card label {
+  margin-top: 1rem;
+}
+.unavailable-note {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: var(--warning-bg);
+}
+.unavailable-note p {
+  margin: 0 0 0.6rem;
+}
+.priority-note {
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-on-primary);
+  font-weight: 700;
+}
+.reservation-link {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+  padding: 0.75rem 0;
+  text-decoration: none;
+  color: inherit;
+}
+.reservation-link img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+.reservation-link > div {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.reservation-link strong {
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+}
+.reservation-link > div span {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+.reservation-link > .status {
+  grid-column: 2;
+}
+.reservation-actions {
+  margin: 1.5rem 0;
+}
+.decline-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.waitlist-card {
+  padding: 1.1rem 1.25rem;
+  margin: 0.75rem 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+.waitlist-card.is-priority {
+  box-shadow:
+    0 0 0 2px var(--lime-400),
+    var(--shadow-soft);
+}
+.waitlist-card strong {
+  font-size: 1.0625rem;
+}
+.waitlist-card p {
+  margin: 0.3rem 0;
+}
+.waitlist-card .card-topline {
+  margin-bottom: 0.6rem;
+}
+.status-r-confirmed,
+.status-w-notified,
+.status-w-fulfilled {
+  color: var(--color-primary-text);
+  background: var(--color-primary-soft);
+}
+.status-r-declined,
+.status-r-cancelled,
+.status-r-expired,
+.status-w-expired,
+.status-w-cancelled {
+  background: var(--color-sunken);
+  color: var(--color-text-secondary);
+}
+.inbox-section-title {
+  margin: 2rem 0 0.25rem;
+  font-size: 1.0625rem;
+}
+.notification-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0;
+  display: grid;
+  gap: 0.5rem;
+}
+/* Read items sit on the background; unread ones lift onto a white surface. */
+.notification {
+  display: grid;
+  gap: 0.2rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.9rem 1.1rem;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.notification.is-unread {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+.notification strong {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 1rem;
+}
+.notification span {
+  font-size: 0.9375rem;
+}
+.notification span.muted {
+  font-size: 0.8125rem;
+}
+.unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  flex: none;
+}
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.history-list li {
+  display: grid;
+  font-size: 0.9375rem;
+}
+.history-list li span:first-child {
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+}

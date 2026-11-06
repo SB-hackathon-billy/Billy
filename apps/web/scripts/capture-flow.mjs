@@ -68,6 +68,7 @@ try {
   await page.getByRole('button', { name: /통화 시작/ }).click();
   await expect(page.getByRole('alert')).toContainText('마이크 권한이 꺼져 있어요');
   await capture('R01-microphone-denied');
+  await page.getByRole('link', { name: '텍스트로 입력하기', exact: true }).click();
   await page.getByRole('button', { name: '텍스트로 입력', exact: true }).click();
   await page
     .getByLabel('필요한 물품과 사용 계획')
@@ -167,6 +168,7 @@ try {
   await capture('O01-superseded');
   await switchTo('hana');
   await page.getByRole('link', { name: '공유대여', exact: true }).click();
+  await page.getByRole('link', { name: '텍스트로 입력하기', exact: true }).click();
   await page.getByRole('button', { name: '텍스트로 입력', exact: true }).click();
   await page
     .getByLabel('필요한 물품과 사용 계획')

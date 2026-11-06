@@ -53,40 +53,40 @@ export function Ink({ active = false, small = false }: { active?: boolean; small
           <feDisplacementMap in="SourceGraphic" scale="6" />
         </filter>
       </defs>
-      <ellipse cx="110" cy="124" rx="76" ry="8" fill="#E4EBF0" />
+      <ellipse cx="110" cy="124" rx="76" ry="8" fill="#E9ECE5" />
       <g filter={`url(#${id})`}>
         <path
           d="M65 26C26 51 24 92 52 110C77 127 110 109 113 79C117 46 86 15 65 26Z"
-          fill="#253C52"
+          fill="#173C2C"
           opacity=".92"
         />
         <path
           d="M150 17C122 35 102 73 121 98C139 122 181 113 189 83C198 53 173 11 150 17Z"
-          fill="#91AD95"
+          fill="#C8F169"
           opacity=".85"
         />
       </g>
-      <circle cx="68" cy="78" r="3" fill="white" />
-      <circle cx="86" cy="77" r="3" fill="white" />
+      <circle cx="68" cy="78" r="3" fill="#FFFFFF" />
+      <circle cx="86" cy="77" r="3" fill="#FFFFFF" />
       <path
         d="M72 88Q79 94 86 87"
-        stroke="white"
+        stroke="#FFFFFF"
         fill="none"
         strokeWidth="2.5"
         strokeLinecap="round"
       />
-      <circle cx="145" cy="73" r="3" fill="#253C52" />
-      <circle cx="162" cy="72" r="3" fill="#253C52" />
+      <circle cx="145" cy="73" r="3" fill="#173C2C" />
+      <circle cx="162" cy="72" r="3" fill="#173C2C" />
       <path
         d="M146 83Q154 89 162 82"
-        stroke="#253C52"
+        stroke="#173C2C"
         fill="none"
         strokeWidth="2.5"
         strokeLinecap="round"
       />
       <path
         d="M24 35l5-7m166 72l8 2M116 12l2-7"
-        stroke="#91AD95"
+        stroke="#A5C8B2"
         strokeWidth="3"
         strokeLinecap="round"
       />

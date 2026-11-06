@@ -53,6 +53,7 @@ export class RealtimeSync {
   private stopped = false;
   private generation = 0;
   private abort: AbortController | null = null;
+  private synced = false;
   constructor(
     private query: QueryClient,
     private status: (status: ConnectionStatus) => void,
@@ -114,9 +115,19 @@ export class RealtimeSync {
       if (this.stopped || generation !== this.generation) return;
       this.gate.snapshot(snapshot);
       this.query.setQueryData(['sync'], snapshot);
+      // 3번 조회(명세 0004)는 화면이 열릴 때 이미 받으므로 첫 동기화에서는 다시 받지 않고,
+      // 재연결·복귀 때만 놓친 이벤트를 메우기 위해 새로 고친다.
+      const recovering = this.synced;
+      this.synced = true;
       await this.query.invalidateQueries({
         predicate: (q) =>
-          ['request', 'negotiation', 'payment', 'task'].includes(String(q.queryKey[0])),
+          [
+            'request',
+            'negotiation',
+            'payment',
+            'task',
+            ...(recovering ? ['reservations', 'reservation', 'waitlist', 'notifications'] : []),
+          ].includes(String(q.queryKey[0])),
       });
       if (this.stopped || generation !== this.generation) return;
       const source = new EventSource(
@@ -155,7 +166,10 @@ export class RealtimeSync {
               void this.resync();
               return;
             }
-            void this.query.invalidateQueries({ queryKey: ['sync'] });
+            // 3번 예약·대기·알림 이벤트는 /sync(요청·협상 요약)를 바꾸지 않는다(명세 0004).
+            const threeOnly = ['reservation.updated', 'waitlist.updated', 'notification.created'];
+            if (!threeOnly.includes(event.type))
+              void this.query.invalidateQueries({ queryKey: ['sync'] });
             if (event.requestId)
               void this.query.invalidateQueries({ queryKey: ['request', event.requestId] });
             if (event.negotiationId)
@@ -164,6 +178,23 @@ export class RealtimeSync {
               void this.query.invalidateQueries({ queryKey: ['task', event.taskId] });
             if (event.type === 'demo_hold.expired')
               void this.query.invalidateQueries({ queryKey: ['payment', event.requestId] });
+            // 명세 0004: 3번 예약·대기·알림 조회를 새로 고친다.
+            // 한 명령이 여러 이벤트를 보내므로 진행 중인 조회는 취소하지 않고 이어 쓴다.
+            const settle = { cancelRefetch: false };
+            if (event.type === 'reservation.updated') {
+              void this.query.invalidateQueries({ queryKey: ['reservations'] }, settle);
+              void this.query.invalidateQueries(
+                { queryKey: ['reservation', event.reservationId] },
+                settle,
+              );
+              void this.query.invalidateQueries({ queryKey: ['catalog'] }, settle);
+            }
+            if (event.type === 'waitlist.updated') {
+              void this.query.invalidateQueries({ queryKey: ['waitlist'] }, settle);
+              void this.query.invalidateQueries({ queryKey: ['catalog'] }, settle);
+            }
+            if (event.type === 'notification.created')
+              void this.query.invalidateQueries({ queryKey: ['notifications'] }, settle);
           } catch {
             this.fail();
           }
