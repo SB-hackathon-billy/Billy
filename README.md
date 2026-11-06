@@ -28,6 +28,19 @@ npm run seed -- --scenario default
 
 `http://localhost:8000`으로 접속합니다. 서비스는 이 PC의 localhost에서만 열립니다. seed는 개발 DB의 업무 데이터를 초기화하므로 공유 DB 사용자와 조율해야 합니다. 공유 DB에 `docker compose down -v`를 실행하지 마세요.
 
+### Railway 배포
+
+`main`에 push하면 Railway 프로젝트 `billy`가 자동 배포합니다. 공개 주소: https://web-production-968e50.up.railway.app
+
+| 서비스     | Dockerfile                                | 시작·배포 전 명령                                                                                         |
+| ---------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `web`      | `infra/web.Dockerfile` (정적 web + Caddy) | `API_UPSTREAM=api.railway.internal:3000`, `PORT=8080`                                                     |
+| `api`      | `infra/runtime.Dockerfile`                | 배포 전 `npm run -w @sb/db migrate`, 시작 `npm run -w @sb/api start` (`HOST=::`, `APP_ORIGINS`=공개 주소) |
+| `worker`   | `infra/runtime.Dockerfile`                | `npm run -w @sb/worker start`                                                                             |
+| `Postgres` | Railway 관리형                            | 외부 공개 없음. 각 서비스는 `DATABASE_URL=${{Postgres.DATABASE_URL}}` 참조                                |
+
+서비스 설정은 Railway 대시보드(Settings)에 있습니다. 데모 데이터 재적재는 api의 배포 전 명령을 `sh -c 'npm run -w @sb/db migrate && npm run -w @sb/db seed -- --scenario default'`로 바꿔 한 번 배포한 뒤 원래대로 되돌립니다. seed는 업무 데이터를 초기화합니다.
+
 ## 구조와 검증
 
 - `apps/web`: React PWA
