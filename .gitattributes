@@ -1,0 +1,2 @@
+# Exported PDF contains ASCII85 image streams; keep it binary in Git diffs.
+docs/demo/v3/*.pdf binary
