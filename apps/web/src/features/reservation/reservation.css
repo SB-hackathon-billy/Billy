@@ -668,117 +668,107 @@
 .hubs-map {
   margin: 1rem 0 0.75rem;
 }
-.hubs-leaflet {
-  height: min(62vh, 460px);
+/* 성북구 지도(카카오톡 캡처 같은 색면 지도) */
+.sb-map-frame {
+  padding: 0.75rem;
   border-radius: 24px;
-  overflow: hidden;
+  background: #ece9e4;
   box-shadow: var(--shadow-soft);
-  background: #eef0ea;
-  z-index: 0;
 }
-.hubs-leaflet-loading {
-  display: grid;
-  place-items: center;
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
+.sb-map {
+  display: block;
+  width: 100%;
+  height: auto;
 }
-.hubs-leaflet .leaflet-control-attribution {
-  font-size: 10px;
+.sb-land {
+  fill: #f6f3ef;
 }
-/* 기본 타일을 차분하게: 채도·대비를 낮춰 핀이 먼저 보이게 한다. */
-.hubs-leaflet .leaflet-tile-pane {
-  filter: saturate(0.45) brightness(1.04) contrast(0.92);
+.sb-dongs {
+  fill: none;
+  stroke: #d6d1cb;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
-/* 지도 핀: 점 + 말풍선 이름표(이름·거리). divIcon 안이라 전역 클래스로 둔다. */
-.lp-wrap {
-  background: none;
-  border: 0;
+.sb-edge {
+  fill: none;
+  stroke: #cfc9c2;
+  stroke-width: 2.4;
+  stroke-linejoin: round;
 }
-.lp {
-  position: absolute;
-  transform: translate(-50%, -100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  filter: drop-shadow(0 4px 8px rgb(31 27 61 / 0.25));
+.sb-center rect {
+  fill: #3b3570;
 }
-.lp-label {
-  order: -1;
-  display: flex;
-  gap: 0.3rem;
-  align-items: baseline;
-  margin-bottom: 4px;
-  padding: 0.3rem 0.6rem;
-  border-radius: 999px;
-  background: #fff;
-  color: #2b2650;
-  font: 800 13px/1.1 var(--font-sans, system-ui, sans-serif);
-  white-space: nowrap;
+.sb-center text {
+  font-size: 12px;
+  font-weight: 800;
+  fill: #3b3570;
+  paint-order: stroke;
+  stroke: #f6f3ef;
+  stroke-width: 4px;
+  stroke-linejoin: round;
 }
-.lp-label b {
+.sb-pin .halo {
+  fill: #5b4fae;
+  opacity: 0.16;
+}
+.sb-pin .dot {
+  fill: #5b4fae;
+  stroke: #fff;
+  stroke-width: 3;
+}
+.sb-pin .name {
+  font-size: 15px;
+  font-weight: 800;
+  fill: #3b3570;
+  paint-order: stroke;
+  stroke: #f6f3ef;
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+.sb-pin .dist {
   font-size: 11px;
   font-weight: 700;
-  color: var(--color-primary-text);
+  fill: #5b4fae;
 }
-.lp-dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #5b4fae;
-  border: 3px solid #fff;
-  box-sizing: border-box;
+.sb-pin:hover .halo {
+  opacity: 0.3;
 }
-.lp.selected .lp-label,
-.lp.nearest .lp-label {
-  background: var(--color-strong);
-  color: var(--color-on-strong);
+.sb-pin.selected .dot,
+.sb-pin.nearest .dot {
+  fill: #3b3570;
 }
-.lp.selected .lp-label b,
-.lp.nearest .lp-label b {
-  color: var(--color-primary);
+.sb-pin.selected .halo,
+.sb-pin.nearest .halo {
+  opacity: 0.32;
+  animation: sb-pulse 1.8s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
 }
-.lp.selected .lp-dot,
-.lp.nearest .lp-dot {
-  background: var(--color-primary);
-  border-color: var(--color-strong);
-  box-shadow: 0 0 0 6px rgb(200 240 100 / 0.45);
-}
-.lp-center .lp-label {
-  font-size: 12px;
-  background: #3b3570;
-  color: #fff;
-}
-.lp-diamond {
-  width: 14px;
-  height: 14px;
-  margin: 2px 0;
-  border-radius: 2px;
-  background: #3b3570;
-  border: 2px solid #fff;
-  transform: rotate(45deg);
-}
-.lp-me {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: #2f7cf6;
-  border: 3px solid #fff;
-  box-shadow: 0 0 0 0 rgb(47 124 246 / 0.5);
-  animation: lp-me 2s ease-out infinite;
-}
-@keyframes lp-me {
-  to {
-    box-shadow: 0 0 0 16px rgb(47 124 246 / 0);
+@keyframes sb-pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.45;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .lp-me {
-    animation: none;
-    box-shadow: 0 0 0 6px rgb(47 124 246 / 0.25);
+  .sb-pin .halo {
+    animation: none !important;
   }
+}
+.sb-me circle {
+  fill: #2f7cf6;
+  stroke: #fff;
+  stroke-width: 2.5;
+}
+.sb-me .halo {
+  fill: #2f7cf6;
+  opacity: 0.2;
+  stroke: none;
 }
 .hubs-legend {
   display: flex;

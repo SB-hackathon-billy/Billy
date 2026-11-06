@@ -1,7 +1,7 @@
 // 캠퍼스 대여소 화면: 거점 위치도·거리(/hubs), 대여소별 물품(/hubs/:placeId).
 // 위치는 브라우저 안에서만 계산하고 서버로 보내지 않는다.
-import { lazy, Suspense, useMemo } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useMemo } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { CAMPUS_HUB_PLACE_IDS, CatalogItemSchema, listDataSchema } from '@sb/contracts';
 import { api } from '../../lib/api.js';
@@ -19,7 +19,7 @@ import {
 } from '../../lib/campus.js';
 import { ActionButton, ErrorNotice, Loading } from '../../components/ui.js';
 import { CatalogCard, PhotoCredit } from './pages.js';
-import type { MapHub } from './HubsMap.js';
+import SeongbukMap, { type MapHub } from './HubsMap.js';
 import './reservation.css';
 
 // ponytail: 물품 수는 카탈로그 첫 50개로 센다. 물품이 50개를 넘으면 대여소별 count API를 둔다.
@@ -44,9 +44,7 @@ function useHubs() {
   return { hubs, here, loading: places.isPending };
 }
 
-const LeafletMap = lazy(() => import('./HubsMap.js'));
-
-/** 거리 지도(Leaflet) + 범례·출처. 지도 라이브러리는 이 화면에서만 받는다. */
+/** 성북구 지도 + 범례·출처. */
 function HubsMap({
   hubs,
   here,
@@ -56,7 +54,6 @@ function HubsMap({
   here: Here;
   selected?: string;
 }) {
-  const navigate = useNavigate();
   const key = hubs
     .map((h) => `${h.place.id}:${h.meters === null ? '' : Math.round(h.meters)}`)
     .join('|');
@@ -70,16 +67,9 @@ function HubsMap({
   const outside = here.status === 'ready' && !insideSeongbuk(here);
   return (
     <figure className="hubs-map">
-      <Suspense
-        fallback={<div className="hubs-leaflet hubs-leaflet-loading">지도를 불러오고 있어요…</div>}
-      >
-        <LeafletMap
-          hubs={mapHubs}
-          here={here}
-          {...(selected ? { selected } : {})}
-          onPick={(id) => navigate(`/hubs/${id}`)}
-        />
-      </Suspense>
+      <div className="sb-map-frame">
+        <SeongbukMap hubs={mapHubs} here={here} {...(selected ? { selected } : {})} />
+      </div>
       <figcaption className="hubs-legend">
         <span>
           <i className="dot hub" /> 캠퍼스 대여소
@@ -93,7 +83,9 @@ function HubsMap({
           </span>
         )}
       </figcaption>
-      <p className="hubs-source">학교 위치는 지도 표시용 대략값이에요. 지도·경계 © OpenStreetMap</p>
+      <p className="hubs-source">
+        학교 위치는 지도 표시용 대략값이에요. 구·동 경계 © OpenStreetMap
+      </p>
     </figure>
   );
 }
