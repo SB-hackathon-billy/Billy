@@ -163,7 +163,9 @@ const residentItems: Item[] = [
 ];
 const items: Item[] = [...publicItems, ...residentItems];
 /** 기존 물품도 캠퍼스 거점에서 주고받게 한다(장소는 최대 3곳). */
-const addHansung = ['res-cleaner-duri', 'res-projector-duri', 'res-tool-hana', 'res-case-hana'];
+const addHansung = ['res-cleaner-duri', 'res-projector-duri', 'res-case-hana'];
+/** 실제 사진이 없는 기본 물품은 시연 목록에서 뺀다(테스트 fixture에는 남는다). */
+const hidden = ['res-tool-hana'];
 
 /** 거점에서 찍은 사진 대신 쓰는 사진 카드(물품 이름·촬영 구분·시각). */
 const photoSvg = (title: string, label: string, taken: string) =>
@@ -197,6 +199,10 @@ export async function showcase(db: Database, now = new Date()) {
       `UPDATE items SET data = jsonb_set(data, '{allowedPlaceIds}', (data->'allowedPlaceIds') || '"place-hansung"')
        WHERE id = ANY($1::text[]) AND NOT (data->'allowedPlaceIds' ? 'place-hansung')`,
       [addHansung],
+    );
+    await u.c.query(
+      `UPDATE items SET data = jsonb_set(data, '{enabled}', 'false') WHERE id = ANY($1::text[])`,
+      [hidden],
     );
   });
 
@@ -308,7 +314,7 @@ export async function showcase(db: Database, now = new Date()) {
   );
 
   // 빌려주기(하나) ④ 슬의 신청 · 하나가 승인할 차례.
-  await reserve('u_seul', 'res-tool-hana', 'place-hansung', [1, '13:00'], [2, '13:00'], now);
+  await reserve('u_seul', 'res-dryer-hana', 'place-hansung', [1, '13:00'], [2, '13:00'], now);
 
   // 빌려주기(하나) ⑤ 준에게 빌려준 여행 가방 · 대여 중(거점에서 인계 완료).
   const lent = await reserve(

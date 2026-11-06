@@ -546,11 +546,13 @@
   animation: vc-slide 1.2s linear infinite;
 }
 
-/* ---- 3D character (Character3D); the 2D one below is its loading/no-WebGL fallback ---- */
+/* ---- 3D character (Character3D); the 2D one below is only its no-WebGL fallback ---- */
 .vc-character-3d {
   position: relative;
   display: flex;
   justify-content: center;
+  /* 모델을 받는 동안 빈 자리여도 화면이 흔들리지 않게 캐릭터 높이를 잡아 둔다. */
+  min-height: clamp(168px, 48vw, 224px);
 }
 .vc-character-3d canvas {
   display: block;

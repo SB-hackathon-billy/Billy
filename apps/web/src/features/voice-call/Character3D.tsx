@@ -268,7 +268,8 @@ export function Character3D(props: CharacterRendererProps) {
   return (
     <div className="vc-character-3d" data-ready={status === 'ready' || undefined}>
       {status !== 'failed' && <canvas ref={canvasRef} aria-hidden="true" />}
-      {status !== 'ready' && <Character2D {...props} />}
+      {/* 모델을 받는 동안은 빈 자리로 두고, 3D를 그릴 수 없을 때만 2D로 바꾼다. */}
+      {status === 'failed' && <Character2D {...props} />}
     </div>
   );
 }

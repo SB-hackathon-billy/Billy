@@ -31,7 +31,8 @@ export function CallCharacter(props: Omit<CharacterRendererProps, 'reducedMotion
       <p className="vc-state" role="status" aria-label={`캐릭터 상태 ${props.state}`}>
         {props.state}
       </p>
-      <Suspense fallback={<Character2D {...props} reducedMotion={reducedMotion} />}>
+      {/* 3D 청크를 받는 동안 다른 캐릭터가 잠깐 보이지 않도록 같은 크기의 빈 자리만 둔다. */}
+      <Suspense fallback={<div className="vc-character-3d" aria-hidden="true" />}>
         <Character3D {...props} reducedMotion={reducedMotion} />
       </Suspense>
     </div>
