@@ -1,6 +1,7 @@
 // 3번 거점 인계·반납 HTTP 테스트. 명세: docs/specs/0007-hub-handover-return.md
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
+import sharp from 'sharp';
 import type { FastifyInstance } from 'fastify';
 import {
   DemoSessionDataSchema,
@@ -18,6 +19,11 @@ let db: Database, app: FastifyInstance, cleanup: () => Promise<void>;
 const now = new Date('2026-11-02T01:00:00Z');
 const origin = 'http://localhost:8000';
 const actors: Record<string, { cookie: string; csrf: string }> = {};
+const JPEG = (
+  await sharp({ create: { width: 2, height: 2, channels: 3, background: '#654321' } })
+    .jpeg()
+    .toBuffer()
+).toString('base64');
 
 function api(who: string, method: 'GET' | 'POST', path: string, payload?: unknown) {
   const a = actors[who]!;
@@ -41,7 +47,7 @@ const photo = async () =>
   (
     await api('hub', 'POST', '/images', {
       contentType: 'image/jpeg',
-      dataBase64: Buffer.from('fake-jpeg-bytes').toString('base64'),
+      dataBase64: JPEG,
     })
   ).json().data.id as string;
 const types = async (who: string) =>

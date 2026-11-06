@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { CAMPUS_HUB_PLACE_IDS, CatalogItemSchema, listDataSchema } from '@sb/contracts';
-import { api } from '../../lib/api.js';
+import { allPages } from '../../lib/pagination.js';
 import { usePlaces } from '../../lib/hooks.js';
 import {
   HUB_SPOTS,
@@ -22,12 +22,11 @@ import { CatalogCard, PhotoCredit } from './pages.js';
 import SeongbukMap, { type MapHub } from './HubsMap.js';
 import './reservation.css';
 
-// ponytail: 물품 수는 카탈로그 첫 50개로 센다. 물품이 50개를 넘으면 대여소별 count API를 둔다.
 function useAllItems() {
   return useQuery({
     queryKey: ['catalog', 'hubs-all'],
     queryFn: ({ signal }) =>
-      api.get('/catalog?limit=50', listDataSchema(CatalogItemSchema), signal),
+      allPages('/catalog?limit=50', listDataSchema(CatalogItemSchema), signal),
   });
 }
 
@@ -180,7 +179,7 @@ export function HubDetailPage() {
   const items = useQuery({
     queryKey: ['catalog', 'hub', placeId],
     queryFn: ({ signal }) =>
-      api.get(
+      allPages(
         `/catalog?limit=50&placeId=${encodeURIComponent(placeId)}`,
         listDataSchema(CatalogItemSchema),
         signal,

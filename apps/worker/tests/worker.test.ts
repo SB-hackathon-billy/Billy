@@ -195,28 +195,40 @@ describe('real PostgreSQL + pg-boss worker', () => {
     expect(await quotes(found.request.id)).toEqual(original);
   });
 
-  it('ROUTE_INTENT delegates to EXTRACT_NEED, persists a proposal and leaves the draft untouched', async () => {
-    await start();
-    const draft = await db.transaction((u) => u.create('u_hana', createEmptyNeed()));
-    const turn = await db.transaction((u) =>
-      u.agentTurn('u_hana', {
-        requestId: draft.request.id,
-        expectedRequestVersion: 1,
-        text: '모레 오전 열 시부터 다음날 오후 네 시까지 프로젝터가 필요해요.',
-      }),
-    );
-    const result = await until(
-      () => tasks(draft.request.id, 'EXTRACT_NEED'),
-      (ts) => ts.some((t) => t.status === 'SUCCEEDED'),
-    );
-    expect(result[0]?.result).toHaveProperty('proposedNeed.category', 'HOBBY');
-    expect((await db.getTask(turn.taskId)).status).toBe('SUCCEEDED');
-    expect((await view(draft.request.id)).request).toMatchObject({
-      status: 'DRAFT',
-      need: createEmptyNeed(),
-      needRevision: 1,
-    });
-  });
+  it.each([0, 6])(
+    'ROUTE_INTENT extracts with %i extra places and leaves the draft untouched',
+    async (extra) => {
+      for (let i = 0; i < extra; i++) {
+        const place = {
+          id: `place-campus-${i}`,
+          label: `캠퍼스 ${i}`,
+          description: '대여 거점',
+          isDemo: true,
+        };
+        await db.pool.query('INSERT INTO places(id,data) VALUES($1,$2)', [place.id, place]);
+      }
+      await start();
+      const draft = await db.transaction((u) => u.create('u_hana', createEmptyNeed()));
+      const turn = await db.transaction((u) =>
+        u.agentTurn('u_hana', {
+          requestId: draft.request.id,
+          expectedRequestVersion: 1,
+          text: '모레 오전 열 시부터 다음날 오후 네 시까지 프로젝터가 필요해요.',
+        }),
+      );
+      const result = await until(
+        () => tasks(draft.request.id, 'EXTRACT_NEED'),
+        (ts) => ts.some((t) => t.status === 'SUCCEEDED'),
+      );
+      expect(result[0]?.result).toHaveProperty('proposedNeed.category', 'HOBBY');
+      expect((await db.getTask(turn.taskId)).status).toBe('SUCCEEDED');
+      expect((await view(draft.request.id)).request).toMatchObject({
+        status: 'DRAFT',
+        need: createEmptyNeed(),
+        needRevision: 1,
+      });
+    },
+  );
 
   it('AT17 re-delivered outbox and queue jobs commit exactly one SEARCH effect', async () => {
     await start();

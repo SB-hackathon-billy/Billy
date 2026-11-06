@@ -158,7 +158,8 @@ export async function buildApi(options: ApiOptions = {}): Promise<FastifyInstanc
       .filter(Boolean),
   );
   const cookieName = options.cookieName ?? process.env.COOKIE_NAME ?? 'demo_session';
-  const cookieSecure = options.cookieSecure ?? false;
+  const cookieSecure =
+    options.cookieSecure ?? [...appOrigins].some((origin) => new URL(origin).protocol === 'https:');
   const meta = (): C.Meta => ({
     contractVersion: C.CONTRACT_VERSION,
     serverTime: db.now().toISOString(),
@@ -166,16 +167,32 @@ export async function buildApi(options: ApiOptions = {}): Promise<FastifyInstanc
   });
   const envelope = (data: unknown) => ({ data, meta: meta() });
   await app.register(cookie);
+  app.decorateRequest('demoSession', null);
   await app.register(rateLimit, {
     global: true,
     max: options.rateLimitMax ?? 120,
     timeWindow: '1 minute',
+    keyGenerator: async (request) => {
+      if (request.demoSession) return `user:${request.demoSession.userId}`;
+      const token = request.cookies[cookieName];
+      if (token) {
+        try {
+          request.demoSession = await db.transaction((u) => u.session(token));
+          return `user:${request.demoSession.userId}`;
+        } catch (error) {
+          if (!(error instanceof DomainError) || error.code !== 'SESSION_EXPIRED') throw error;
+        }
+      }
+      return `ip:${request.ip}`;
+    },
     errorResponseBuilder: () => ({ statusCode: 429 }),
   });
-  app.decorateRequest('demoSession', null);
   app.addHook('onRequest', async (request, reply) => {
     reply.header('Cache-Control', 'no-store');
     reply.header('X-Content-Type-Options', 'nosniff');
+  });
+  // Route-level onRequest limiters must run before auth rejects, while CSRF still precedes body parsing.
+  app.addHook('preParsing', async (request, _reply, payload) => {
     if (['POST', 'PATCH', 'PUT', 'DELETE'].includes(request.method)) {
       if (!request.headers.origin || !appOrigins.has(request.headers.origin)) fail('CSRF_REJECTED');
     }
@@ -187,7 +204,7 @@ export async function buildApi(options: ApiOptions = {}): Promise<FastifyInstanc
           path === '/api/v1/items' ||
           path.startsWith('/api/v1/items/')));
     if (path.startsWith('/api/v1/') && !publicRoute) {
-      request.demoSession = await db.transaction((u) => u.session(request.cookies[cookieName]));
+      request.demoSession ??= await db.transaction((u) => u.session(request.cookies[cookieName]));
       if (['POST', 'PATCH', 'PUT', 'DELETE'].includes(request.method)) {
         const csrf = request.headers['x-csrf-token'];
         if (typeof csrf !== 'string' || !sameToken(csrf, request.demoSession.csrfToken))
@@ -196,6 +213,7 @@ export async function buildApi(options: ApiOptions = {}): Promise<FastifyInstanc
         if (typeof key !== 'string' || !key.trim() || key.length > 200) fail('BAD_REQUEST');
       }
     }
+    return payload;
   });
   app.setErrorHandler((error, request, reply) => {
     const response = errorResponse(error, meta());

@@ -216,7 +216,8 @@ export const ExtractNeedInputSchema = z
       .object({
         text: textSchema(2_000),
         draft: NeedDraftSchema,
-        places: z.array(PlaceSchema).max(3),
+        // This is the complete server-owned directory, not the user's <=3 preferences.
+        places: z.array(PlaceSchema),
       })
       .strict(),
   })

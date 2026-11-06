@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { readFile } from 'node:fs/promises';
 import { defaultRequestPeriod } from '@sb/demo-data';
 import * as C from '@sb/contracts';
 import { harness, type Harness, fixture, selectBody, until, origin, stream } from './harness.js';
@@ -435,20 +434,8 @@ describe('AT01–AT20 real HTTP, PostgreSQL and pg-boss acceptance', () => {
     const current = await h.fresh(v.request.id);
     expect(current.negotiations[0]!.offer).toEqual(approved.offer);
     expect(current.comparison[0]!.selectable).toBe(true);
-    // Actual Live closure is independently evidenced by W2; this suite does not fake a voice gateway.
-    const live = JSON.parse(
-      await readFile(
-        new URL(
-          '../../apps/api/test/fixtures/voice/live-2026-10-31T15-50-15.138Z.json',
-          import.meta.url,
-        ),
-        'utf8',
-      ),
-    ) as Record<string, unknown>;
-    expect(live).toMatchObject({ success: true, mode: 'live', rawVoiceTextsAfterClose: 0 });
-    expect(live.diagnostics).toContainEqual(
-      expect.objectContaining({ event: 'voice.closed', confirmed: true }),
-    );
+    // This case verifies current persisted state. Historical Live JSON is not a runtime fixture;
+    // voice closure/scrubbing is covered by the voice API regression suite and live manual checks.
   });
 
   it.each(['failure', 'timeout', 'invalid-option'] as const)(

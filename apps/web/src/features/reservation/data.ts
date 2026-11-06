@@ -1,5 +1,5 @@
 // 3번 탐색·예약·대기·알림 조회 훅과 표시 문구. 명세: docs/specs/0004-reservations-waitlist-notifications.md
-import { useQuery } from '@tanstack/react-query';
+import { infiniteQueryOptions, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
   CatalogItemDetailSchema,
   CatalogItemSchema,
@@ -16,6 +16,7 @@ import {
 } from '@sb/contracts';
 import { api, idPath } from '../../lib/api.js';
 import { useSession } from '../../lib/session.js';
+import { allPages } from '../../lib/pagination.js';
 
 export interface CatalogFilters {
   q: string;
@@ -41,13 +42,22 @@ export function catalogSearch(filters: CatalogFilters, cursor?: string) {
   return params.toString();
 }
 
-export function useCatalog(filters: CatalogFilters, cursor?: string) {
-  const search = catalogSearch(filters, cursor);
-  return useQuery({
+export function catalogOptions(filters: CatalogFilters) {
+  const search = catalogSearch(filters);
+  return infiniteQueryOptions({
     queryKey: ['catalog', search],
-    queryFn: ({ signal }) =>
-      api.get(`/catalog?${search}`, listDataSchema(CatalogItemSchema), signal),
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ signal, pageParam }) =>
+      api.get(
+        `/catalog?${catalogSearch(filters, pageParam)}`,
+        listDataSchema(CatalogItemSchema),
+        signal,
+      ),
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
+}
+export function useCatalog(filters: CatalogFilters) {
+  return useInfiniteQuery(catalogOptions(filters));
 }
 export function useCatalogItem(itemId: string) {
   return useQuery({
@@ -79,7 +89,12 @@ export function useReservations(role: 'REQUESTER' | 'OWNER', requestId?: string)
     queryKey: ['reservations', role, requestId ?? ''],
     enabled: !!session,
     queryFn: ({ signal }) =>
-      api.get(`/reservations?${params.toString()}`, listDataSchema(ReservationViewSchema), signal),
+      allPages(
+        `/reservations?${params.toString()}`,
+        listDataSchema(ReservationViewSchema),
+        signal,
+        (view) => view.reservation.id,
+      ),
   });
 }
 export function useReservation(id: string) {
@@ -94,7 +109,7 @@ export function useWaitlist(enabled = true) {
     queryKey: ['waitlist'],
     enabled: !!session && enabled,
     queryFn: ({ signal }) =>
-      api.get('/waitlist-entries?limit=50', listDataSchema(WaitlistEntrySchema), signal),
+      allPages('/waitlist-entries?limit=50', listDataSchema(WaitlistEntrySchema), signal),
   });
 }
 export function useNotifications() {
@@ -102,7 +117,7 @@ export function useNotifications() {
   return useQuery({
     queryKey: ['notifications'],
     enabled: !!session,
-    queryFn: ({ signal }) => api.get('/notifications?limit=50', NotificationListSchema, signal),
+    queryFn: ({ signal }) => allPages('/notifications?limit=50', NotificationListSchema, signal),
     // 새 알림은 SSE(notification.created)와 재연결 동기화로 갱신한다. 주기 조회는 하지 않는다.
     staleTime: 10_000,
   });

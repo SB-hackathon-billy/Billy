@@ -11,10 +11,19 @@ http://:{$PORT:8000} {
 	}
 	handle {
 		root * /srv
-		@fresh path /index.html /sw.js /registerSW.js /manifest.webmanifest
-		header @fresh Cache-Control "no-cache"
-		try_files {path} /index.html
-		file_server
+		# Static resources must not fall back to the SPA document.
+		@static path /assets/* /photos/* /models/* /brand/* /content/* /manifest.webmanifest /robots.txt *.js *.css *.png *.jpg *.jpeg *.webp *.svg *.gif *.ico *.woff *.woff2 *.ttf *.glb *.gltf
+		handle @static {
+			@staticFresh path /sw.js /registerSW.js /manifest.webmanifest
+			header @staticFresh Cache-Control "no-cache"
+			file_server
+		}
+		handle {
+			@fresh path /index.html
+			header @fresh Cache-Control "no-cache"
+			try_files {path} /index.html
+			file_server
+		}
 	}
 	header X-Content-Type-Options nosniff
 	header Referrer-Policy same-origin

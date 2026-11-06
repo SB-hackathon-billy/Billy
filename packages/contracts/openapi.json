@@ -12538,7 +12538,6 @@
                     "additionalProperties": false
                   },
                   "places": {
-                    "maxItems": 3,
                     "type": "array",
                     "items": {
                       "type": "object",
@@ -14835,7 +14834,6 @@
                 "additionalProperties": false
               },
               "places": {
-                "maxItems": 3,
                 "type": "array",
                 "items": {
                   "type": "object",

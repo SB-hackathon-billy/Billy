@@ -4,6 +4,7 @@ import * as C from '@sb/contracts';
 import { all, fail, id, put, type Commands } from '@sb/db';
 import { createListingDrafter, type ListingDrafter } from '@sb/ai';
 import { paginate } from '../index.js';
+import { decodeUpload } from './image-validation.js';
 
 const FAR_PAST = '2000-01-01T00:00:00.000Z';
 const FAR_FUTURE = '2999-12-31T00:00:00.000Z';
@@ -101,8 +102,7 @@ export default async function listingsPlugin(app: FastifyInstance) {
   app.post('/api/v1/images', { bodyLimit: 7_000_000 }, async (request, reply) => {
     const { userId } = requireSession(request);
     const body = C.ImageUploadBodySchema.parse(request.body);
-    const bytes = Buffer.from(body.dataBase64, 'base64');
-    if (!bytes.length || bytes.length > C.MAX_IMAGE_BYTES) fail('BAD_REQUEST');
+    const bytes = await decodeUpload(body);
     const imageId = id('img');
     await db.transaction((u) =>
       u.c.query('INSERT INTO item_images(id,owner_id,content_type,bytes) VALUES($1,$2,$3,$4)', [

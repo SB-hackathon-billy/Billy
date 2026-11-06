@@ -1,5 +1,6 @@
 import { beforeAll, afterAll, describe, it, expect } from 'vitest';
 import { randomUUID } from 'node:crypto';
+import sharp from 'sharp';
 import type { FastifyInstance } from 'fastify';
 import { createTestDatabase, type Database } from '@sb/db';
 import { DemoSessionDataSchema, ListingSchema, ItemSchema, type Listing } from '@sb/contracts';
@@ -7,9 +8,11 @@ import { buildApi } from '../index.js';
 
 process.env.AI_MODE = 'fixture';
 const origin = 'http://localhost:8000';
-// 1x1 PNG
-const PNG =
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+const PNG = (
+  await sharp({ create: { width: 2, height: 2, channels: 3, background: '#123456' } })
+    .png()
+    .toBuffer()
+).toString('base64');
 let db: Database, app: FastifyInstance, cleanup: () => Promise<void>;
 const actors: Record<string, { cookie: string; csrf: string }> = {};
 
@@ -46,6 +49,18 @@ afterAll(async () => {
 });
 
 describe('2번 AI 물품 등록', () => {
+  it('rejects non-image uploads before inserting any database row', async () => {
+    const count = async () =>
+      Number((await db.pool.query('SELECT count(*) AS n FROM item_images')).rows[0].n);
+    const before = await count();
+    const res = await call('hana', 'POST', '/images', {
+      contentType: 'image/png',
+      dataBase64: Buffer.from('not-an-image').toString('base64'),
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error.code).toBe('BAD_REQUEST');
+    expect(await count()).toBe(before);
+  });
   it('사진 → AI 초안 → 수정 → 게시 → 검색 원장 투영 → 비활성화', async () => {
     let res = await call('hana', 'POST', '/images', { contentType: 'image/png', dataBase64: PNG });
     expect(res.statusCode).toBe(201);

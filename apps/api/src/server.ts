@@ -8,7 +8,7 @@ const app = await buildApi({
   db,
   logger: true,
   ...(process.env.APP_MODE === 'automated-test' ? { rateLimitMax: 1_000 } : {}),
-  // ponytail: 공개 배포도 모든 사용자가 Caddy IP 하나로 한도를 공유한다. 사용자별 한도가 필요하면 trustProxy로 전환.
+  // Validated sessions use per-user buckets; anonymous traffic remains IP-limited.
   ...(process.env.RATE_LIMIT_MAX ? { rateLimitMax: Number(process.env.RATE_LIMIT_MAX) } : {}),
 });
 app.addHook('onClose', async () => db.close());

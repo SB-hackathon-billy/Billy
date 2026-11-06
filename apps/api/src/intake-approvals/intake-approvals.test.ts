@@ -141,12 +141,18 @@ describe('request_reservation tool after human approval', () => {
     const matched = RequestViewSchema.parse(
       (await call(hana, 'GET', `/requests/${view.request.id}`)).json().data,
     );
-    expect(
-      matched.request.status,
-      JSON.stringify(
-        matched.candidates.map((c) => [c.itemId, c.availability, c.unavailableReason]),
-      ),
-    ).toBe('MATCHES_READY');
+    // The real retry interval may already submit between runSearch and this HTTP read.
+    // Both observations are valid, but an advanced request must have a completed approval job.
+    if (matched.request.status === 'COLLECTING_OFFERS') {
+      expect((await status(job.id)).status).toBe('SUBMITTED');
+    } else {
+      expect(
+        matched.request.status,
+        JSON.stringify(
+          matched.candidates.map((c) => [c.itemId, c.availability, c.unavailableReason]),
+        ),
+      ).toBe('MATCHES_READY');
+    }
     await db.pool.query(
       "UPDATE intake_approvals SET next_attempt_at=now() - interval '1 second' WHERE id=$1",
       [job.id],

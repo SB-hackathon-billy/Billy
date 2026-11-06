@@ -99,6 +99,8 @@ export function CatalogPage() {
   const [params, setParams] = useSearchParams();
   const places = usePlaces();
   const [q, setQ] = useState(params.get('q') ?? '');
+  const queryText = params.get('q') ?? '';
+  useEffect(() => setQ(queryText), [queryText]);
   const filters: CatalogFilters = {
     q: params.get('q') ?? '',
     category: (params.get('category') as Category | null) ?? '',
@@ -111,18 +113,13 @@ export function CatalogPage() {
     !!filters.startAt &&
     !!filters.endAt &&
     validatePeriod(filters.startAt, filters.endAt, serverClock.now()).valid;
-  const [cursors, setCursors] = useState<string[]>([]);
   // 형식이 맞지 않는 기간은 서버에 보내지 않고 목록만 보여 준다.
-  const page = useCatalog(
-    periodValid ? filters : { ...filters, startAt: null, endAt: null },
-    cursors.at(-1),
-  );
-  const [items, setItems] = useState<CatalogItem[]>([]);
-  useEffect(() => setCursors([]), [params]);
-  useEffect(() => {
-    if (!page.data) return;
-    setItems((previous) => (cursors.length ? [...previous, ...page.data.items] : page.data.items));
-  }, [page.data, cursors.length]);
+  const page = useCatalog(periodValid ? filters : { ...filters, startAt: null, endAt: null });
+  const items = [
+    ...new Map(
+      page.data?.pages.flatMap((p) => p.items).map((item) => [item.id, item]) ?? [],
+    ).values(),
+  ];
   // 빌려주는 곳: 장위동 물품대여소(센터 앞)와 캠퍼스 대여소 6곳, 그리고 이웃 물품.
   const lenders = (places.data?.items ?? [])
     .filter((p) => p.id === 'place-center' || CAMPUS_HUB_PLACE_IDS.includes(p.id))
@@ -228,11 +225,13 @@ export function CatalogPage() {
           ))}
         </ul>
       )}
-      {page.data?.nextCursor && (
+      {page.hasNextPage && (
         <ActionButton
           secondary
           isDisabled={page.isFetching}
-          onPress={() => setCursors([...cursors, page.data!.nextCursor!])}
+          onPress={() => {
+            void page.fetchNextPage();
+          }}
         >
           더 보기
         </ActionButton>

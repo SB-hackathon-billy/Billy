@@ -10,15 +10,16 @@
     "start": "node --env-file-if-exists=../../.env --import tsx src/server.ts"
   },
   "dependencies": {
-    "@sb/contracts": "*",
-    "@sb/db": "*",
-    "@sb/ai": "*",
-    "fastify": "5.12.7",
     "@fastify/cookie": "11.1.5",
     "@fastify/rate-limit": "11.2.1",
-    "zod": "4.6.7",
+    "@sb/ai": "*",
+    "@sb/contracts": "*",
+    "@sb/db": "*",
+    "fastify": "5.12.7",
     "pg": "8.23.1",
-    "pg-boss": "12.38.0"
+    "pg-boss": "12.38.0",
+    "sharp": "0.35.5",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@types/pg": "8.23.1"

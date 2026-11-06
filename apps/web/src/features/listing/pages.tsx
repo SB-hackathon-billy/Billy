@@ -20,6 +20,7 @@ import { categories } from '../../lib/presentation.js';
 import { ActionButton, ErrorNotice, Loading } from '../../components/ui.js';
 import { PeriodFields } from '../../components/PeriodFields.js';
 import { shrink } from '../../lib/photo.js';
+import { allPages } from '../../lib/pagination.js';
 
 const statusText: Record<Listing['status'], string> = {
   DRAFT: '작성 중',
@@ -31,7 +32,7 @@ export function ListingsPage() {
   const query = useQuery({
     queryKey: ['listings', 'mine'],
     queryFn: ({ signal }) =>
-      api.get('/listings?mine=true&limit=50', listDataSchema(ListingSchema), signal),
+      allPages('/listings?mine=true&limit=50', listDataSchema(ListingSchema), signal),
   });
   return (
     <section>
