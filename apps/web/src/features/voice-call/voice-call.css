@@ -182,13 +182,17 @@
   align-items: center;
   justify-content: flex-start;
   padding: clamp(0.5rem, 4.5vh, 3rem) 1.25rem 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
   transition: padding 0.5s ease;
 }
 .vc-screen:not([data-phase='collecting']) .vc-stage {
   padding-top: 0.25rem;
 }
 .vc-character-slot {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -210,6 +214,7 @@
   border: 1px solid var(--color-border-strong);
 }
 .vc-checklist {
+  flex-shrink: 0;
   list-style: none;
   margin: 0.4rem 0 0;
   padding: 0;
@@ -218,13 +223,40 @@
     opacity 0.35s ease,
     transform 0.45s ease,
     max-height 0.5s ease;
-  max-height: 30rem;
+  padding-bottom: 0.8rem;
+}
+.vc-item-confirmation {
+  flex-shrink: 0;
+  width: min(100%, 22rem);
+  margin: 0 0 0.8rem;
+  padding: 0.9rem;
+  border-radius: 16px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+.vc-item-confirmation h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+.vc-item-confirmation p {
+  margin: 0.4rem 0;
+  overflow-wrap: anywhere;
+}
+.vc-item-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+.vc-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+.vc-item-actions .button {
+  flex: 1 1 8rem;
 }
 .vc-screen:not([data-phase='collecting']) .vc-checklist {
-  opacity: 0;
-  transform: translateY(1rem);
-  max-height: 0;
-  pointer-events: none;
+  display: none;
 }
 .vc-check {
   position: relative;
@@ -234,15 +266,6 @@
   align-items: center;
   padding: 0.3rem 0;
   transition: opacity 0.3s ease;
-}
-/* 체크 사이 파란 점선. */
-.vc-check + .vc-check::before {
-  content: '';
-  position: absolute;
-  left: 12px;
-  top: -0.55rem;
-  height: 1.1rem;
-  border-left: 2px dashed color-mix(in srgb, var(--blue-500) 55%, transparent);
 }
 .vc-check:not([data-done]) {
   opacity: 0.62;
@@ -326,6 +349,7 @@
 }
 
 .vc-captions {
+  flex-shrink: 0;
   padding: 0 1.25rem;
   min-height: 3.2rem;
 }
@@ -364,6 +388,7 @@
   margin: 0 0 0.3rem;
 }
 .vc-controls {
+  flex-shrink: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;

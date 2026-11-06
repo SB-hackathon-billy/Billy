@@ -10,6 +10,7 @@ import {
 import { ActionScope, api, noContent, idPath } from '../../lib/api.js';
 
 export interface CallSnapshot {
+  inputRevision: number;
   voiceSessionId: string | null;
   /** Latest EXTRACT_NEED task the server attached to this call. */
   taskId: string | null;
@@ -22,6 +23,7 @@ export interface CallEvents {
   transcript: (role: 'user' | 'assistant', delta: string) => void;
   error: (message: string) => void;
   snapshot: (snapshot: CallSnapshot) => void;
+  processing?: (processing: boolean) => void;
 }
 
 const SPEECH_RMS = 0.025;
@@ -50,6 +52,9 @@ export class VoiceCallClient {
   private userMuted = false;
   private held = false;
   private userSpoke = false;
+  private lastFormTaskId: string | null = null;
+  private formTaskBeforeSpeech: string | null = null;
+  private awaitingForm = false;
   private pendingClose: Promise<void> | null = null;
 
   constructor(private readonly on: CallEvents) {}
@@ -71,6 +76,9 @@ export class VoiceCallClient {
     this.userMuted = false;
     this.held = false;
     this.userSpoke = false;
+    this.lastFormTaskId = null;
+    this.formTaskBeforeSpeech = null;
+    this.awaitingForm = false;
     this.replyIntent = new ActionScope();
     try {
       if (!navigator.mediaDevices?.getUserMedia || !window.isSecureContext)
@@ -101,6 +109,7 @@ export class VoiceCallClient {
         analyser.getFloatTimeDomainData(samples);
         const rms = Math.sqrt(samples.reduce((sum, v) => sum + v * v, 0) / samples.length);
         if (rms > SPEECH_RMS) {
+          this.beginProcessing();
           this.lastSpeechAt = Date.now();
           this.speechPending = true;
           this.closePlayback();
@@ -177,6 +186,7 @@ export class VoiceCallClient {
       this.closePlayback();
       this.on.status('LISTENING');
       this.on.transcript('user', value.delta);
+      this.beginProcessing();
     }
     if (value.type === 'session.output_transcript.delta' && typeof value.delta === 'string') {
       if (this.playbackAllowed && !this.held) {
@@ -195,6 +205,12 @@ export class VoiceCallClient {
   private closePlayback() {
     this.playbackAllowed = false;
     if (this.audio) this.audio.muted = true;
+  }
+
+  private beginProcessing() {
+    if (!this.awaitingForm) this.formTaskBeforeSpeech = this.lastFormTaskId;
+    this.awaitingForm = true;
+    this.on.processing?.(true);
   }
 
   private poll(generation: number) {
@@ -221,9 +237,21 @@ export class VoiceCallClient {
           this.speechPending = false;
           this.approvedRevision = value.inputRevision;
         }
+        // READY permits a spoken reply before extraction finishes. The server keeps the previous
+        // formTaskId until a new extraction succeeds, so never treat READY alone as a new form.
+        this.lastFormTaskId = value.taskId;
+        if (
+          ready &&
+          (value.turnStatus === 'BLOCKED' ||
+            (value.taskId !== null && value.taskId !== this.formTaskBeforeSpeech))
+        ) {
+          this.awaitingForm = false;
+          this.on.processing?.(false);
+        }
         this.playbackAllowed = ready && !this.held;
         if (this.audio) this.audio.muted = !this.playbackAllowed;
         this.on.snapshot({
+          inputRevision: value.inputRevision,
           voiceSessionId: id,
           taskId: value.taskId,
           completion: value.completion,
@@ -285,6 +313,8 @@ export class VoiceCallClient {
 
   stop(): Promise<void> {
     this.generation++;
+    this.awaitingForm = false;
+    this.on.processing?.(false);
     if (this.pollTimer) clearTimeout(this.pollTimer);
     if (this.speechTimer) clearInterval(this.speechTimer);
     this.pollTimer = null;

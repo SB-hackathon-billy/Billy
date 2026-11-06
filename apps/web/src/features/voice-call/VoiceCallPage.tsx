@@ -32,6 +32,7 @@ import {
 } from './checklist.js';
 import { buildDemoScript } from './demo-script.js';
 import { reservationOutbox } from './reservation-outbox.js';
+import { hasCurrentVoiceCompletion, itemConfirmationKey } from './item-confirmation.js';
 import { PolicyCards } from './PolicyCards.js';
 import {
   policyUtterances,
@@ -78,6 +79,9 @@ export function VoiceCallPage() {
     null,
   );
   const [scriptThinking, setScriptThinking] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [confirmedItem, setConfirmedItem] = useState<string | null>(null);
+  const [rejectedTaskId, setRejectedTaskId] = useState<string | null>(null);
   const [phase, setPhase] = useState<ApprovalPhase>('collecting');
   const [dismissedTaskId, setDismissedTaskId] = useState<string | null>(null);
   const [reservation, setReservation] = useState<IntakeApproval | null>(null);
@@ -105,6 +109,7 @@ export function VoiceCallPage() {
       }),
     error: setError,
     snapshot: setSnapshot,
+    processing: setProcessing,
   });
 
   const stopScript = () => {
@@ -185,16 +190,36 @@ export function VoiceCallPage() {
   }, [task.data]);
   const thinking = scripted
     ? scriptThinking
-    : task.data?.status === 'QUEUED' || task.data?.status === 'RUNNING';
+    : processing ||
+      (!!taskId && task.isPending) ||
+      task.data?.status === 'QUEUED' ||
+      task.data?.status === 'RUNNING';
 
   const need = proposal?.result.proposedNeed ?? request?.request.need ?? createEmptyNeed();
+  const itemKey = itemConfirmationKey(need);
+  const itemConfirmed = !!itemKey && confirmedItem === itemKey;
+  const currentProposal = scripted || (!!taskId && proposal?.taskId === taskId);
+  const itemChoiceDisabled =
+    thinking || !['CONNECTING', 'LISTENING', 'SPEAKING'].includes(status) || !currentProposal;
+  useEffect(() => {
+    setConfirmedItem(null);
+  }, [itemKey]);
   const checklist = useMemo(
-    () => buildChecklist(need, places.data?.items ?? [], eligible),
+    () =>
+      buildChecklist(need, places.data?.items ?? [], eligible).filter(
+        (item) => item.key !== 'eligibility',
+      ),
     [need, places.data, eligible],
   );
   const progress = checklistProgress(checklist);
   const active = ['CONNECTING', 'LISTENING', 'SPEAKING'].includes(status);
-  const complete = readyForApproval(proposal?.result ?? null, eligible, serverClock.now());
+  const complete =
+    !thinking &&
+    currentProposal &&
+    (scripted || hasCurrentVoiceCompletion(snapshot, proposal?.taskId)) &&
+    snapshot?.turnStatus !== 'BLOCKED' &&
+    itemConfirmed &&
+    readyForApproval(proposal?.result ?? null, eligible, serverClock.now());
   // 명세 0005: 통화 중 발화로 관련 정책을 백그라운드에서 찾는다(통화 화면에는 표시하지 않음).
   const utterances = useMemo(() => policyUtterances(lines), [lines]);
   const policyMatch = usePolicyMatch(utterances, scripted);
@@ -241,6 +266,10 @@ export function VoiceCallPage() {
     setLines([]);
     setSnapshot(null);
     setProposal(null);
+    setConfirmedItem(null);
+    setRejectedTaskId(null);
+    setProcessing(false);
+    setScriptThinking(false);
     setPhase('collecting');
     setDismissedTaskId(null);
     setReservation(null);
@@ -280,12 +309,13 @@ export function VoiceCallPage() {
   const endCall = () => {
     stopRinging();
     stopScript();
+    setScriptThinking(false);
     if (scripted) setStatus('CLOSED');
     void client.current?.stop();
   };
 
   const approve = async () => {
-    if (!proposal || phase !== 'review') return;
+    if (!proposal || phase !== 'review' || !complete) return;
     setPhase('reserving');
     setError('');
     client.current?.hold();
@@ -363,6 +393,55 @@ export function VoiceCallPage() {
 
       <div className="vc-stage">
         <CallCharacter state={character} progress={progress} />
+        {phase === 'collecting' && itemKey && (
+          <section
+            className="vc-item-confirmation"
+            aria-labelledby="vc-item-title"
+            aria-busy={thinking}
+          >
+            <h2 id="vc-item-title">이 물품이 맞나요?</h2>
+            <p className="vc-item-name">{need.queryText.trim()}</p>
+            {itemConfirmed ? (
+              <>
+                <p role="status">빌릴 물품으로 선택했어요.</p>
+                <ActionButton
+                  secondary
+                  onPress={() => setConfirmedItem(null)}
+                  isDisabled={itemChoiceDisabled}
+                >
+                  다시 선택하기
+                </ActionButton>
+              </>
+            ) : rejectedTaskId === proposal?.taskId ? (
+              <>
+                <p role="status">빌리려는 물품 이름을 다시 말씀해 주세요.</p>
+                <ActionButton
+                  secondary
+                  onPress={() => setRejectedTaskId(null)}
+                  isDisabled={itemChoiceDisabled}
+                >
+                  이 물품 다시 확인하기
+                </ActionButton>
+              </>
+            ) : (
+              <div className="vc-item-actions">
+                <ActionButton
+                  onPress={() => setConfirmedItem(itemKey)}
+                  isDisabled={itemChoiceDisabled}
+                >
+                  네, 이 물품이에요
+                </ActionButton>
+                <ActionButton
+                  secondary
+                  onPress={() => setRejectedTaskId(proposal?.taskId ?? null)}
+                  isDisabled={itemChoiceDisabled}
+                >
+                  아니요, 다시 말할게요
+                </ActionButton>
+              </div>
+            )}
+          </section>
+        )}
         <ul className="vc-checklist" aria-label="접수에 필요한 정보" aria-hidden={sheetOpen}>
           {checklist.map((item) => (
             <ChecklistRow key={item.key} item={item} current={item === nextItem && active} />
