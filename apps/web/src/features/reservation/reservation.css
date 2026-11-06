@@ -666,50 +666,135 @@
 
 /* 캠퍼스 대여소 화면(/hubs, /hubs/:placeId) */
 .hubs-map {
+  margin: 1rem 0 0.75rem;
+}
+.hubs-map-svg {
   display: block;
   width: 100%;
   height: auto;
-  margin: 1rem 0 0.75rem;
-  border-radius: 22px;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  border-radius: 24px;
+  background: linear-gradient(160deg, #f3f1fb, #eaf3e2);
   box-shadow: var(--shadow-soft);
 }
-.hubs-map-bg {
-  fill: #eef3e6;
+.sb-land {
+  fill: #fff;
+  stroke: #c9c4e3;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
 }
-.hubs-map-road {
-  fill: none;
-  stroke: #fff;
-  stroke-width: 9;
-  stroke-linecap: round;
-  opacity: 0.9;
+.sb-title {
+  font-size: 15px;
+  font-weight: 800;
+  fill: #3b3570;
+  opacity: 0.55;
+  letter-spacing: 0.1em;
 }
-.hubs-map-pin circle {
-  fill: var(--color-strong);
-  stroke: #fff;
-  stroke-width: 3;
+.sb-center rect {
+  fill: #3b3570;
 }
-.hubs-map-pin.selected circle {
-  fill: var(--color-primary);
-  stroke: var(--color-strong);
-}
-.hubs-map-pin text,
-.hubs-map-me text {
-  font-size: 9px;
+.sb-center text {
+  font-size: 10px;
   font-weight: 700;
-  fill: var(--color-strong);
-  paint-order: stroke;
-  stroke: #eef3e6;
-  stroke-width: 4px;
+  fill: #3b3570;
 }
-.hubs-map-me circle {
+.sb-pin .halo {
+  fill: #5b4fae;
+  opacity: 0.14;
+}
+.sb-pin .dot {
+  fill: #5b4fae;
+  stroke: #fff;
+  stroke-width: 2.5;
+}
+.sb-pin .name {
+  font-size: 12px;
+  font-weight: 800;
+  fill: #2b2650;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.sb-pin .dist {
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--color-primary-text);
+}
+.sb-pin:hover .halo,
+.sb-pin.selected .halo,
+.sb-pin.nearest .halo {
+  fill: var(--color-primary);
+  opacity: 0.55;
+}
+.sb-pin.selected .dot,
+.sb-pin.nearest .dot {
+  fill: var(--color-strong);
+}
+.sb-pin.selected .halo,
+.sb-pin.nearest .halo {
+  animation: sb-pulse 1.8s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes sb-pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sb-pin .halo {
+    animation: none !important;
+  }
+}
+.sb-me circle {
   fill: #2f7cf6;
   stroke: #fff;
   stroke-width: 2;
 }
-.hubs-map-me .halo {
+.sb-me .halo {
   fill: #2f7cf6;
   opacity: 0.18;
   stroke: none;
+}
+.hubs-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+  margin-top: 0.6rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+.hubs-legend .dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 0.2rem;
+  border-radius: 50%;
+  vertical-align: -1px;
+}
+.hubs-legend .dot.hub {
+  background: #5b4fae;
+  box-shadow: 0 0 0 3px rgb(91 79 174 / 0.2);
+}
+.hubs-legend .dot.center {
+  background: #3b3570;
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+.hubs-legend .dot.me {
+  background: #2f7cf6;
+}
+.hubs-source {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
 }
 .hubs-locate {
   display: grid;

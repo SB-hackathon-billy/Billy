@@ -6,11 +6,14 @@ import { CAMPUS_HUB_PLACE_IDS, CatalogItemSchema, listDataSchema } from '@sb/con
 import { api } from '../../lib/api.js';
 import { usePlaces } from '../../lib/hooks.js';
 import {
+  CENTER_SPOT,
   HUB_SPOTS,
+  SEONGBUK_MAP,
   formatDistance,
   locate,
   mapUrl,
   metersTo,
+  project,
   useHere,
   walkMinutes,
   type Here,
@@ -41,7 +44,20 @@ function useHubs() {
   return { hubs, here, loading: places.isPending };
 }
 
-/** 거점 위치도: 실제 위경도를 상자에 맞춰 찍은 점 지도. 내 위치가 가까우면 함께 보인다. */
+/** 학교 이름표 위치(점 기준). 가까운 학교끼리 겹치지 않게 방향만 정한다. */
+const LABEL_SIDE: Record<string, 'up' | 'down' | 'left' | 'right'> = {
+  'place-korea': 'right',
+  'place-sungshin': 'up',
+  'place-hansung': 'left',
+  'place-kookmin': 'up',
+  'place-seokyeong': 'up',
+  'place-dongduk': 'down',
+};
+
+/**
+ * 성북구 지도: 실제 행정경계 위에 캠퍼스 거점 6곳과 장위동 물품대여소만 찍는다.
+ * 모든 점(거점·내 위치)은 같은 투영(project)을 쓴다.
+ */
 function HubsMap({
   hubs,
   here,
@@ -51,64 +67,98 @@ function HubsMap({
   here: Here;
   selected?: string;
 }) {
-  const me =
-    here.status === 'ready' && hubs.some((h) => (h.meters ?? Infinity) < 5_000) ? here : null;
-  const points = [...hubs.map((h) => h.spot), ...(me ? [me] : [])];
-  const lat = points.map((p) => p.lat);
-  const lng = points.map((p) => p.lng);
-  const [minLat, maxLat, minLng, maxLng] = [
-    Math.min(...lat),
-    Math.max(...lat),
-    Math.min(...lng),
-    Math.max(...lng),
-  ];
-  const W = 320;
-  const H = 220;
-  const pad = 34;
-  // 위도 1도와 경도 1도의 실제 거리 비율(서울 부근 약 0.79)을 맞춰 모양이 찌그러지지 않게 한다.
-  const kx = 0.79;
-  const span = Math.max((maxLng - minLng) * kx, (maxLat - minLat) * (W / H), 1e-6);
-  const scale = (W - pad * 2) / span;
-  const cx = (minLng + maxLng) / 2;
-  const cy = (minLat + maxLat) / 2;
-  const x = (p: { lng: number }) => W / 2 + (p.lng - cx) * kx * scale;
-  const y = (p: { lat: number }) => H / 2 - (p.lat - cy) * scale;
+  const me = here.status === 'ready' ? project(here) : null;
+  const meInside =
+    me && me.x > 0 && me.y > 0 && me.x < SEONGBUK_MAP.width && me.y < SEONGBUK_MAP.height;
+  const nearest = hubs[0]?.meters != null ? hubs[0].place.id : null;
+  const center = project(CENTER_SPOT);
+  const label = (side: string, x: number, y: number) =>
+    side === 'up'
+      ? { x, y: y - 14, anchor: 'middle' as const }
+      : side === 'down'
+        ? { x, y: y + 22, anchor: 'middle' as const }
+        : side === 'left'
+          ? { x: x - 13, y: y + 4, anchor: 'end' as const }
+          : { x: x + 13, y: y + 4, anchor: 'start' as const };
   return (
-    <svg
-      className="hubs-map"
-      viewBox={`0 0 ${W} ${H}`}
-      role="img"
-      aria-label="캠퍼스 대여소 위치도"
-    >
-      <rect width={W} height={H} rx="20" className="hubs-map-bg" />
-      <path
-        d={`M0 ${H * 0.62} C ${W * 0.3} ${H * 0.5}, ${W * 0.6} ${H * 0.78}, ${W} ${H * 0.6}`}
-        className="hubs-map-road"
-      />
-      <path
-        d={`M${W * 0.42} 0 C ${W * 0.48} ${H * 0.4}, ${W * 0.38} ${H * 0.7}, ${W * 0.46} ${H}`}
-        className="hubs-map-road"
-      />
-      {hubs.map((h) => (
-        <Link key={h.place.id} to={`/hubs/${h.place.id}`} aria-label={`${h.place.label} 물품 보기`}>
-          <g className={`hubs-map-pin ${selected === h.place.id ? 'selected' : ''}`}>
-            <circle cx={x(h.spot)} cy={y(h.spot)} r={selected === h.place.id ? 11 : 8} />
-            <text x={x(h.spot)} y={y(h.spot) - 15} textAnchor="middle">
-              {h.place.label.replace(' 거점', '')}
-            </text>
-          </g>
-        </Link>
-      ))}
-      {me && (
-        <g className="hubs-map-me">
-          <circle cx={x(me)} cy={y(me)} r="14" className="halo" />
-          <circle cx={x(me)} cy={y(me)} r="6" />
-          <text x={x(me)} y={y(me) + 24} textAnchor="middle">
-            나
+    <figure className="hubs-map">
+      <svg
+        className="hubs-map-svg"
+        viewBox={`0 0 ${SEONGBUK_MAP.width} ${SEONGBUK_MAP.height}`}
+        role="img"
+        aria-label="성북구 캠퍼스 대여소 지도"
+      >
+        <defs>
+          <filter id="hubs-shadow" x="-10%" y="-10%" width="120%" height="130%">
+            <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#2b2a4a" floodOpacity="0.12" />
+          </filter>
+        </defs>
+        <path d={SEONGBUK_MAP.path} className="sb-land" filter="url(#hubs-shadow)" />
+        <text x="22" y="34" className="sb-title">
+          성북구
+        </text>
+        <g className="sb-center">
+          <rect
+            x={center.x - 7}
+            y={center.y - 7}
+            width="14"
+            height="14"
+            rx="2"
+            transform={`rotate(45 ${center.x} ${center.y})`}
+          />
+          <text x={center.x + 13} y={center.y - 10}>
+            장위동 물품대여소
           </text>
         </g>
-      )}
-    </svg>
+        {hubs.map((h) => {
+          const { x, y } = project(h.spot);
+          const state =
+            selected === h.place.id
+              ? 'selected'
+              : !selected && nearest === h.place.id
+                ? 'nearest'
+                : '';
+          const l = label(LABEL_SIDE[h.place.id] ?? 'up', x, y);
+          return (
+            <Link
+              key={h.place.id}
+              to={`/hubs/${h.place.id}`}
+              aria-label={`${h.place.label}${h.meters !== null ? ` · ${formatDistance(h.meters)}` : ''} 물품 보기`}
+            >
+              <g className={`sb-pin ${state}`}>
+                <circle cx={x} cy={y} r="16" className="halo" />
+                <circle cx={x} cy={y} r="7" className="dot" />
+                <text x={l.x} y={l.y} textAnchor={l.anchor} className="name">
+                  {h.place.label.replace(' 거점', '')}
+                  {h.meters !== null && <tspan className="dist"> {formatDistance(h.meters)}</tspan>}
+                </text>
+              </g>
+            </Link>
+          );
+        })}
+        {meInside && (
+          <g className="sb-me">
+            <circle cx={me.x} cy={me.y} r="13" className="halo" />
+            <circle cx={me.x} cy={me.y} r="5.5" />
+          </g>
+        )}
+      </svg>
+      <figcaption className="hubs-legend">
+        <span>
+          <i className="dot hub" /> 캠퍼스 대여소
+        </span>
+        <span>
+          <i className="dot center" /> 1인가구 물품대여소(장위로 82)
+        </span>
+        {meInside && (
+          <span>
+            <i className="dot me" /> 내 위치
+          </span>
+        )}
+        {me && !meInside && <span>지금 위치는 성북구 밖이에요</span>}
+      </figcaption>
+      <p className="hubs-source">지도: 통계청 행정구역 경계(2013) · 학교 위치 OpenStreetMap</p>
+    </figure>
   );
 }
 
