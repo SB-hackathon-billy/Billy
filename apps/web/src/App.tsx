@@ -69,6 +69,7 @@ function Protected({ children }: { children: ReactNode }) {
   const { session, loading } = useSession();
   return loading ? <Loading /> : session ? children : <Navigate to="/entry" replace />;
 }
+/** 새 버전은 안내 없이 적용한다. 통화·작성 중 화면에서는 새로고침하지 않고 안정된 화면으로 오면 적용. */
 function PwaUpdate() {
   const {
     needRefresh: [refresh],
@@ -78,19 +79,10 @@ function PwaUpdate() {
   const stable =
     ['/', '/inbox', '/me', '/entry', '/catalog', '/notifications'].includes(location.pathname) ||
     location.pathname.startsWith('/center');
-  return refresh && stable ? (
-    <div className="update-notice" role="status">
-      <p>새 버전이 준비되었어요.</p>
-      <ActionButton
-        secondary
-        onPress={() => {
-          void updateServiceWorker(true);
-        }}
-      >
-        지금 업데이트
-      </ActionButton>
-    </div>
-  ) : null;
+  useEffect(() => {
+    if (refresh && stable) void updateServiceWorker(true);
+  }, [refresh, stable, updateServiceWorker]);
+  return null;
 }
 function TabIcon({ name }: { name: string }) {
   const paths: Record<string, ReactNode> = {
