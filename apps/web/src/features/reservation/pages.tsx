@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+  CAMPUS_HUB_PLACE_IDS,
   CATEGORY_VALUES,
   ReadNotificationsDataSchema,
   ReservationViewSchema,
@@ -93,11 +94,13 @@ export function CatalogCard({ item, period }: { item: CatalogItem; period: strin
 
 export function CatalogPage() {
   const [params, setParams] = useSearchParams();
+  const places = usePlaces();
   const [q, setQ] = useState(params.get('q') ?? '');
   const filters: CatalogFilters = {
     q: params.get('q') ?? '',
     category: (params.get('category') as Category | null) ?? '',
     source: (params.get('source') as ItemSource | null) ?? '',
+    ...(params.get('place') ? { placeId: params.get('place')! } : {}),
     startAt: params.get('startAt'),
     endAt: params.get('endAt'),
   };
@@ -117,6 +120,14 @@ export function CatalogPage() {
     if (!page.data) return;
     setItems((previous) => (cursors.length ? [...previous, ...page.data.items] : page.data.items));
   }, [page.data, cursors.length]);
+  // 빌려주는 곳: 장위동 물품대여소(센터 앞)와 캠퍼스 대여소 6곳, 그리고 이웃 물품.
+  const lenders = (places.data?.items ?? [])
+    .filter((p) => p.id === 'place-center' || CAMPUS_HUB_PLACE_IDS.includes(p.id))
+    .sort(
+      (a, b) =>
+        Number(b.id === 'place-center') - Number(a.id === 'place-center') ||
+        a.label.localeCompare(b.label, 'ko'),
+    );
   const update = (patch: Record<string, string | null>) => {
     const next = new URLSearchParams(params);
     for (const [key, value] of Object.entries(patch))
@@ -175,12 +186,28 @@ export function CatalogPage() {
         <label>
           빌려주는 곳
           <select
-            value={filters.source}
-            onChange={(event) => update({ source: event.target.value || null })}
+            value={
+              filters.placeId
+                ? `place:${filters.placeId}`
+                : filters.source === 'RESIDENT'
+                  ? 'RESIDENT'
+                  : ''
+            }
+            onChange={(event) => {
+              const v = event.target.value;
+              if (v.startsWith('place:')) update({ place: v.slice(6), source: null });
+              else update({ place: null, source: v || null });
+            }}
           >
             <option value="">전체</option>
-            <option value="PUBLIC">공공(센터)</option>
-            <option value="RESIDENT">이웃</option>
+            <optgroup label="대여소">
+              {lenders.map((p) => (
+                <option key={p.id} value={`place:${p.id}`}>
+                  {p.id === 'place-center' ? '장위동 물품대여소 (센터 앞)' : p.label}
+                </option>
+              ))}
+            </optgroup>
+            <option value="RESIDENT">이웃 물품</option>
           </select>
         </label>
       </div>
