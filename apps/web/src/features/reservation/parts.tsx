@@ -16,6 +16,7 @@ import { useAction, useOnline, usePlaces } from '../../lib/hooks.js';
 import { reasonLabels } from '../../lib/presentation.js';
 import { ActionButton, Check, ErrorNotice } from '../../components/ui.js';
 import { closedReasonLabel, reservationStatusLabels, waitlistStatusLabels } from './data.js';
+import { ticketKind } from './handover.js';
 import './reservation.css';
 
 /** 확정 예약의 인계 단계(명세 0007). */
@@ -61,6 +62,7 @@ export function ReservationCard({ view }: { view: ReservationView }) {
           <span>응답 기한 {formatSeoulDateTime(r.responseDueAt)}</span>
         )}
         {r.closedReason && <span>{closedReasonLabel(r.closedReason)}</span>}
+        {ticketKind(view) && <span className="ticket-chip">QR {ticketKind(view)} 보기 →</span>}
       </div>
       {r.status === 'CONFIRMED' && r.handover && r.handover.stage !== 'READY' ? (
         <span className="status status-r-confirmed">{handoverStageLabels[r.handover.stage]}</span>

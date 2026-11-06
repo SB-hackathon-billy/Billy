@@ -86,6 +86,14 @@ export default async function listingsPlugin(app: FastifyInstance) {
       !(await u.c.query('SELECT 1 FROM places WHERE id=$1', [l.placeId])).rowCount
     )
       missing.push('placeId');
+    // 캠퍼스 거점이 있는 DB에서는 거점으로만 주고받는다(화면과 같은 규칙).
+    if (
+      !missing.length &&
+      !C.CAMPUS_HUB_PLACE_IDS.includes(l.placeId!) &&
+      (await u.c.query('SELECT 1 FROM places WHERE id = ANY($1::text[])', [C.CAMPUS_HUB_PLACE_IDS]))
+        .rowCount
+    )
+      missing.push('placeId');
     if (missing.length) fail('VALIDATION_ERROR', { fields: missing });
   }
 

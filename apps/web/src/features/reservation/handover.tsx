@@ -160,27 +160,74 @@ function HandoverRecord({ handover }: { handover: Handover }) {
   );
 }
 
-/** 예약 상세 화면의 인계 카드. 빌리는 사람에게만 QR을 보여준다. */
+/** 빌리는 사람이 거점에서 보여 줄 QR이 있는 예약(인계 전·대여 중). */
+export function ticketKind(view: ReservationView): '인계권' | '반납권' | null {
+  const r = view.reservation;
+  if (view.role !== 'REQUESTER' || r.status !== 'CONFIRMED' || !r.handover?.code) return null;
+  return r.handover.stage === 'READY'
+    ? '인계권'
+    : r.handover.stage === 'PICKED_UP'
+      ? '반납권'
+      : null;
+}
+
+/** 예약 상세 맨 위의 승차권 모양 인계권. 빌리는 사람에게만 보인다. */
+export function HandoverTicket({
+  view,
+  placeLabel,
+  placeNote,
+}: {
+  view: ReservationView;
+  placeLabel?: string;
+  placeNote?: string;
+}) {
+  const kind = ticketKind(view);
+  if (!kind) return null;
+  const r = view.reservation;
+  const code = r.handover!.code!;
+  return (
+    <section className="handover-ticket" aria-label={`QR ${kind}`}>
+      <div className="ticket-top">
+        <img src={r.item.image.url} alt="" width="64" height="64" />
+        <div>
+          <span className="ticket-kind">QR {kind}</span>
+          <strong>{r.item.title}</strong>
+          <span>
+            {formatSeoulDateTime(r.startAt)} ~ {formatSeoulDateTime(r.endAt)}
+          </span>
+        </div>
+      </div>
+      <div className="ticket-perf" aria-hidden="true" />
+      <div className="ticket-qr">
+        <QrCode text={`${window.location.origin}/hub?code=${code}`} />
+        <p className="handover-code" aria-label={`인계 코드 ${code}`}>
+          {code.slice(0, 4)} {code.slice(4)}
+        </p>
+        <p className="ticket-hint">
+          {kind === '인계권'
+            ? '거점 관리자에게 이 화면을 보여 주세요.'
+            : `${formatSeoulDateTime(r.endAt)}까지 반납할 때 보여 주세요.`}{' '}
+          잘 안 읽히면 화면 밝기를 올려 주세요.
+        </p>
+      </div>
+      <div className="ticket-foot">
+        <span>📍 {placeLabel ?? '거점'}</span>
+        {placeNote && <span>{placeNote}</span>}
+      </div>
+    </section>
+  );
+}
+
+/** 예약 상세 화면의 인계·반납 진행 카드. QR은 맨 위 인계권(HandoverTicket)에 있다. */
 export function HandoverCard({ view, placeLabel }: { view: ReservationView; placeLabel?: string }) {
   const r = view.reservation;
   const handover = r.handover;
   if (r.status !== 'CONFIRMED' || !handover) return null;
-  const owner = view.role === 'OWNER';
   return (
     <div className="content-card handover-card">
       <h2>거점 인계·반납</h2>
       <Steps stage={handover.stage} />
       <p className="handover-message">{stageMessage(view, placeLabel ?? '거점')}</p>
-      {!owner &&
-        handover.code &&
-        (handover.stage === 'READY' || handover.stage === 'PICKED_UP') && (
-          <div className="handover-qr-box">
-            <QrCode text={`${window.location.origin}/hub?code=${handover.code}`} />
-            <p className="handover-code" aria-label={`인계 코드 ${handover.code}`}>
-              {handover.code.slice(0, 4)} {handover.code.slice(4)}
-            </p>
-          </div>
-        )}
       <HandoverRecord handover={handover} />
     </div>
   );

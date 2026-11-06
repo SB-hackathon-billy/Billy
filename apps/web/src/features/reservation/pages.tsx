@@ -18,7 +18,7 @@ import { useAction, useNow, useOnline, usePlaces } from '../../lib/hooks.js';
 import { categories, durationLabel, secondsRemaining } from '../../lib/presentation.js';
 import { ActionButton, Check, ErrorNotice, Ink, Loading } from '../../components/ui.js';
 import { PeriodFields } from '../../components/PeriodFields.js';
-import { HandoverCard } from './handover.js';
+import { HandoverCard, HandoverTicket } from './handover.js';
 import {
   actorLabels,
   availabilityReasonLabels,
@@ -478,6 +478,10 @@ export function ReservationPage() {
       <p className="eyebrow">{owner ? '빌려주기 · 예약 신청' : '빌리기 · 내 예약'}</p>
       <h1>{heading}</h1>
       <ReservationStatusBadge status={r.status} />
+      <HandoverTicket
+        view={view}
+        {...(place ? { placeLabel: place.label, placeNote: place.description } : {})}
+      />
       <div className="content-card">
         <div className="item-header">
           <img src={r.item.image.url} alt={r.item.image.alt} width="92" height="80" />

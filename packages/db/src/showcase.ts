@@ -36,6 +36,24 @@ const places: Place[] = [
     description: '고려대학교 캠퍼스 안 학생 관리자 거점.',
     isDemo: true,
   },
+  {
+    id: 'place-kookmin',
+    label: '국민대 거점',
+    description: '국민대학교 캠퍼스 안 학생 관리자 거점.',
+    isDemo: true,
+  },
+  {
+    id: 'place-dongduk',
+    label: '동덕여대 거점',
+    description: '동덕여자대학교 캠퍼스 안 학생 관리자 거점.',
+    isDemo: true,
+  },
+  {
+    id: 'place-seokyeong',
+    label: '서경대 거점',
+    description: '서경대학교 캠퍼스 안 학생 관리자 거점.',
+    isDemo: true,
+  },
 ];
 
 /** 사진: 성북구1인가구지원센터 물품대여 페이지(공공누리 제1유형). `CENTER_PHOTO_CREDIT` 참고. */
@@ -113,7 +131,7 @@ const residentItems: Item[] = [
     'HOBBY',
     1_000,
     'u_seul',
-    ['place-sungshin', 'place-hansung'],
+    ['place-sungshin', 'place-dongduk'],
     8,
   ),
   item(
@@ -122,7 +140,7 @@ const residentItems: Item[] = [
     'HOBBY',
     1_500,
     'u_jun',
-    ['place-hansung', 'place-korea'],
+    ['place-korea', 'place-kookmin'],
     2,
   ),
   item(
@@ -131,7 +149,7 @@ const residentItems: Item[] = [
     'HOBBY',
     800,
     'u_duri',
-    ['place-center', 'place-hansung'],
+    ['place-seokyeong', 'place-hansung'],
     39,
   ),
   item(
@@ -140,7 +158,7 @@ const residentItems: Item[] = [
     'HOBBY',
     1_500,
     'u_duri',
-    ['place-hansung', 'place-library'],
+    ['place-kookmin', 'place-seokyeong'],
     25,
   ),
   item(
@@ -158,7 +176,7 @@ const residentItems: Item[] = [
     'HOBBY',
     1_000,
     'u_seul',
-    ['place-sungshin'],
+    ['place-dongduk', 'place-sungshin'],
     43,
   ),
 ];
@@ -329,7 +347,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   try {
     await showcase(db);
     console.log(
-      `Showcase: 캠퍼스 거점 3곳, 물품 ${items.length}개, 예약 5건(인계 대기·응답 대기·반납 완료·승인 대기·대여 중).`,
+      `Showcase: 캠퍼스 거점 6곳, 물품 ${items.length}개, 예약 5건(인계 대기·응답 대기·반납 완료·승인 대기·대여 중).`,
     );
   } finally {
     await db.close();

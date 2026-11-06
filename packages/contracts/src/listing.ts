@@ -11,6 +11,19 @@ export type ListingStatus = z.infer<typeof ListingStatusSchema>;
 export const IMAGE_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 export const MAX_IMAGE_BYTES = 5_000_000;
 export const MAX_LISTING_IMAGES = 5;
+/**
+ * 빌려주기 등록에서 고를 수 있는 주고받을 장소: 캠퍼스 거점만(기획서 v2 3장 ②).
+ * ponytail: 거점 목록을 상수로 둔다. 거점이 데이터로 늘어나면 Place에 종류 필드를 둔다.
+ * 이 거점이 하나도 없는 DB(기본 테스트 fixture)는 기존 장소를 그대로 쓴다.
+ */
+export const CAMPUS_HUB_PLACE_IDS: readonly string[] = [
+  'place-korea',
+  'place-kookmin',
+  'place-dongduk',
+  'place-seokyeong',
+  'place-sungshin',
+  'place-hansung',
+];
 
 export const ImageUploadBodySchema = z
   .object({

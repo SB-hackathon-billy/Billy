@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  CAMPUS_HUB_PLACE_IDS,
   CATEGORY_VALUES,
   IMAGE_CONTENT_TYPES,
   ListingSchema,
@@ -161,6 +162,9 @@ export function ListingEditPage() {
   const { listingId = '' } = useParams();
   const client = useQueryClient();
   const places = usePlaces();
+  const all = places.data?.items ?? [];
+  const campus = all.filter((p) => CAMPUS_HUB_PLACE_IDS.includes(p.id));
+  const hubs = campus.length ? campus : all;
   const action = useAction();
   const query = useQuery({
     queryKey: ['listing', listingId],
@@ -175,6 +179,16 @@ export function ListingEditPage() {
   const l = query.data;
   if (!form) return <Loading />;
   const set = (patch: Partial<Form>) => setForm({ ...form, ...patch });
+  // 서버 게시 조건(missingForPublish)과 같은 필수 항목을 미리 알려 준다.
+  const missing = [
+    ...(form.title.trim() ? [] : ['제목']),
+    ...(form.category ? [] : ['분류']),
+    ...(form.dailyRateKrw ? [] : ['하루 대여료']),
+    ...(form.placeId && hubs.some((p) => p.id === form.placeId) ? [] : ['주고받을 장소']),
+    ...(form.availableFrom && form.availableTo && form.availableFrom >= form.availableTo
+      ? ['올바른 대여 가능 기간']
+      : []),
+  ];
 
   const patchBody = (): PatchListingBody => ({
     expectedVersion: l.version,
@@ -199,6 +213,8 @@ export function ListingEditPage() {
         scope.command(`/listings/${id}`, 'PATCH', patchBody()),
         ListingSchema,
       );
+      // 저장은 됐는데 게시가 거절돼도 새 버전을 반영해, 다시 누를 때 버전 충돌(409)이 나지 않게 한다.
+      done(saved);
       done(
         await api.execute(
           scope.command(`/listings/${id}/publish`, 'POST', { expectedVersion: saved.version }),
@@ -293,12 +309,13 @@ export function ListingEditPage() {
             onChange={(e) => set({ placeId: e.target.value || null })}
           >
             <option value="">선택</option>
-            {places.data?.items.map((p) => (
+            {hubs.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.label}
               </option>
             ))}
           </select>
+          <span className="field-hint">이웃 물건은 캠퍼스 거점에서만 주고받아요.</span>
         </label>
         <p className="field-hint">대여 가능 기간 (비워 두면 언제나 가능)</p>
         <PeriodFields
@@ -307,12 +324,20 @@ export function ListingEditPage() {
           onChange={(availableFrom, availableTo) => set({ availableFrom, availableTo })}
         />
       </div>
+      {l.status !== 'PUBLISHED' && missing.length > 0 && (
+        <p className="field-hint" role="status">
+          게시하려면 입력해 주세요: {missing.join(', ')}
+        </p>
+      )}
       <ErrorNotice action={action} />
       <ActionButton secondary isDisabled={action.pending} onPress={() => action.run(save)}>
         저장
       </ActionButton>
       {l.status !== 'PUBLISHED' ? (
-        <ActionButton isDisabled={action.pending} onPress={() => action.run(publish)}>
+        <ActionButton
+          isDisabled={action.pending || missing.length > 0}
+          onPress={() => action.run(publish)}
+        >
           {l.status === 'INACTIVE' ? '다시 게시하기' : '확인하고 게시하기'}
         </ActionButton>
       ) : (

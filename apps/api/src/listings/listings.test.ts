@@ -121,4 +121,32 @@ describe('2번 AI 물품 등록', () => {
     res = await call('hana', 'GET', '/listings?mine=true');
     expect((res.json().data.items as Listing[]).map((x) => x.status)).toEqual(['INACTIVE']);
   });
+
+  it('캠퍼스 거점이 있으면 거점에서만 주고받도록 게시를 막는다', async () => {
+    await db.pool.query(
+      `INSERT INTO places(id,data) VALUES('place-hansung', '{"id":"place-hansung","label":"한성대 거점","description":"캠퍼스 거점","isDemo":true}')`,
+    );
+    let res = await call('hana', 'POST', '/images', { contentType: 'image/png', dataBase64: PNG });
+    const image = res.json().data as { id: string };
+    res = await call('hana', 'POST', '/listings', { imageIds: [image.id] });
+    let l: Listing = ListingSchema.parse(res.json().data);
+    const patch = async (placeId: string) => {
+      res = await call('hana', 'PATCH', `/listings/${l.id}`, {
+        expectedVersion: l.version,
+        title: '전동 드릴',
+        category: 'TOOLS',
+        dailyRateKrw: 1500,
+        placeId,
+      });
+      expect(res.statusCode).toBe(200);
+      l = ListingSchema.parse(res.json().data);
+    };
+    await patch('place-center');
+    res = await call('hana', 'POST', `/listings/${l.id}/publish`, { expectedVersion: l.version });
+    expect(res.statusCode).toBe(422);
+    expect(res.json().error.details.fields).toEqual(['placeId']);
+    await patch('place-hansung');
+    res = await call('hana', 'POST', `/listings/${l.id}/publish`, { expectedVersion: l.version });
+    expect(res.statusCode, res.body).toBe(200);
+  });
 });
