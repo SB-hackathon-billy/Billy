@@ -253,7 +253,11 @@
   margin-top: 0.7rem;
 }
 .vc-item-actions .button {
-  flex: 1 1 8rem;
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+  padding-inline: 0.9rem;
+  text-align: center;
 }
 .vc-screen:not([data-phase='collecting']) .vc-checklist {
   display: none;
