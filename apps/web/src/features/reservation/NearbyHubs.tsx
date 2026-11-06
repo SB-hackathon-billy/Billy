@@ -1,5 +1,5 @@
 // 가까운 캠퍼스 대여소 안내: 현재 위치에서 각 캠퍼스 거점까지의 거리. 위치는 서버로 보내지 않는다.
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { CAMPUS_HUB_PLACE_IDS } from '@sb/contracts';
 import { usePlaces } from '../../lib/hooks.js';
 import {
@@ -17,7 +17,6 @@ import './reservation.css';
 export function NearbyHubs({ limit = 3 }: { limit?: number }) {
   const places = usePlaces();
   const here = useHere();
-  const [all, setAll] = useState(false);
   const hubs = (places.data?.items ?? [])
     .filter((p) => CAMPUS_HUB_PLACE_IDS.includes(p.id) && HUB_SPOTS[p.id])
     .map((p) => ({
@@ -30,7 +29,7 @@ export function NearbyHubs({ limit = 3 }: { limit?: number }) {
         (a.meters ?? 0) - (b.meters ?? 0) || a.place.label.localeCompare(b.place.label, 'ko'),
     );
   if (!hubs.length) return null;
-  const shown = all ? hubs : hubs.slice(0, limit);
+  const shown = hubs.slice(0, limit);
   const nearest = hubs[0]!;
 
   return (
@@ -59,10 +58,14 @@ export function NearbyHubs({ limit = 3 }: { limit?: number }) {
         {shown.map(({ place, spot, meters }, i) => (
           <li key={place.id} className={meters !== null && i === 0 ? 'nearest' : undefined}>
             <div>
-              <strong>
-                {place.label}
-                {meters !== null && i === 0 && <span className="nearby-badge">가장 가까워요</span>}
-              </strong>
+              <Link to={`/hubs/${place.id}`} className="nearby-link">
+                <strong>
+                  {place.label}
+                  {meters !== null && i === 0 && (
+                    <span className="nearby-badge">가장 가까워요</span>
+                  )}
+                </strong>
+              </Link>
               <span>{place.description}</span>
             </div>
             <div className="nearby-meta">
@@ -79,11 +82,9 @@ export function NearbyHubs({ limit = 3 }: { limit?: number }) {
           </li>
         ))}
       </ul>
-      {hubs.length > limit && (
-        <button type="button" className="text-link nearby-more" onClick={() => setAll(!all)}>
-          {all ? '접기' : `거점 ${hubs.length}곳 모두 보기`}
-        </button>
-      )}
+      <Link className="button secondary nearby-all" to="/hubs">
+        캠퍼스 대여소 {hubs.length}곳 위치·물품 보기 →
+      </Link>
       {here.status === 'ready' && (
         <p className="field-hint nearby-note">직선거리 기준이라 실제 걷는 거리와 조금 달라요.</p>
       )}

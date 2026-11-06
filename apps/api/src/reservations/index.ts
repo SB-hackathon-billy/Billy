@@ -39,7 +39,7 @@ export default async function reservationsPlugin(app: FastifyInstance) {
       items,
       q,
       (item) => `${item.source === 'PUBLIC' ? 0 : 1}:${item.id}`,
-      `catalog:${actor}:${[q.q, q.category, q.source, q.startAt, q.endAt].map((v) => v ?? '').join(':')}`,
+      `catalog:${actor}:${[q.q, q.category, q.source, q.placeId, q.startAt, q.endAt].map((v) => v ?? '').join(':')}`,
     );
   });
   get('/catalog/:id', async (request) => {

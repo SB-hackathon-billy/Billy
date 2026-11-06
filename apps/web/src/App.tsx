@@ -56,6 +56,14 @@ const ReservationPage = lazy(() =>
     default: module.ReservationPage,
   })),
 );
+const HubsPage = lazy(() =>
+  import('./features/reservation/HubsPage.js').then((module) => ({ default: module.HubsPage })),
+);
+const HubDetailPage = lazy(() =>
+  import('./features/reservation/HubsPage.js').then((module) => ({
+    default: module.HubDetailPage,
+  })),
+);
 const HubPage = lazy(() =>
   import('./features/reservation/handover.js').then((module) => ({ default: module.HubPage })),
 );
@@ -329,6 +337,8 @@ export function App() {
             ['/reservations/:reservationId', <ReservationPage />],
             ['/notifications', <NotificationsPage />],
             ['/hub', <HubPage />],
+            ['/hubs', <HubsPage />],
+            ['/hubs/:placeId', <HubDetailPage />],
           ] as const
         ).map(([path, page]) => ({ path, element: <Protected>{page}</Protected> })),
         ...(

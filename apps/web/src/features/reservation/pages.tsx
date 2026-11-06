@@ -53,7 +53,7 @@ function SourceLabel({
 }
 
 /** 물품 사진 출처(공공누리 제1유형: 출처표시). */
-function PhotoCredit() {
+export function PhotoCredit() {
   return (
     <p className="field-hint photo-credit">
       물품 사진 출처:{' '}
@@ -65,7 +65,7 @@ function PhotoCredit() {
   );
 }
 
-function CatalogCard({ item, period }: { item: CatalogItem; period: string }) {
+export function CatalogCard({ item, period }: { item: CatalogItem; period: string }) {
   const a = item.availability;
   return (
     <li>
@@ -251,7 +251,8 @@ export function CatalogItemPage() {
     return startAt && endAt ? { startAt, endAt } : defaultPeriod(serverClock.now());
   }, [params]);
   const [period, setPeriod] = useState<{ startAt: string | null; endAt: string | null }>(initial);
-  const [placeId, setPlaceId] = useState<string>('');
+  // 대여소 화면에서 들어오면 그 대여소를 수령 장소로 미리 고른다.
+  const [placeId, setPlaceId] = useState<string>(params.get('place') ?? '');
   const [agreed, setAgreed] = useState(false);
   const valid =
     !!period.startAt &&

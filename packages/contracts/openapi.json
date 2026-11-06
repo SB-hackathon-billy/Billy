@@ -5941,6 +5941,16 @@
             }
           },
           {
+            "name": "placeId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          {
             "name": "startAt",
             "in": "query",
             "required": false,
@@ -25459,6 +25469,11 @@
               "PUBLIC",
               "RESIDENT"
             ]
+          },
+          "placeId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
           },
           "startAt": {
             "type": "string",

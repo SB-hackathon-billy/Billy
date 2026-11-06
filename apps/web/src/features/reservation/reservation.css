@@ -663,3 +663,135 @@
   font-weight: 700;
   color: var(--color-primary-text);
 }
+
+/* 캠퍼스 대여소 화면(/hubs, /hubs/:placeId) */
+.hubs-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 1rem 0 0.75rem;
+  border-radius: 22px;
+  box-shadow: var(--shadow-soft);
+}
+.hubs-map-bg {
+  fill: #eef3e6;
+}
+.hubs-map-road {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 9;
+  stroke-linecap: round;
+  opacity: 0.9;
+}
+.hubs-map-pin circle {
+  fill: var(--color-strong);
+  stroke: #fff;
+  stroke-width: 3;
+}
+.hubs-map-pin.selected circle {
+  fill: var(--color-primary);
+  stroke: var(--color-strong);
+}
+.hubs-map-pin text,
+.hubs-map-me text {
+  font-size: 9px;
+  font-weight: 700;
+  fill: var(--color-strong);
+  paint-order: stroke;
+  stroke: #eef3e6;
+  stroke-width: 4px;
+}
+.hubs-map-me circle {
+  fill: #2f7cf6;
+  stroke: #fff;
+  stroke-width: 2;
+}
+.hubs-map-me .halo {
+  fill: #2f7cf6;
+  opacity: 0.18;
+  stroke: none;
+}
+.hubs-locate {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.hubs-nearest {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background: var(--color-primary-subtle);
+}
+.hubs-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  display: grid;
+  gap: 0.6rem;
+}
+.hub-card {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.1rem;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--shadow-soft);
+  color: inherit;
+  text-decoration: none;
+}
+.hub-card.nearest {
+  box-shadow:
+    var(--shadow-soft),
+    inset 0 0 0 2px var(--color-primary);
+}
+.hub-card > div:first-child {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+.hub-card strong {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 1.0625rem;
+}
+.hub-card span {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+.hub-card .hub-count {
+  font-weight: 700;
+  color: var(--color-primary-text);
+}
+.hub-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  margin: 0.5rem 0 0.75rem;
+}
+.hub-detail-meta .button {
+  width: auto;
+}
+.hub-map-frame {
+  display: block;
+  width: 100%;
+  height: 240px;
+  border: 0;
+  border-radius: 22px;
+  box-shadow: var(--shadow-soft);
+  background: var(--color-sunken);
+}
+.hub-items-title {
+  margin: 1.5rem 0 0.25rem;
+}
+.nearby-link {
+  color: inherit;
+  text-decoration: none;
+}
+.nearby-all {
+  margin-top: 0.75rem;
+}

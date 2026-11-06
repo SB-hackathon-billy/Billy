@@ -21,6 +21,8 @@ export interface CatalogFilters {
   q: string;
   category: Category | '';
   source: ItemSource | '';
+  /** 대여소(장소) 필터. 없으면 전체. */
+  placeId?: string;
   startAt: string | null;
   endAt: string | null;
 }
@@ -30,6 +32,7 @@ export function catalogSearch(filters: CatalogFilters, cursor?: string) {
   if (filters.q.trim()) params.set('q', filters.q.trim());
   if (filters.category) params.set('category', filters.category);
   if (filters.source) params.set('source', filters.source);
+  if (filters.placeId) params.set('placeId', filters.placeId);
   if (filters.startAt && filters.endAt) {
     params.set('startAt', filters.startAt);
     params.set('endAt', filters.endAt);

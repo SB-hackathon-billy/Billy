@@ -1211,6 +1211,7 @@ export async function listCatalog(u: Commands, actor: string, q: CatalogQuery) {
     (item) =>
       (!q.category || item.category === q.category) &&
       (!q.source || item.source === q.source) &&
+      (!q.placeId || item.allowedPlaceIds.includes(q.placeId)) &&
       (!q.q || matchesItem(q.q, item)),
   );
   const result: CatalogItem[] = [];

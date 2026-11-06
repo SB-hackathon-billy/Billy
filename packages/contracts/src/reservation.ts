@@ -125,6 +125,8 @@ export const CatalogQuerySchema = PaginationQuerySchema.extend({
   q: z.string().trim().max(100).optional(),
   category: CategorySchema.optional(),
   source: ItemSourceSchema.optional(),
+  /** 이 대여소(장소)에서 주고받을 수 있는 물품만. */
+  placeId: IdSchema.optional(),
   startAt: UtcDateTimeSchema.optional(),
   endAt: UtcDateTimeSchema.optional(),
 }).superRefine(periodQuery);

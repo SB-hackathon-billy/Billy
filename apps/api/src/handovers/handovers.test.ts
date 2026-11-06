@@ -203,4 +203,15 @@ describe('3번 거점 인계·반납', () => {
       expect.arrayContaining(['HANDOVER_PICKED_UP', 'HANDOVER_RETURNED', 'INSPECTED_OK']),
     );
   });
+
+  it('카탈로그를 대여소(placeId)로 거른다', async () => {
+    const res = await api('hana', 'GET', '/catalog?limit=50&placeId=place-library');
+    expect(res.statusCode, res.body).toBe(200);
+    const ids = (res.json().data.items as { id: string; allowedPlaceIds: string[] }[]).map((i) => {
+      expect(i.allowedPlaceIds).toContain('place-library');
+      return i.id;
+    });
+    expect(ids).toContain('res-cleaner-duri');
+    expect(ids).not.toContain('pub-cleaner');
+  });
 });
