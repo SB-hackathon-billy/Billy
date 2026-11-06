@@ -54,7 +54,7 @@ export default function HubsMap({
     >
       <defs>
         <filter id="sb-map-shadow" x="-10%" y="-10%" width="120%" height="130%">
-          <feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#3b3570" floodOpacity="0.14" />
+          <feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#162542" floodOpacity="0.14" />
         </filter>
       </defs>
       <path d={SEONGBUK_SVG.outline} className="sb-land" filter="url(#sb-map-shadow)" />

@@ -42,7 +42,7 @@ export function buildDemoScript(now: number, placeId: string): ScriptStep[] {
       at: 1000,
       kind: 'line',
       role: 'assistant',
-      text: '안녕하세요, 성북 공유대여 상담 도우미예요. 어떤 물건이 필요하세요?',
+      text: '안녕하세요, 빌리 상담 도우미 감탄이예요. 어떤 물건이 필요하세요?',
     },
     { at: 3200, kind: 'status', status: 'LISTENING' },
     {

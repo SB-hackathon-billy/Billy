@@ -21,6 +21,15 @@ export function ActionButton({
     </Button>
   );
 }
+/** 디자이너 화면의 파란 동그라미 화살표. */
+export function ArrowBadge() {
+  return (
+    <svg className="arrow-badge" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="12" />
+      <path d="M7 12h9m-4-4 4 4-4 4" />
+    </svg>
+  );
+}
 export function Check({
   children,
   ...props
@@ -53,16 +62,16 @@ export function Ink({ active = false, small = false }: { active?: boolean; small
           <feDisplacementMap in="SourceGraphic" scale="6" />
         </filter>
       </defs>
-      <ellipse cx="110" cy="124" rx="76" ry="8" fill="#E9ECE5" />
+      <ellipse cx="110" cy="124" rx="76" ry="8" fill="#DDE9FB" />
       <g filter={`url(#${id})`}>
         <path
           d="M65 26C26 51 24 92 52 110C77 127 110 109 113 79C117 46 86 15 65 26Z"
-          fill="#173C2C"
+          fill="#162542"
           opacity=".92"
         />
         <path
           d="M150 17C122 35 102 73 121 98C139 122 181 113 189 83C198 53 173 11 150 17Z"
-          fill="#C8F169"
+          fill="#A7EF21"
           opacity=".85"
         />
       </g>
@@ -75,11 +84,11 @@ export function Ink({ active = false, small = false }: { active?: boolean; small
         strokeWidth="2.5"
         strokeLinecap="round"
       />
-      <circle cx="145" cy="73" r="3" fill="#173C2C" />
-      <circle cx="162" cy="72" r="3" fill="#173C2C" />
+      <circle cx="145" cy="73" r="3" fill="#162542" />
+      <circle cx="162" cy="72" r="3" fill="#162542" />
       <path
         d="M146 83Q154 89 162 82"
-        stroke="#173C2C"
+        stroke="#162542"
         fill="none"
         strokeWidth="2.5"
         strokeLinecap="round"

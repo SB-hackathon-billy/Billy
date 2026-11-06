@@ -92,6 +92,15 @@ export function NearbyHubs({ limit = 3 }: { limit?: number }) {
   );
 }
 
+function PinIcon() {
+  return (
+    <svg className="pin-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z" />
+      <circle cx="12" cy="10" r="2.6" />
+    </svg>
+  );
+}
+
 /** 장소 id들을 가까운 순으로(위치를 모르면 원래 순서로). */
 function useSortedPlaces(placeIds: readonly string[]) {
   const places = usePlaces();
@@ -116,7 +125,8 @@ export function ItemPlacesLine({ placeIds }: { placeIds: readonly string[] }) {
   const rest = sorted.length - shown.length;
   return (
     <span className="item-places">
-      📍 {shown.map((p) => p.label).join(' · ')}
+      <PinIcon />
+      {shown.map((p) => p.label).join(' · ')}
       {first.meters !== null && ` ${formatDistance(first.meters)}`}
       {rest > 0 && ` 외 ${rest}곳`}
     </span>

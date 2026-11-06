@@ -10,9 +10,8 @@
   /* clip (not hidden): the fixed call screen must never be scrolled by focus or live regions. */
   overflow: clip;
   color: var(--color-text);
-  background:
-    radial-gradient(120% 60% at 50% 18%, var(--color-surface) 0%, transparent 60%),
-    linear-gradient(180deg, var(--color-primary-subtle), var(--color-bg));
+  /* 디자이너 04 공유대여 통화: 위쪽 라임에서 하늘색으로. */
+  background: var(--gradient-page), var(--color-bg);
   padding-bottom: env(safe-area-inset-bottom);
 }
 .vc-topbar {
@@ -39,9 +38,9 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  font-weight: 700;
   text-decoration: none;
-  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
 }
 .vc-live {
   font-size: 0.72rem;
@@ -228,12 +227,22 @@
   pointer-events: none;
 }
 .vc-check {
+  position: relative;
   display: grid;
   grid-template-columns: 26px 1fr;
   gap: 0.65rem;
   align-items: center;
-  padding: 0.22rem 0;
+  padding: 0.3rem 0;
   transition: opacity 0.3s ease;
+}
+/* 체크 사이 파란 점선. */
+.vc-check + .vc-check::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: -0.55rem;
+  height: 1.1rem;
+  border-left: 2px dashed color-mix(in srgb, var(--blue-500) 55%, transparent);
 }
 .vc-check:not([data-done]) {
   opacity: 0.62;
@@ -247,8 +256,8 @@
   display: block;
 }
 .vc-check-mark circle {
-  fill: none;
-  stroke: var(--color-border-strong);
+  fill: var(--color-surface);
+  stroke: var(--blue-500);
   stroke-width: 2;
   stroke-dasharray: 63;
   transition:
@@ -257,7 +266,7 @@
 }
 .vc-check-mark path {
   fill: none;
-  stroke: var(--color-on-primary);
+  stroke: #fff;
   stroke-width: 2.6;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -266,14 +275,14 @@
   transition: stroke-dashoffset 0.35s 0.15s ease;
 }
 .vc-check[data-current] .vc-check-mark circle {
-  stroke: var(--color-primary-text);
+  stroke: var(--blue-500);
   stroke-dasharray: 10 6;
   animation: vc-spin 2.4s linear infinite;
   transform-origin: 12px 12px;
 }
 .vc-check[data-done] .vc-check-mark circle {
-  fill: var(--color-primary);
-  stroke: var(--color-primary);
+  fill: var(--blue-500);
+  stroke: var(--blue-500);
   animation: vc-pop 0.4s ease;
   transform-origin: 12px 12px;
 }

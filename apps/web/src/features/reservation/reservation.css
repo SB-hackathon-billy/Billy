@@ -8,14 +8,17 @@
 }
 .catalog-search input {
   width: 100%;
-  min-height: 54px;
+  min-height: 55px;
   margin-top: 0;
   padding: 0 1.25rem;
+  border: 0;
   border-radius: var(--radius-pill);
+  background: var(--color-surface);
 }
 .catalog-search .button {
   width: auto;
   min-width: 5.5rem;
+  border-radius: var(--radius-pill);
 }
 .filter-row {
   display: grid;
@@ -36,6 +39,9 @@
 }
 .filter-row select {
   margin-top: 0.35rem;
+  border: 0;
+  border-radius: 18px;
+  background-color: var(--color-surface);
 }
 .period-filter {
   margin: 0.75rem 0 0.25rem;
@@ -58,48 +64,101 @@
   background: var(--color-primary-soft);
   box-shadow: none;
 }
+.catalog-title {
+  margin: 1.5rem 0 1.1rem;
+  font-size: 1.3rem;
+  text-align: center;
+}
 .catalog-list {
   list-style: none;
   padding: 0;
   margin: 1.5rem 0;
   display: grid;
-  gap: 0.5rem;
+  gap: 0.85rem;
 }
-/* Borderless rows: the white image tile carries the grouping, whitespace separates items. */
+/* 디자이너 04 둘러보기: 흰 카드 · 왼쪽 사진 · 오른쪽 분류/대여소 칩 · 큰 가격. */
 .catalog-card {
   display: grid;
-  grid-template-columns: 92px minmax(0, 1fr);
+  grid-template-columns: 104px minmax(0, 1fr);
   gap: 1rem;
   align-items: center;
-  padding: 0.4rem 0;
+  padding: 0.9rem 1.1rem 0.9rem 0.9rem;
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
   text-decoration: none;
   color: inherit;
 }
 .catalog-card img {
-  width: 92px;
-  height: 92px;
-  /* 사진마다 비율·여백이 달라도 같은 흰 타일 안에 물건 전체가 보이게 맞춘다. */
+  width: 104px;
+  height: 104px;
+  /* 사진마다 비율·여백이 달라도 같은 타일 안에 물건 전체가 보이게 맞춘다. */
   object-fit: contain;
-  padding: 10px;
+  padding: 8px;
   box-sizing: border-box;
-  border-radius: 22px;
-  background: #fff;
-  box-shadow:
-    var(--shadow-soft),
-    inset 0 0 0 1px rgb(0 0 0 / 0.04);
+  border-radius: 14px;
+  background: var(--neutral-50);
 }
 .catalog-card > div {
   display: grid;
-  gap: 0.1rem;
+  gap: 0.2rem;
   min-width: 0;
 }
 .catalog-card strong {
   font-size: 1.0625rem;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.04em;
   overflow-wrap: anywhere;
 }
-.catalog-card .muted {
+.catalog-card .source-label {
+  font-size: 0.75rem;
+}
+.catalog-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.chip-category,
+.catalog-chips .item-places {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.12rem 0.55rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.chip-category {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.catalog-chips .item-places {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: inset 0 0 0 1px var(--neutral-200);
+}
+.pin-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+.pin-icon path {
+  fill: var(--blue-500);
+}
+.pin-icon circle {
+  fill: #fff;
+}
+.catalog-price {
+  justify-self: end;
   font-size: 0.875rem;
+  font-weight: 600;
+}
+.catalog-price b {
+  margin-left: 0.2rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
 }
 .availability {
   font-size: 0.875rem;
@@ -672,7 +731,7 @@
 .sb-map-frame {
   padding: 0.75rem;
   border-radius: 24px;
-  background: #ece9e4;
+  background: #dde9fb;
   box-shadow: var(--shadow-soft);
 }
 .sb-map {
@@ -681,62 +740,62 @@
   height: auto;
 }
 .sb-land {
-  fill: #f6f3ef;
+  fill: #ffffff;
 }
 .sb-dongs {
   fill: none;
-  stroke: #d6d1cb;
+  stroke: #d5dfec;
   stroke-width: 1.2;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 .sb-edge {
   fill: none;
-  stroke: #cfc9c2;
+  stroke: #c0ccdc;
   stroke-width: 2.4;
   stroke-linejoin: round;
 }
 .sb-center rect {
-  fill: #3b3570;
+  fill: #162542;
 }
 .sb-center text {
   font-size: 12px;
   font-weight: 800;
-  fill: #3b3570;
+  fill: #162542;
   paint-order: stroke;
-  stroke: #f6f3ef;
+  stroke: #ffffff;
   stroke-width: 4px;
   stroke-linejoin: round;
 }
 .sb-pin .halo {
-  fill: #5b4fae;
+  fill: #458cff;
   opacity: 0.16;
 }
 .sb-pin .dot {
-  fill: #5b4fae;
+  fill: #458cff;
   stroke: #fff;
   stroke-width: 3;
 }
 .sb-pin .name {
   font-size: 15px;
   font-weight: 800;
-  fill: #3b3570;
+  fill: #162542;
   paint-order: stroke;
-  stroke: #f6f3ef;
+  stroke: #ffffff;
   stroke-width: 5px;
   stroke-linejoin: round;
 }
 .sb-pin .dist {
   font-size: 11px;
   font-weight: 700;
-  fill: #5b4fae;
+  fill: #458cff;
 }
 .sb-pin:hover .halo {
   opacity: 0.3;
 }
 .sb-pin.selected .dot,
 .sb-pin.nearest .dot {
-  fill: #3b3570;
+  fill: #162542;
 }
 .sb-pin.selected .halo,
 .sb-pin.nearest .halo {
@@ -761,12 +820,12 @@
   }
 }
 .sb-me circle {
-  fill: #2f7cf6;
+  fill: #f26b3a;
   stroke: #fff;
   stroke-width: 2.5;
 }
 .sb-me .halo {
-  fill: #2f7cf6;
+  fill: #f26b3a;
   opacity: 0.2;
   stroke: none;
 }
@@ -787,16 +846,16 @@
   vertical-align: -1px;
 }
 .hubs-legend .dot.hub {
-  background: #5b4fae;
+  background: #458cff;
   box-shadow: 0 0 0 3px rgb(91 79 174 / 0.2);
 }
 .hubs-legend .dot.center {
-  background: #3b3570;
+  background: #162542;
   border-radius: 2px;
   transform: rotate(45deg);
 }
 .hubs-legend .dot.me {
-  background: #2f7cf6;
+  background: #f26b3a;
 }
 .hubs-source {
   margin: 0.25rem 0 0;

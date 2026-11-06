@@ -1,44 +1,44 @@
 :root {
   color-scheme: light;
-  /* Source of truth: design/color-palette.html #palette-tokens. Keep values in sync. */
+  /* Source of truth: 디자이너 Figma(최종ppt · Section 1) 빌리 화면. 라임 #A7EF21 · 네이비 #162542 · 블루 #458CFF. */
   /* Primary — Lime (연두). 300 is the brand color. Fill only; never text/lines on light bg. */
-  --lime-50: #f2fce2;
-  --lime-100: #e6fac8;
-  --lime-200: #d4f7a0;
-  --lime-300: #c8f169;
-  --lime-400: #a6e259;
-  --lime-500: #8cc848;
-  --lime-600: #6fa936;
-  --lime-700: #50812c;
-  --lime-800: #43682c;
-  --lime-900: #314c24;
-  --lime-950: #1f3318;
+  --lime-50: #f4fde3;
+  --lime-100: #e8fbc4;
+  --lime-200: #d5f78f;
+  --lime-300: #a7ef21;
+  --lime-400: #98e014;
+  --lime-500: #86c80f;
+  --lime-600: #6aa10d;
+  --lime-700: #517a10;
+  --lime-800: #426213;
+  --lime-900: #374f15;
+  --lime-950: #1d2c06;
 
-  /* Secondary — Forest (짙은 숲색). 900 is the deep brand color. */
-  --forest-50: #f0f8f2;
-  --forest-100: #e0f0e5;
-  --forest-200: #c6dfce;
-  --forest-300: #a5c8b2;
-  --forest-400: #7faa90;
-  --forest-500: #5c8d71;
-  --forest-600: #407358;
-  --forest-700: #2b5b44;
-  --forest-800: #1e4a35;
-  --forest-900: #173c2c;
-  --forest-950: #0f2a1e;
+  /* Secondary — Navy (이름은 forest 그대로). 900 = 본문 네이비 #162542. */
+  --forest-50: #eef4fd;
+  --forest-100: #dde9fb;
+  --forest-200: #c3d6f5;
+  --forest-300: #9ebbe9;
+  --forest-400: #6f93d2;
+  --forest-500: #4a70b3;
+  --forest-600: #355690;
+  --forest-700: #284372;
+  --forest-800: #1e3459;
+  --forest-900: #162542;
+  --forest-950: #0e182c;
 
-  /* Neutral — green-tinted gray. */
+  /* Neutral — 푸른 기가 도는 회색. 400 = placeholder #BABABA. */
   --neutral-0: #ffffff;
-  --neutral-50: #f6f7f2;
-  --neutral-100: #e9ece5;
-  --neutral-200: #d3dcd5;
-  --neutral-300: #c4d0c8;
-  --neutral-400: #a3aca5;
-  --neutral-500: #738079;
-  --neutral-600: #536159;
-  --neutral-700: #44504a;
-  --neutral-800: #2c3933;
-  --neutral-900: #17231e;
+  --neutral-50: #f3f7fc;
+  --neutral-100: #e6edf6;
+  --neutral-200: #d5dfec;
+  --neutral-300: #c0ccdc;
+  --neutral-400: #bababa;
+  --neutral-500: #77839a;
+  --neutral-600: #56627a;
+  --neutral-700: #434e64;
+  --neutral-800: #2b354a;
+  --neutral-900: #162542;
 
   /* Accent — Orange (포인트). Decorative fills only; text uses 600+. */
   --orange-50: #fff4ef;
@@ -52,6 +52,11 @@
   --orange-800: #8b432a;
   --orange-900: #673321;
   --orange-950: #432014;
+
+  /* Accent — Blue (빌리 로고·화살표). 600 for text on light bg. */
+  --blue-500: #458cff;
+  --blue-600: #2f6fe0;
+  --blue-100: #e3eeff;
 
   /* Status */
   --success-bg: var(--lime-100);
@@ -74,11 +79,11 @@
   --color-on-primary: var(--forest-900);
   --color-primary-soft: var(--lime-100);
   --color-primary-subtle: var(--lime-50);
-  --color-primary-text: var(--lime-800);
+  --color-primary-text: var(--blue-600);
   --color-strong: var(--forest-900);
   --color-on-strong: var(--neutral-0);
-  --color-accent: var(--orange-400);
-  --color-bg: var(--neutral-50);
+  --color-accent: var(--blue-500);
+  --color-bg: #eaf4fd;
   --color-surface: var(--neutral-0);
   --color-sunken: var(--neutral-100);
   --color-border: var(--neutral-100);
@@ -94,28 +99,12 @@
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-pill: 999px;
-  --shadow-soft: 0 1px 2px rgb(23 60 44 / 0.04), 0 10px 28px -14px rgb(23 60 44 / 0.16);
-  --shadow-raised: 0 2px 8px rgb(23 60 44 / 0.05), 0 22px 44px -18px rgb(23 60 44 / 0.24);
-  --shadow-primary: 0 12px 24px -12px color-mix(in srgb, var(--lime-700) 75%, transparent);
+  --shadow-soft: 0 1px 2px rgb(22 37 66 / 0.04), 0 10px 28px -14px rgb(22 37 66 / 0.16);
+  --shadow-raised: 0 2px 8px rgb(22 37 66 / 0.05), 0 22px 44px -18px rgb(22 37 66 / 0.24);
+  --shadow-primary: 0 10px 20px -14px rgb(22 37 66 / 0.35);
   --color-glass: color-mix(in srgb, var(--neutral-0) 82%, transparent);
   /* Page background: lime glow at the top-left fading into the neutral base. */
-  --gradient-page:
-    radial-gradient(
-      95% 50% at 0% 0%,
-      color-mix(in srgb, var(--lime-200) 72%, transparent),
-      transparent 72%
-    ),
-    radial-gradient(
-      75% 42% at 100% 6%,
-      color-mix(in srgb, var(--forest-100) 95%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      90% 45% at 100% 100%,
-      color-mix(in srgb, var(--lime-100) 70%, transparent),
-      transparent 70%
-    ),
-    linear-gradient(180deg, var(--lime-50) 0%, var(--neutral-50) 50%);
+  --gradient-page: linear-gradient(180deg, rgb(167 239 33 / 0.5) -10.69%, #eaf4fd 34.54%);
 
   --font-body:
     'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',

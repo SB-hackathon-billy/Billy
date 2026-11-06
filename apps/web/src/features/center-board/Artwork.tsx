@@ -70,6 +70,25 @@ const shapes: Record<Artwork, ReactNode> = {
   ),
 };
 
+/** 디자이너 센터 소식 화면의 선 아이콘: 같은 그림을 배경 없이 한 색 선으로. 색은 currentColor. */
+export function PostIcon({ artwork }: { artwork: Artwork }) {
+  return (
+    <svg
+      className="cb-icon"
+      viewBox="34 28 132 96"
+      aria-hidden="true"
+      focusable="false"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {shapes[artwork]}
+    </svg>
+  );
+}
+
 /** Decorative illustration standing in for the post's original photo. */
 export function PostArtwork({ artwork, label }: { artwork: Artwork; label?: string }) {
   const [light, mid, ink] = palette[artwork];

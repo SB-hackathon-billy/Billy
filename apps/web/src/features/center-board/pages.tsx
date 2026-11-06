@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Dialog, Heading, Modal, ModalOverlay } from 'react-aria-components';
 import { ExternalLink } from '../center/shared.js';
-import { PostArtwork } from './Artwork.js';
+import { PostArtwork, PostIcon } from './Artwork.js';
 import {
   BOARD_LABELS,
   CENTER_PROFILE,
@@ -26,7 +26,9 @@ export function BoardPage() {
   return (
     <section className="cb-page" aria-labelledby="cb-board-title">
       <header className="cb-hero">
-        <h1 id="cb-board-title">{CENTER_PROFILE.name} 소식</h1>
+        <h1 id="cb-board-title">
+          <span className="cb-hl">성북구</span> {CENTER_PROFILE.name.replace(/^성북구\s*/, '')} 소식
+        </h1>
         <p>센터 공지와 활동 소식을 모바일에서 한눈에 확인하세요.</p>
       </header>
       <ServiceStrip />
@@ -52,6 +54,15 @@ export function BoardPage() {
           </li>
         ))}
       </ul>
+      <a
+        className="button cb-site"
+        href={CENTER_PROFILE.site}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        센터 공식 사이트 <span aria-hidden="true">↗</span>
+        <span className="visually-hidden"> (새 창)</span>
+      </a>
       <SourceNote />
     </section>
   );
@@ -60,7 +71,7 @@ export function BoardPage() {
 function PostCard({ post }: { post: CenterPost }) {
   return (
     <Link className="cb-card" to={`/center/board/${post.id}`}>
-      <PostArtwork artwork={post.artwork} />
+      <PostIcon artwork={post.artwork} />
       <span className="cb-card-body">
         <span className="cb-tags">
           {post.pinned && <span className="cb-tag pinned">고정</span>}
@@ -132,7 +143,7 @@ function ServiceStrip() {
     <nav className="cb-strip" aria-label="센터 서비스 바로가기">
       {centerServices.map((service) => (
         <Link key={service.id} to={service.connectedTo ?? `/center/services/${service.id}`}>
-          <PostArtwork artwork={service.artwork} />
+          <PostIcon artwork={service.artwork} />
           <span>{service.title}</span>
         </Link>
       ))}

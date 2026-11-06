@@ -175,10 +175,12 @@ function AppShell() {
         본문으로 이동
       </a>
       <header className="app-header">
-        <Link className="brand" to="/">
-          <img src="/icon.svg" alt="" />
-          성북 공유대여
-        </Link>
+        {/* 진입 화면은 큰 로고가 따로 있어 머리말 로고를 숨긴다. */}
+        {!entry && (
+          <Link className="brand" to="/">
+            <img src="/brand/billy-logo.svg" alt="빌리" />
+          </Link>
+        )}
         <div className="header-actions">
           {session && !entry && (
             <>

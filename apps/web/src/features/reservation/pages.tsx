@@ -73,12 +73,12 @@ export function CatalogCard({ item, period }: { item: CatalogItem; period: strin
       <Link className="catalog-card" to={`/catalog/${item.id}${period}`}>
         <img src={item.image.url} alt={item.image.alt} width="88" height="88" />
         <div>
-          <SourceLabel item={item} />
-          <strong>{item.title}</strong>
-          <span className="muted">
-            {categories[item.category]} · 하루 {formatKrw(item.dailyRateKrw)}
+          <span className="catalog-chips">
+            <span className="chip-category">{categories[item.category]}</span>
+            <ItemPlacesLine placeIds={item.allowedPlaceIds} />
           </span>
-          <ItemPlacesLine placeIds={item.allowedPlaceIds} />
+          <strong>{item.title}</strong>
+          <SourceLabel item={item} />
           {a && (
             <span className={`availability ${a.status === 'AVAILABLE' ? 'is-available' : ''}`}>
               {a.status === 'AVAILABLE'
@@ -86,6 +86,9 @@ export function CatalogCard({ item, period }: { item: CatalogItem; period: strin
                 : (availabilityReasonLabels[a.reason!] ?? '빌릴 수 없어요')}
             </span>
           )}
+          <span className="catalog-price">
+            하루 <b>{item.dailyRateKrw ? formatKrw(item.dailyRateKrw) : '무료'}</b>
+          </span>
         </div>
       </Link>
     </li>
@@ -141,11 +144,7 @@ export function CatalogPage() {
       : '';
   return (
     <section>
-      <h1>
-        동네에서 빌릴 수 있는
-        <br />
-        물건을 찾아보세요.
-      </h1>
+      <h1 className="catalog-title">동네에서 빌릴 수 있는 물건을 찾아보세요</h1>
       <form
         className="catalog-search"
         role="search"
@@ -164,9 +163,7 @@ export function CatalogPage() {
             onChange={(event) => setQ(event.target.value)}
           />
         </label>
-        <ActionButton type="submit" secondary>
-          찾기
-        </ActionButton>
+        <ActionButton type="submit">검색</ActionButton>
       </form>
       <div className="filter-row">
         <label>

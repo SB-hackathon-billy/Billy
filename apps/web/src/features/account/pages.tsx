@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { HUB_MANAGER_ID } from '@sb/contracts';
 import { useSession, useSync } from '../../lib/session.js';
 import { useAction, useOnline } from '../../lib/hooks.js';
-import { ActionButton, ErrorNotice, Ink, Loading, Status } from '../../components/ui.js';
+import { ActionButton, ArrowBadge, ErrorNotice, Loading, Status } from '../../components/ui.js';
 import { formatSeoulDateTime } from '../../lib/api.js';
 import { illustrations } from '../../assets/illustrations/manifest.js';
 import { isEmptyRequest } from '../../lib/presentation.js';
@@ -22,18 +22,11 @@ export function EntryPage() {
   if (session) return <Navigate to="/" replace />;
   return (
     <section className="entry-page">
-      <div className="entry-art">
-        <Ink />
-      </div>
-      <h1>
-        필요할 때 잠깐,
-        <br />
-        함께 쓰는 일상.
-      </h1>
-      <p className="lead">
+      <img className="entry-logo" src="/brand/billy-logo.svg" alt="빌리" />
+      <p className="entry-lead">
         우리 동네 공공 물품과 이웃의 물품을
         <br />
-        한곳에서 찾아보세요.
+        한곳에서 찾아보세요!
       </p>
       <form
         onSubmit={(e) => {
@@ -56,7 +49,7 @@ export function EntryPage() {
         }}
       >
         <label>
-          데모 아이디
+          <span className="visually-hidden">데모 아이디</span>
           <input
             name="handle"
             autoComplete="off"
@@ -64,33 +57,41 @@ export function EntryPage() {
             spellCheck={false}
             value={handle}
             onChange={(e) => setHandle(e.target.value)}
-            placeholder="demo-hana"
+            placeholder="아이디"
             maxLength={64}
             required
           />
         </label>
-        <ActionButton type="submit" isDisabled={action.pending || !online || !handle.trim()}>
-          {action.pending ? '들어가는 중…' : '데모 시작하기'}
+        <ActionButton
+          type="submit"
+          aria-label="데모 시작하기"
+          isDisabled={action.pending || !online || !handle.trim()}
+        >
+          {action.pending ? '들어가는 중…' : '시작하기'}
         </ActionButton>
       </form>
       <ErrorNotice action={action} />
-      <p className="field-hint">준비된 아이디를 골라도 좋아요</p>
+      <h2 className="entry-pick">준비된 아이디 고르기</h2>
       <div className="handle-options">
         {['hana', 'duri', 'seul', 'jun', 'hub'].map((name, i) => (
-          <ActionButton secondary key={name} onPress={() => setHandle(`demo-${name}`)}>
-            {['하나', '두리', '슬', '준', '거점 관리자'][i]} · demo-{name}
-          </ActionButton>
+          <button
+            type="button"
+            key={name}
+            className="handle-chip"
+            aria-pressed={handle === `demo-${name}`}
+            onClick={() => setHandle(`demo-${name}`)}
+          >
+            {['하나', '두리', '슬', '준', '거점 관리자'][i]} – {name}
+          </button>
         ))}
       </div>
-      <aside className="demo-notice">
-        <strong>데모 아이디는 신원 인증이 아니에요.</strong>
-        <p>
-          같은 아이디를 입력하면 같은 합성 계정을 사용합니다. 함께 시연할 때는 서로 다른 아이디와
-          기기·브라우저 프로필을 사용해 주세요.
-        </p>
-        <p>실제 결제와 기관 예약은 이루어지지 않습니다. 예약은 앱 안의 데모 상태예요.</p>
-      </aside>
-      <Link to="/center">센터 안내 먼저 보기 →</Link>
+      <Link className="button" to="/center">
+        센터 안내 먼저 보기
+      </Link>
+      <p className="demo-notice">
+        데모 아이디는 신원 인증이 아니에요. 같은 아이디를 입력하면 같은 합성 계정을 쓰고, 실제
+        결제와 기관 예약은 이루어지지 않아요.
+      </p>
     </section>
   );
 }
@@ -111,52 +112,32 @@ export function HomePage() {
     .sort((a, b) => a.reservation.startAt.localeCompare(b.reservation.startAt))
     .slice(0, 2);
   return (
-    <section>
+    <section className="home-page">
+      <img className="home-house" src="/brand/billy-house.svg" alt="" />
       <p className="home-hello">{session?.user.displayName}님, 안녕하세요</p>
-      <h1 className="home-greeting">
-        오늘은 무엇이
-        <br />
-        필요하세요?
-      </h1>
+      <h1 className="home-greeting">오늘은 무엇이 필요하신가요?</h1>
       {session?.user.id === HUB_MANAGER_ID && (
-        <Link className="button" to="/hub">
+        <Link className="button secondary" to="/hub">
           거점 관리 · 인계·반납 기록하기
         </Link>
       )}
-      <Link className="voice-hero" to="/rental">
-        <img
-          className="home-illustration"
-          src={illustrations['sharing-home'].src}
-          alt=""
-          aria-hidden="true"
-        />
-        <span className="microphone" aria-hidden="true">
-          <svg
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-          >
-            <rect x="8" y="2" width="8" height="13" rx="4" />
-            <path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8" />
-          </svg>
-        </span>
+      <Link className="home-card home-ask" to="/rental">
+        <span>필요한 물건을 알려주세요</span>
         <strong>
-          필요한 물건,
-          <br />
-          알려만 주세요
+          감탄이에게 물어보기 <ArrowBadge />
         </strong>
-        <span>
-          말하거나 글로 요청하기 <b aria-hidden="true">→</b>
-        </span>
       </Link>
-      <Link className="catalog-teaser" to="/catalog">
-        <strong>물품 둘러보기</strong>
+      <Link className="home-card home-browse" to="/catalog">
+        <strong>
+          물품 둘러보기 <ArrowBadge />
+        </strong>
         <span>공공·이웃 물품을 골라 바로 신청해요</span>
       </Link>
+      {offered > 0 && (
+        <Link className="new-offers" to="/inbox">
+          새로운 조건 {offered}개가 기다리고 있어요 <span>확인하기 →</span>
+        </Link>
+      )}
       {upcoming.length > 0 && (
         <>
           <div className="section-heading">
@@ -168,15 +149,9 @@ export function HomePage() {
           ))}
         </>
       )}
-      <NearbyHubs />
-      {offered > 0 && (
-        <Link className="new-offers" to="/inbox">
-          새로운 조건 {offered}개가 기다리고 있어요 <span>확인하기 →</span>
-        </Link>
-      )}
       <div className="section-heading">
         <h2>최근 내 요청</h2>
-        <Link to="/inbox">모두 보기</Link>
+        {recent.length > 0 && <Link to="/inbox">모두 보기</Link>}
       </div>
       <ErrorNotice error={sync.error} />
       {recent.map((request) => (
@@ -207,9 +182,9 @@ export function HomePage() {
           </p>
         </div>
       )}
-      <Link to="/center" className="center-teaser">
-        <strong>성북구 1인가구지원센터</strong>
-        <span>프로그램과 공간 살펴보기 →</span>
+      <NearbyHubs />
+      <Link to="/center" className="button home-center">
+        성북구 1인가구지원센터 살펴보기 →
       </Link>
       <p className="demo-footnote">
         공공 신청·요금은 데모입니다. 주민의 응답은 참여자가 직접 결정해요.

@@ -348,7 +348,7 @@ export function VoiceCallPage() {
             <span className="vc-dialing-wave" />
             <img src={mascotAvatar} alt="" width={176} height={176} />
           </div>
-          <p className="vc-dialing-name">공유대여 상담 도우미</p>
+          <p className="vc-dialing-name">감탄이 · 공유대여 상담</p>
           <p className="vc-dialing-text" role="status">
             전화를 연결하고 있어요
             <span className="vc-dialing-dots" aria-hidden="true">
@@ -379,13 +379,13 @@ export function VoiceCallPage() {
         )}
         {latestAssistant && (
           <p className="vc-caption assistant">
-            <span>도우미</span>
+            <span>감탄이</span>
             {latestAssistant.text}
           </p>
         )}
         {!lines.length && !active && phase === 'collecting' && (
           <p className="vc-caption hint">
-            통화를 시작하면 도우미가 먼저 인사해요. 체크리스트가 모두 채워지면 신청 내용을 보여
+            통화를 시작하면 감탄이가 먼저 인사해요. 체크리스트가 모두 채워지면 신청 내용을 보여
             드려요.
           </p>
         )}
@@ -434,7 +434,7 @@ export function VoiceCallPage() {
               >
                 {muted ? '음소거 해제' : '음소거'}
               </ActionButton>
-              <ActionButton onPress={endCall}>통화 종료</ActionButton>
+              <ActionButton onPress={endCall}>통화 종료하기</ActionButton>
             </>
           )
         )}
@@ -556,7 +556,7 @@ function ApprovalSheet({
             예약 신청을 보내고 있어요
           </h2>
           <p className="vc-sheet-lead">
-            도우미가 예약 신청 도구를 실행하고 있어요. 끝나면 통화를 종료해요.
+            감탄이가 예약 신청 도구를 실행하고 있어요. 끝나면 통화를 종료해요.
           </p>
           <div className="vc-progress" aria-hidden="true" />
         </>
