@@ -53,6 +53,8 @@ export default function HubsMap({
     // ponytail: OpenStreetMap 기본 타일(키 없음, 사용 정책상 소량 이용). 이용이 늘면 키가 있는 타일 서비스로 바꾼다.
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
+      // 앱은 Referrer-Policy: same-origin이라 타일 요청에 출처가 빠져 OSM이 막는다. 타일만 출처(도메인)를 보낸다.
+      referrerPolicy: 'strict-origin-when-cross-origin',
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(m);
     // 성북구 밖은 흐리게, 경계선은 보라색으로.
