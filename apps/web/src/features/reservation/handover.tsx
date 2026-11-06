@@ -67,6 +67,53 @@ function Steps({ stage }: { stage: Handover['stage'] }) {
   );
 }
 
+/** 사진을 못 불러오면 대체 텍스트 대신 안내 상자를 보여준다. */
+function Photo({ photoId, label, at }: { photoId: string; label: string; at: string | null }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <figure>
+      {failed ? (
+        <div className="handover-photo-missing" role="img" aria-label={`${label} 사진`}>
+          사진을 불러오지 못했어요
+        </div>
+      ) : (
+        <img
+          src={`/api/v1/images/${photoId}`}
+          alt={`${label} 사진`}
+          onError={() => setFailed(true)}
+        />
+      )}
+      <figcaption>
+        {label}
+        {at ? ` · ${formatSeoulDateTime(at)}` : ''}
+      </figcaption>
+    </figure>
+  );
+}
+
+/** 단계별 진행 설명. 빌리는 사람·빌려준 이웃 모두에게 보인다. */
+function stageMessage(view: ReservationView, placeLabel: string) {
+  const r = view.reservation;
+  const h = r.handover!;
+  const owner = view.role === 'OWNER';
+  switch (h.stage) {
+    case 'READY':
+      return owner
+        ? `${view.requesterDisplayName}님이 ${placeLabel}에서 물건을 받으면 알려드려요. 대여 시작 ${formatSeoulDateTime(r.startAt)}.`
+        : `${placeLabel}에서 거점 관리자에게 이 QR을 보여 주세요. 관리자가 대여 전 사진을 찍고 물건을 건네드려요.`;
+    case 'PICKED_UP':
+      return owner
+        ? `${view.requesterDisplayName}님이 ${h.pickedUpAt ? formatSeoulDateTime(h.pickedUpAt) : ''}에 ${placeLabel}에서 받아 갔어요. ${formatSeoulDateTime(r.endAt)}까지 같은 거점으로 반납돼요.`
+        : `${formatSeoulDateTime(r.endAt)}까지 ${placeLabel}에 반납해 주세요. 반납할 때도 이 QR을 보여 주세요.`;
+    case 'RETURNED':
+      return `${h.returnedAt ? formatSeoulDateTime(h.returnedAt) : ''}에 ${placeLabel}로 반납됐어요. 거점 관리자가 사진을 비교하고 상태를 확인하고 있어요.`;
+    case 'COMPLETED':
+      return h.inspection?.result === 'DAMAGED'
+        ? '반납 확인 중 파손이 기록됐어요. 센터에서 처리 방법을 안내할 예정이에요.'
+        : `${h.inspection ? formatSeoulDateTime(h.inspection.at) : ''} 거점 관리자가 반납 상태를 확인했어요. 이용해 주셔서 고마워요.`;
+  }
+}
+
 /** 대여 전·반납 사진, AI 비교 후보, 관리자 판정. */
 function HandoverRecord({ handover }: { handover: Handover }) {
   const { comparison, inspection } = handover;
@@ -75,20 +122,10 @@ function HandoverRecord({ handover }: { handover: Handover }) {
       {(handover.pickupPhotoId || handover.returnPhotoId) && (
         <div className="handover-photos">
           {handover.pickupPhotoId && (
-            <figure>
-              <img src={`/api/v1/images/${handover.pickupPhotoId}`} alt="대여 전 사진" />
-              <figcaption>
-                대여 전{handover.pickedUpAt ? ` · ${formatSeoulDateTime(handover.pickedUpAt)}` : ''}
-              </figcaption>
-            </figure>
+            <Photo photoId={handover.pickupPhotoId} label="대여 전" at={handover.pickedUpAt} />
           )}
           {handover.returnPhotoId && (
-            <figure>
-              <img src={`/api/v1/images/${handover.returnPhotoId}`} alt="반납 사진" />
-              <figcaption>
-                반납{handover.returnedAt ? ` · ${formatSeoulDateTime(handover.returnedAt)}` : ''}
-              </figcaption>
-            </figure>
+            <Photo photoId={handover.returnPhotoId} label="반납" at={handover.returnedAt} />
           )}
         </div>
       )}
@@ -133,34 +170,17 @@ export function HandoverCard({ view, placeLabel }: { view: ReservationView; plac
     <div className="content-card handover-card">
       <h2>거점 인계·반납</h2>
       <Steps stage={handover.stage} />
-      {handover.stage === 'READY' &&
-        (owner ? (
-          <p className="field-hint">빌리는 이웃이 거점에서 물건을 받으면 알려드려요.</p>
-        ) : (
-          handover.code && (
-            <div className="handover-qr-box">
-              <QrCode text={`${window.location.origin}/hub?code=${handover.code}`} />
-              <p className="handover-code" aria-label={`인계 코드 ${handover.code}`}>
-                {handover.code.slice(0, 4)} {handover.code.slice(4)}
-              </p>
-              <p className="field-hint">
-                {placeLabel ?? '만남 장소'}에서 거점 관리자에게 이 QR을 보여 주세요. 관리자가 대여
-                전 사진을 찍고 물건을 건네드려요.
-              </p>
-            </div>
-          )
-        ))}
-      {handover.stage === 'PICKED_UP' && !owner && (
-        <p className="field-hint">
-          {formatSeoulDateTime(r.endAt)}까지 같은 거점에 반납해 주세요. 반납할 때도 이 화면의 QR을
-          보여 주세요.
-        </p>
-      )}
-      {handover.stage === 'PICKED_UP' && !owner && handover.code && (
-        <div className="handover-qr-box">
-          <QrCode text={`${window.location.origin}/hub?code=${handover.code}`} />
-        </div>
-      )}
+      <p className="handover-message">{stageMessage(view, placeLabel ?? '거점')}</p>
+      {!owner &&
+        handover.code &&
+        (handover.stage === 'READY' || handover.stage === 'PICKED_UP') && (
+          <div className="handover-qr-box">
+            <QrCode text={`${window.location.origin}/hub?code=${handover.code}`} />
+            <p className="handover-code" aria-label={`인계 코드 ${handover.code}`}>
+              {handover.code.slice(0, 4)} {handover.code.slice(4)}
+            </p>
+          </div>
+        )}
       <HandoverRecord handover={handover} />
     </div>
   );

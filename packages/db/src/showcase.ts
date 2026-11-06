@@ -2,7 +2,7 @@
 // 캠퍼스 거점·가격이 다른 물품을 더하고, 실제 도메인 명령으로 예약·인계·반납 상태를 만든다.
 // 테스트 fixture(@sb/demo-data)는 바꾸지 않는다. seed를 다시 하면 이 데이터도 지워진다.
 import { pathToFileURL } from 'node:url';
-import type { Item, Place, ReservationView } from '@sb/contracts';
+import { formatSeoulDateTime, type Item, type Place, type ReservationView } from '@sb/contracts';
 import { seoulCalendarDate, seoulDateTimeToUtc } from '@sb/demo-data';
 import { Database } from './database.js';
 import {
@@ -92,10 +92,22 @@ const items: Item[] = [
 /** 기존 물품도 캠퍼스 거점에서 주고받게 한다(장소는 최대 3곳). */
 const addHansung = ['res-cleaner-duri', 'res-projector-duri', 'res-tool-hana', 'res-case-hana'];
 
-/** 인계·반납 사진 대신 쓰는 단순 일러스트. */
-const photoSvg = (label: string, scratch: boolean) =>
+/** 거점에서 찍은 사진 대신 쓰는 사진 카드(물품 이름·촬영 구분·시각). */
+const photoSvg = (title: string, label: string, taken: string) =>
   Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240"><rect width="320" height="240" fill="#f4f4ef"/><rect x="80" y="60" width="160" height="120" rx="12" fill="#cfe59a"/>${scratch ? '<path d="M110 150h90" stroke="#555" stroke-width="5"/>' : ''}<text x="160" y="215" font-size="18" text-anchor="middle" fill="#555">${label}</text></svg>`,
+    `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <rect width="320" height="240" fill="#e9eddf"/>
+  <rect x="0" y="170" width="320" height="70" fill="#d6dcc6"/>
+  <rect x="96" y="58" width="128" height="120" rx="14" fill="#9fbf5a"/>
+  <rect x="112" y="40" width="96" height="24" rx="10" fill="none" stroke="#5f7a2b" stroke-width="8"/>
+  <rect x="96" y="104" width="128" height="10" fill="#7f9f3f"/>
+  <circle cx="118" cy="182" r="7" fill="#3d4a24"/><circle cx="202" cy="182" r="7" fill="#3d4a24"/>
+  <rect x="10" y="10" width="92" height="26" rx="13" fill="#1f2a12" opacity="0.8"/>
+  <text x="56" y="28" font-family="sans-serif" font-size="13" fill="#fff" text-anchor="middle">${label}</text>
+  <text x="160" y="214" font-family="sans-serif" font-size="16" font-weight="700" fill="#1f2a12" text-anchor="middle">${title}</text>
+  <text x="160" y="232" font-family="sans-serif" font-size="11" fill="#3d4a24" text-anchor="middle">한성대 거점 · ${taken}</text>
+</svg>`,
   );
 
 export async function showcase(db: Database, now = new Date()) {
@@ -115,12 +127,12 @@ export async function showcase(db: Database, now = new Date()) {
     );
   });
 
-  const photo = (label: string, scratch = false) =>
+  const photo = (title: string, label: string, taken: Date) =>
     db.transaction(async (u) => {
       const photoId = id('img');
       await u.c.query(
         "INSERT INTO item_images(id,owner_id,content_type,bytes) VALUES($1,'u_hub','image/svg+xml',$2)",
-        [photoId, photoSvg(label, scratch)],
+        [photoId, photoSvg(title, label, formatSeoulDateTime(taken.toISOString()))],
       );
       return photoId;
     });
@@ -160,7 +172,7 @@ export async function showcase(db: Database, now = new Date()) {
       )
     ).rows[0].code as string;
   const pickup = async (v: ReservationView, asOf: Date) => {
-    const photoId = await photo('대여 전');
+    const photoId = await photo(v.reservation.item.title, '대여 전', asOf);
     const code = await codeOf(v.reservation.id);
     return db.transaction(
       (u) =>
@@ -197,7 +209,7 @@ export async function showcase(db: Database, now = new Date()) {
   );
   const pastOk = await approve('u_jun', past, when(-4, '10:00'));
   const pastPicked = await pickup(pastOk, when(-3, '10:10'));
-  const returnPhoto = await photo('반납');
+  const returnPhoto = await photo(pastPicked.reservation.item.title, '반납', when(-3, '17:50'));
   const pastReturned = await db.transaction(
     (u) =>
       recordReturn(

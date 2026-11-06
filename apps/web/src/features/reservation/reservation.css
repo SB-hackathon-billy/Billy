@@ -415,3 +415,20 @@
   align-items: end;
   margin-bottom: 1rem;
 }
+
+.handover-message {
+  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.handover-photo-missing {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  background: var(--color-sunken);
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  text-align: center;
+  padding: 0.5rem;
+}
