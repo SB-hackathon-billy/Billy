@@ -8,6 +8,7 @@
 !apps/api/**
 !apps/worker/**
 !apps/web/package.json
+!apps/web/public/assets/items/center/**
 **/node_modules
 **/dist
 **/.env*
