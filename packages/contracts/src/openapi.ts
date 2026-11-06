@@ -7,6 +7,7 @@ import * as http from './http.js';
 import * as listing from './listing.js';
 import * as intake from './intake.js';
 import * as reservation from './reservation.js';
+import * as policy from './policy.js';
 
 const namedSchemas = {
   ...enums,
@@ -17,6 +18,7 @@ const namedSchemas = {
   ...listing,
   ...intake,
   ...reservation,
+  ...policy,
 };
 const schemas: Record<string, z.ZodType> = {};
 for (const [name, schema] of Object.entries(namedSchemas)) {
@@ -57,6 +59,7 @@ const responses = {
   WaitlistEntries: http.successEnvelopeSchema(http.listDataSchema(reservation.WaitlistEntrySchema)),
   Notifications: http.successEnvelopeSchema(reservation.NotificationListSchema),
   ReadNotifications: http.successEnvelopeSchema(reservation.ReadNotificationsDataSchema),
+  PolicyMatch: http.successEnvelopeSchema(policy.PolicyMatchSchema),
 };
 for (const [name, schema] of Object.entries(responses)) schemas[`${name}Response`] = schema;
 
@@ -72,6 +75,8 @@ type Operation = {
   public?: boolean;
   sse?: boolean;
   binary?: boolean;
+  /** Stateless computation: the Idempotency-Key is checked but the result is not replayed. */
+  recomputed?: boolean;
 };
 /** The method/path pairs in COMMON_CONTRACT §6.1. */
 export const API_OPERATIONS: readonly Operation[] = [
@@ -432,6 +437,16 @@ export const API_OPERATIONS: readonly Operation[] = [
     response: 'IntakeApproval',
   },
   {
+    method: 'post',
+    path: '/policy-matches',
+    operationId: 'matchPolicies',
+    summary: '통화 발화의 대여 상황으로 신청완료 화면에 안내할 센터 정책 선택(저장 없음)',
+    status: 200,
+    response: 'PolicyMatch',
+    body: 'PolicyMatchBody',
+    recomputed: true,
+  },
+  {
     method: 'get',
     path: '/catalog',
     operationId: 'listCatalog',
@@ -576,7 +591,9 @@ export function buildOpenApi() {
           in: 'header',
           required: true,
           schema: { type: 'string', minLength: 1, maxLength: 128 },
-          description: '24시간 동안 같은 세션·실제 경로·body에 최초 결과를 재현합니다.',
+          description: operation.recomputed
+            ? '전역 요청 검사용 필수 헤더. 이 경로는 결과를 저장하지 않아 같은 키로도 다시 계산합니다.'
+            : '24시간 동안 같은 세션·실제 경로·body에 최초 결과를 재현합니다.',
         },
       );
     if (operation.query) {

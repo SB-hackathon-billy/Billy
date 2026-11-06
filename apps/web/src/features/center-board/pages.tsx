@@ -26,7 +26,6 @@ export function BoardPage() {
   return (
     <section className="cb-page" aria-labelledby="cb-board-title">
       <header className="cb-hero">
-        <p className="eyebrow">{CENTER_PROFILE.operator}</p>
         <h1 id="cb-board-title">{CENTER_PROFILE.name} 소식</h1>
         <p>센터 공지와 활동 소식을 모바일에서 한눈에 확인하세요.</p>
       </header>
@@ -145,7 +144,6 @@ export function ServicesPage() {
   return (
     <section className="cb-page" aria-labelledby="cb-services-title">
       <header className="cb-hero">
-        <p className="eyebrow">센터 서비스</p>
         <h1 id="cb-services-title">센터에서 이용할 수 있어요</h1>
         <p>
           센터가 운영하는 서비스를 한곳에 모았어요. 물품대여는 상담 통화로 바로 신청할 수 있어요.

@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>빌리 컬러 팔레트</title>
+    <style id="palette-tokens">
+      :root {
+        /* Primary — Lime (연두). 300 is the brand color. */
+        --lime-50: #f2fce2;
+        --lime-100: #e6fac8;
+        --lime-200: #d4f7a0;
+        --lime-300: #c8f169;
+        --lime-400: #a6e259;
+        --lime-500: #8cc848;
+        --lime-600: #6fa936;
+        --lime-700: #50812c;
+        --lime-800: #43682c;
+        --lime-900: #314c24;
+        --lime-950: #1f3318;
+
+        /* Secondary — Forest (짙은 숲색). 900 is the deep brand color. */
+        --forest-50: #f0f8f2;
+        --forest-100: #e0f0e5;
+        --forest-200: #c6dfce;
+        --forest-300: #a5c8b2;
+        --forest-400: #7faa90;
+        --forest-500: #5c8d71;
+        --forest-600: #407358;
+        --forest-700: #2b5b44;
+        --forest-800: #1e4a35;
+        --forest-900: #173c2c;
+        --forest-950: #0f2a1e;
+
+        /* Neutral — green-tinted gray. */
+        --neutral-0: #ffffff;
+        --neutral-50: #f6f7f2;
+        --neutral-100: #e9ece5;
+        --neutral-200: #d3dcd5;
+        --neutral-300: #c4d0c8;
+        --neutral-400: #a3aca5;
+        --neutral-500: #738079;
+        --neutral-600: #536159;
+        --neutral-700: #44504a;
+        --neutral-800: #2c3933;
+        --neutral-900: #17231e;
+
+        /* Accent — Orange (포인트). Decorative fills only; text uses 600+. */
+        --orange-50: #fff4ef;
+        --orange-100: #ffe7dc;
+        --orange-200: #fecdb5;
+        --orange-300: #ffab86;
+        --orange-400: #fa8b5a;
+        --orange-500: #de7041;
+        --orange-600: #bc5a31;
+        --orange-700: #a14d2f;
+        --orange-800: #8b432a;
+        --orange-900: #673321;
+        --orange-950: #432014;
+
+        /* Status */
+        --success-bg: var(--lime-100);
+        --success-border: var(--lime-400);
+        --success-text: var(--lime-800);
+        --warning-bg: #fff7e9;
+        --warning-border: #f0dfba;
+        --warning-text: #74613c;
+        --danger-bg: #fbeceb;
+        --danger-border: #f0c4bf;
+        --danger-text: #b33830;
+        --info-bg: #e3ecef;
+        --info-border: #c3d4da;
+        --info-text: #3f5f6b;
+
+        /* Roles */
+        --color-primary: var(--lime-300);
+        --color-primary-hover: var(--lime-400);
+        --color-primary-pressed: var(--lime-500);
+        --color-on-primary: var(--forest-900);
+        --color-primary-soft: var(--lime-100);
+        --color-primary-subtle: var(--lime-50);
+        --color-primary-text: var(--lime-800);
+        --color-strong: var(--forest-900);
+        --color-on-strong: var(--neutral-0);
+        --color-accent: var(--orange-400);
+        --color-bg: var(--neutral-50);
+        --color-surface: var(--neutral-0);
+        --color-sunken: var(--neutral-100);
+        --color-border: var(--neutral-100);
+        --color-border-strong: var(--neutral-300);
+        --color-text: var(--neutral-900);
+        --color-text-secondary: var(--neutral-600);
+        --color-text-tertiary: var(--neutral-500);
+        --color-placeholder: var(--neutral-400);
+        --color-focus: var(--forest-900);
+      }
+    </style>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-family:
+          'Pretendard Variable',
+          Pretendard,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Apple SD Gothic Neo',
+          'Noto Sans KR',
+          sans-serif;
+        line-height: 1.6;
+      }
+      main {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 48px 24px 96px;
+      }
+      h1 {
+        margin: 8px 0 8px;
+        font-size: 40px;
+        letter-spacing: -1.5px;
+        line-height: 1.2;
+      }
+      h2 {
+        margin: 64px 0 6px;
+        font-size: 22px;
+        letter-spacing: -0.5px;
+      }
+      .lead,
+      .desc {
+        margin: 0 0 20px;
+        color: var(--color-text-secondary);
+      }
+      .eyebrow {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 99px;
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1px;
+      }
+      code {
+        font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+        font-size: 0.9em;
+      }
+
+      /* Core */
+      .core {
+        display: grid;
+        grid-template-columns: 2.4fr 1.4fr 1fr 1fr 1fr;
+        gap: 12px;
+      }
+      .core-swatch {
+        min-height: 220px;
+        padding: 18px;
+        border-radius: 20px;
+        border: 1px solid var(--color-border);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+      .core-swatch b {
+        font-size: 18px;
+      }
+      .core-swatch span {
+        font-size: 13px;
+        opacity: 0.85;
+      }
+
+      /* Scales */
+      .scale {
+        display: grid;
+        grid-template-columns: repeat(var(--steps), minmax(0, 1fr));
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--color-border);
+      }
+      .step {
+        min-height: 128px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-size: 12px;
+      }
+      .step.is-brand {
+        box-shadow: inset 0 0 0 3px var(--forest-900);
+      }
+      .step b {
+        font-size: 14px;
+      }
+      .step .hex {
+        font-family: ui-monospace, Menlo, monospace;
+        text-transform: uppercase;
+      }
+      .step .ratio {
+        font-size: 11px;
+        line-height: 1.4;
+      }
+      .scale-name {
+        margin: 28px 0 10px;
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      /* Status */
+      .status-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .status {
+        padding: 16px;
+        border-radius: 16px;
+        border: 1px solid;
+        font-size: 14px;
+      }
+      .status b {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      /* Tables */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--color-surface);
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--color-border);
+        font-size: 14px;
+      }
+      th,
+      td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--color-border);
+        vertical-align: middle;
+      }
+      th {
+        background: var(--color-sunken);
+        font-size: 12px;
+        color: var(--color-text-secondary);
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      .chip-swatch {
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        border-radius: 7px;
+        border: 1px solid var(--color-border-strong);
+        vertical-align: middle;
+      }
+
+      /* Rules */
+      .rules {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .rule {
+        padding: 18px;
+        border-radius: 16px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+      }
+      .rule h3 {
+        margin: 0 0 8px;
+        font-size: 15px;
+      }
+      .rule ul {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 14px;
+        color: var(--color-text-secondary);
+      }
+      .rule.do h3::before {
+        content: '✓ ';
+        color: var(--color-primary-text);
+      }
+      .rule.dont h3::before {
+        content: '✕ ';
+        color: var(--danger-text);
+      }
+      .ratio-bar {
+        display: flex;
+        height: 56px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid var(--color-border);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .ratio-bar div {
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+      }
+
+      /* Examples */
+      .examples {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .example {
+        padding: 22px;
+        border-radius: 20px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+      }
+      .example h3 {
+        margin: 0 0 16px;
+        font-size: 13px;
+        color: var(--color-text-tertiary);
+      }
+      .stepper {
+        display: flex;
+      }
+      .stepper div {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        font-size: 13px;
+        color: var(--color-text-tertiary);
+      }
+      .stepper div::before {
+        content: '';
+        position: absolute;
+        top: 22px;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--color-sunken);
+      }
+      .stepper div:first-child::before {
+        left: 50%;
+      }
+      .stepper div:last-child::before {
+        right: 50%;
+      }
+      .stepper i {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 8px;
+        border-radius: 50%;
+        background: var(--color-sunken);
+        font-style: normal;
+        font-weight: 800;
+      }
+      .stepper .done i,
+      .stepper .now i {
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+      }
+      .stepper .now {
+        color: var(--color-text);
+        font-weight: 800;
+      }
+      .btn-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .btn {
+        height: 48px;
+        padding: 0 20px;
+        border: 0;
+        border-radius: 14px;
+        font: inherit;
+        font-weight: 800;
+      }
+      .btn.primary {
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+      }
+      .btn.strong {
+        background: var(--color-strong);
+        color: var(--color-on-strong);
+      }
+      .btn.soft {
+        background: var(--color-primary-soft);
+        color: var(--color-on-primary);
+      }
+      .btn.line {
+        background: var(--color-surface);
+        color: var(--color-text);
+        box-shadow: inset 0 0 0 1px var(--color-border-strong);
+      }
+      .btn.disabled {
+        background: var(--color-sunken);
+        color: var(--color-placeholder);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 14px;
+      }
+      .chip {
+        padding: 7px 12px;
+        border-radius: 99px;
+        font-size: 13px;
+        font-weight: 700;
+        background: var(--color-surface);
+        color: var(--color-text-secondary);
+        box-shadow: inset 0 0 0 1px var(--color-border);
+      }
+      .chip.on {
+        background: var(--color-primary);
+        color: var(--color-on-primary);
+        box-shadow: none;
+      }
+      .tag {
+        display: inline-block;
+        padding: 4px 9px;
+        border-radius: 99px;
+        background: var(--color-primary-soft);
+        color: var(--color-primary-text);
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .tag.accent {
+        background: var(--orange-100);
+        color: var(--orange-700);
+      }
+      .card {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid var(--color-border);
+      }
+      .card .thumb {
+        width: 64px;
+        height: 64px;
+        flex: none;
+        border-radius: 14px;
+        background: var(--color-primary-subtle);
+        display: grid;
+        place-items: center;
+        font-size: 30px;
+      }
+      .card p {
+        margin: 4px 0 0;
+        font-size: 13px;
+        color: var(--color-text-secondary);
+      }
+      .price {
+        color: var(--color-primary-text);
+        font-weight: 800;
+      }
+      .tabbar {
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+        border-top: 1px solid var(--color-border);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--color-text-tertiary);
+      }
+      .tabbar span {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+      .tabbar i {
+        font-style: normal;
+        font-size: 18px;
+        padding: 4px 12px;
+        border-radius: 12px;
+      }
+      .tabbar .on {
+        color: var(--color-strong);
+      }
+      .tabbar .on i {
+        background: var(--color-primary);
+      }
+      .banner {
+        padding: 20px;
+        border-radius: 20px;
+        background: var(--color-strong);
+        color: var(--color-on-strong);
+      }
+      .banner small {
+        color: var(--lime-300);
+        font-weight: 800;
+        letter-spacing: 1px;
+      }
+      .banner p {
+        margin: 6px 0 14px;
+        font-size: 18px;
+        font-weight: 800;
+      }
+      pre {
+        margin: 0;
+        padding: 20px;
+        border-radius: 16px;
+        background: var(--neutral-900);
+        color: var(--neutral-100);
+        font-size: 12px;
+        line-height: 1.6;
+        overflow: auto;
+      }
+      @media (max-width: 760px) {
+        .core,
+        .status-grid,
+        .rules,
+        .examples {
+          grid-template-columns: 1fr;
+        }
+        .scale {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <span class="eyebrow">BILLY DESIGN · COLOR v1</span>
+      <h1>빌리 컬러 팔레트</h1>
+      <p class="lead">
+        메인 컬러는 연두 <code>Lime 300 #C8F169</code>입니다. 짙은 숲색 <code>Forest 900</code>이
+        글자와 강조를 받치고, 초록 기운의 뉴트럴이 바탕을 이룹니다. 각 칸의 대비값은 이 페이지가
+        직접 계산합니다(WCAG 2.x).
+      </p>
+
+      <h2>핵심 컬러</h2>
+      <p class="desc">화면에서 가장 자주 보이는 다섯 가지. 연두는 면(채움)으로만 씁니다.</p>
+      <div class="core">
+        <div class="core-swatch" style="background: var(--lime-300); color: var(--forest-900)">
+          <b>Lime 300 · 메인</b><span>#C8F169 · 주요 버튼, 진행 상태, 선택, 활성 탭</span>
+        </div>
+        <div class="core-swatch" style="background: var(--forest-900); color: #fff">
+          <b>Forest 900</b><span>#173C2C · 연두 위 글자, 배너, 보조 강조</span>
+        </div>
+        <div class="core-swatch" style="background: var(--neutral-900); color: #fff">
+          <b>Ink</b><span>#17231E · 본문</span>
+        </div>
+        <div class="core-swatch" style="background: var(--neutral-50)">
+          <b>Paper</b><span>#F6F7F2 · 바탕</span>
+        </div>
+        <div class="core-swatch" style="background: var(--orange-400); color: var(--neutral-900)">
+          <b>Orange 400</b><span>#FA8B5A · 포인트</span>
+        </div>
+      </div>
+
+      <h2>스케일</h2>
+      <p class="desc">
+        테두리 굵은 칸이 기준색입니다. 칸마다 흰 바탕 대비와 그 칸 위에 올릴 글자색(잉크/흰색)과의
+        대비를 표시합니다. <b>AA</b>는 본문 4.5:1 이상, <b>AA18</b>은 큰 글자 전용(3:1 이상)입니다.
+      </p>
+      <div id="scales"></div>
+
+      <h2>상태 컬러</h2>
+      <p class="desc">상태는 색만으로 구분하지 않고 아이콘·문구를 함께 씁니다.</p>
+      <div class="status-grid">
+        <div
+          class="status"
+          style="
+            background: var(--success-bg);
+            border-color: var(--success-border);
+            color: var(--success-text);
+          "
+        >
+          <b>성공 · 완료</b>예약이 확정됐어요
+        </div>
+        <div
+          class="status"
+          style="
+            background: var(--warning-bg);
+            border-color: var(--warning-border);
+            color: var(--warning-text);
+          "
+        >
+          <b>주의</b>반납 기한이 하루 남았어요
+        </div>
+        <div
+          class="status"
+          style="
+            background: var(--danger-bg);
+            border-color: var(--danger-border);
+            color: var(--danger-text);
+          "
+        >
+          <b>오류 · 위험</b>연결이 끊어졌어요
+        </div>
+        <div
+          class="status"
+          style="
+            background: var(--info-bg);
+            border-color: var(--info-border);
+            color: var(--info-text);
+          "
+        >
+          <b>안내</b>운영시간 10:00–18:00
+        </div>
+      </div>
+
+      <h2>역할 토큰</h2>
+      <p class="desc">화면 코드는 스케일 값 대신 역할 토큰을 참조합니다.</p>
+      <table id="roles">
+        <thead>
+          <tr>
+            <th></th>
+            <th>토큰</th>
+            <th>값</th>
+            <th>쓰임</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <h2>사용 규칙</h2>
+      <p class="desc">
+        한 화면의 색 비중 목표: 바탕 뉴트럴 ≈ 70 · 연두 ≈ 20 · 숲색/잉크 ≈ 8 · 오렌지 ≤ 2.
+      </p>
+      <div class="ratio-bar" aria-hidden="true">
+        <div style="flex: 70; background: var(--neutral-50)">Neutral 70</div>
+        <div style="flex: 20; background: var(--lime-300); color: var(--forest-900)">Lime 20</div>
+        <div style="flex: 8; background: var(--forest-900); color: #fff">8</div>
+        <div style="flex: 2; background: var(--orange-400)"></div>
+      </div>
+      <div class="rules" style="margin-top: 12px">
+        <div class="rule do">
+          <h3>이렇게</h3>
+          <ul>
+            <li>
+              연두(Lime 300)는 주요 버튼·진행 단계·선택된 칩·활성 탭 같은 <b>채움 면</b>에 씁니다.
+            </li>
+            <li>연두 위 글자·아이콘은 항상 <b>Forest 900</b> (9.45:1).</li>
+            <li>초록 글자·링크·가격은 <b>Lime 800</b> (흰 바탕 6.45:1).</li>
+            <li>포커스 링은 <b>Forest 900</b> 3px.</li>
+            <li>연한 선택 배경은 Lime 100, 이미지 타일은 Lime 50.</li>
+          </ul>
+        </div>
+        <div class="rule dont">
+          <h3>이렇게 하지 않기</h3>
+          <ul>
+            <li>연두(Lime 200–500)를 흰/밝은 바탕 위 <b>글자·선</b>으로 쓰지 않기 (1.3–2:1).</li>
+            <li>연두 버튼에 흰 글자 쓰지 않기 (1.29:1).</li>
+            <li>Neutral 500은 4.1:1이라 작은 본문 대신 보조 정보·큰 글자에만.</li>
+            <li>오렌지 400을 글자색으로 쓰지 않기. 글자가 필요하면 Orange 600 이상.</li>
+            <li>오류를 오렌지 포인트와 섞지 않기. 오류는 Danger 토큰만.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>적용 예시</h2>
+      <div class="examples">
+        <div class="example">
+          <h3>진행 단계</h3>
+          <div class="stepper">
+            <div class="done"><i>✓</i>예약</div>
+            <div class="done"><i>✓</i>수령</div>
+            <div class="now"><i>3</i>반납</div>
+          </div>
+        </div>
+        <div class="example">
+          <h3>버튼 · 칩</h3>
+          <div class="btn-row">
+            <button class="btn primary">빌리기</button>
+            <button class="btn strong">거점 확인</button>
+            <button class="btn soft">찜하기</button>
+            <button class="btn line">취소</button>
+            <button class="btn disabled" disabled>마감</button>
+          </div>
+          <div class="chips">
+            <span class="chip on">전체</span><span class="chip">청소</span
+            ><span class="chip">여행</span><span class="chip">취미</span>
+          </div>
+        </div>
+        <div class="example">
+          <h3>물품 카드</h3>
+          <div class="card">
+            <div class="thumb">🧹</div>
+            <div>
+              <span class="tag">공공 · 센터</span> <span class="tag accent">인기</span>
+              <div style="margin-top: 6px; font-weight: 800">무선 청소기</div>
+              <p><span class="price">1,000원</span> / 1일 · 안암동 거점 350m</p>
+            </div>
+          </div>
+        </div>
+        <div class="example">
+          <h3>배너 · 탭 바</h3>
+          <div class="banner">
+            <small>NEIGHBOR SHARING</small>
+            <p>필요할 때 잠깐,<br />함께 쓰는 일상</p>
+            <button class="btn primary">둘러보기</button>
+          </div>
+          <div class="tabbar" style="margin-top: 12px">
+            <span class="on"><i>⌂</i>홈</span><span><i>⌕</i>둘러보기</span><span><i>▢</i>대여</span
+            ><span><i>☺</i>내 정보</span>
+          </div>
+        </div>
+      </div>
+
+      <h2>CSS 변수</h2>
+      <p class="desc">이 페이지의 <code>#palette-tokens</code> 스타일이 팔레트의 원본입니다.</p>
+      <pre id="css-source"></pre>
+    </main>
+
+    <script>
+      const scales = [
+        { name: 'Lime · 메인', key: 'lime', brand: 300 },
+        { name: 'Forest · 보조', key: 'forest', brand: 900 },
+        { name: 'Neutral', key: 'neutral', brand: 50 },
+        { name: 'Orange · 포인트', key: 'orange', brand: 400 },
+      ];
+      const roles = [
+        ['--color-primary', '주요 버튼, 진행 단계, 선택 칩, 활성 탭 (채움 전용)'],
+        ['--color-primary-hover', '주요 버튼 hover'],
+        ['--color-primary-pressed', '주요 버튼 pressed'],
+        ['--color-on-primary', '연두 위 글자·아이콘'],
+        ['--color-primary-soft', '연한 선택 배경, 태그, 보조 버튼'],
+        ['--color-primary-subtle', '이미지·아이콘 타일 바탕'],
+        ['--color-primary-text', '초록 글자, 링크, 가격'],
+        ['--color-strong', '배너, 보조 강조 버튼'],
+        ['--color-on-strong', '숲색 위 글자'],
+        ['--color-accent', '배지·일러스트 포인트 (글자 금지)'],
+        ['--color-bg', '페이지 바탕'],
+        ['--color-surface', '카드, 입력창, 시트'],
+        ['--color-sunken', '세그먼트 트랙, 비활성 단계, 오목한 영역'],
+        ['--color-border', '카드·구분선'],
+        ['--color-border-strong', '입력창 테두리, 아웃라인 버튼'],
+        ['--color-text', '제목, 본문'],
+        ['--color-text-secondary', '보조 설명'],
+        ['--color-text-tertiary', '메타 정보, 큰 글자 보조 (4.1:1)'],
+        ['--color-placeholder', '플레이스홀더, 비활성 (글자 대비 미달)'],
+        ['--color-focus', '포커스 링'],
+      ];
+
+      const root = getComputedStyle(document.documentElement);
+      const css = document.getElementById('palette-tokens').textContent;
+      const read = (name) => root.getPropertyValue(name).trim();
+
+      const luminance = (hex) => {
+        const [r, g, b] = [1, 3, 5].map((i) => {
+          const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+          return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const contrast = (a, b) => {
+        const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m);
+        return (x + 0.05) / (y + 0.05);
+      };
+      const grade = (ratio) => (ratio >= 4.5 ? 'AA' : ratio >= 3 ? 'AA18' : '—');
+      const ink = read('--neutral-900');
+      const white = '#ffffff';
+
+      const scalesEl = document.getElementById('scales');
+      for (const scale of scales) {
+        const steps = [
+          ...css.matchAll(new RegExp(`--${scale.key}-(\\d+):\\s*(#[0-9a-f]{6})`, 'gi')),
+        ];
+        const title = document.createElement('div');
+        title.className = 'scale-name';
+        title.textContent = scale.name;
+        const row = document.createElement('div');
+        row.className = 'scale';
+        row.style.setProperty('--steps', steps.length);
+        for (const [, step, hex] of steps) {
+          const onInk = contrast(hex, ink);
+          const text = onInk >= contrast(hex, white) ? ink : white;
+          const cell = document.createElement('div');
+          cell.className = Number(step) === scale.brand ? 'step is-brand' : 'step';
+          cell.style.background = hex;
+          cell.style.color = text;
+          const vsWhite = contrast(hex, white);
+          const vsText = contrast(hex, text);
+          cell.innerHTML =
+            `<b>${step}</b><span><span class="hex">${hex}</span><br>` +
+            `<span class="ratio">흰 바탕 ${vsWhite.toFixed(2)} ${grade(vsWhite)}<br>` +
+            `${text === ink ? '잉크' : '흰'} 글자 ${vsText.toFixed(2)} ${grade(vsText)}</span></span>`;
+          row.append(cell);
+        }
+        scalesEl.append(title, row);
+      }
+
+      const resolve = (name) => {
+        let value = read(name);
+        const ref = css.match(new RegExp(`${name}:\\s*var\\((--[a-z0-9-]+)\\)`));
+        return { value, ref: ref ? ref[1] : null };
+      };
+      const tbody = document.querySelector('#roles tbody');
+      for (const [name, usage] of roles) {
+        const { value, ref } = resolve(name);
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          `<td><span class="chip-swatch" style="background:${value}"></span></td>` +
+          `<td><code>${name}</code></td>` +
+          `<td><code>${ref ?? ''}</code> ${value.toUpperCase()}</td><td>${usage}</td>`;
+        tbody.append(tr);
+      }
+
+      document.getElementById('css-source').textContent = css.trim().replace(/^ {6}/gm, '');
+    </script>
+  </body>
+</html>

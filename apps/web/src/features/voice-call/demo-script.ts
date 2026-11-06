@@ -49,7 +49,7 @@ export function buildDemoScript(now: number, placeId: string): ScriptStep[] {
       at: 3600,
       kind: 'line',
       role: 'user',
-      text: '다음 주 제주도 여행 가는데 캐리어 빌릴 수 있을까요?',
+      text: '다음 주에 친구들이랑 제주도 여행 가는데 캐리어 빌릴 수 있을까요?',
     },
     { at: 5200, kind: 'thinking' },
     {

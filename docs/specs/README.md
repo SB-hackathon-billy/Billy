@@ -15,5 +15,7 @@
 | 0002 | [2번 AI 물품 등록](0002-item-registration.md)                                  | `full` | `implemented` | 사진 기반 등록 초안·게시·비활성화, `items` 호환 투영                                                        |
 | 0003 | [음성 접수 통화 화면·승인 후 예약 신청](0003-voice-call-reservation.md)        | `full` | `implemented` | 캐릭터·체크리스트·승인 바텀시트, `request_reservation` 도구·백그라운드 재시도, 센터 서비스 시연             |
 | 0004 | [3번 물품 탐색·예약·대기·앱 알림](0004-reservations-waitlist-notifications.md) | `full` | `implemented` | 카탈로그·바로 신청·소유자 응답·미리보기 확정·취소·만료, 대기 1순위 우선권, 앱 알림, 1번 도구 영구 실패 처리 |
+| 0005 | [통화 신청완료 화면의 상황별 정책 안내](0005-call-policy-guidance.md)          | `full` | `implemented` | 통화 발화의 대여 상황으로 관련 센터 정책 카드 안내, 매칭 없으면 무작위 1개, `POST /policy-matches`          |
+| 0006 | [화면 디자인 정리·고도화](0006-ui-refresh.md)                                  | `card` | `implemented` | 그라데이션 배경·공용 토큰(모서리·그림자)·알약형 버튼, 구분선 대신 여백, 중복 문구 제거. 기능 변경 없음      |
 
 2·3번 연동 API는 0004(카탈로그·예약·대기·알림)로 확정했다. 0001의 나머지 미결정 사항은 범위별 명세로 분리한 뒤 구현한다. 2·3번 내부의 독립 작업은 해당 범위 명세를 먼저 작성하고 진행할 수 있다. 개인별 담당 배정은 이 목록에 적지 않는다.

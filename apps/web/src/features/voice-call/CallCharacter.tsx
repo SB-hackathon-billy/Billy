@@ -1,16 +1,14 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { Character2D } from './Character2D.js';
-import type { CharacterRenderer, CharacterRendererProps } from './character.js';
+import type { CharacterRendererProps } from './character.js';
 
-/**
- * Renderer registry. When the animated 3D character is ready, add e.g.
- *   '3d': lazy(() => import('./Character3D.js').then((m) => ({ default: m.Character3D })))
- * and select it with VITE_CHARACTER_RENDERER=3d. The GLB goes in public/models/character/.
- */
-const renderers: Record<string, CharacterRenderer | ReturnType<typeof lazy<CharacterRenderer>>> = {
-  '2d': Character2D,
-};
-const selected = renderers[import.meta.env.VITE_CHARACTER_RENDERER ?? '2d'] ?? Character2D;
+// three.js is only fetched on the call screen. If the chunk cannot load, the 2D character stays.
+const Character3D = lazy(() =>
+  import('./Character3D.js').then(
+    (module) => ({ default: module.Character3D }),
+    () => ({ default: Character2D }),
+  ),
+);
 
 function useReducedMotion() {
   const query = '(prefers-reduced-motion: reduce)';
@@ -27,7 +25,6 @@ function useReducedMotion() {
 
 export function CallCharacter(props: Omit<CharacterRendererProps, 'reducedMotion'>) {
   const reducedMotion = useReducedMotion();
-  const Renderer = selected;
   return (
     <div className="vc-character-slot">
       {/* The enum value itself, as requested, so the state machine is visible while the art evolves. */}
@@ -35,7 +32,7 @@ export function CallCharacter(props: Omit<CharacterRendererProps, 'reducedMotion
         {props.state}
       </p>
       <Suspense fallback={<Character2D {...props} reducedMotion={reducedMotion} />}>
-        <Renderer {...props} reducedMotion={reducedMotion} />
+        <Character3D {...props} reducedMotion={reducedMotion} />
       </Suspense>
     </div>
   );

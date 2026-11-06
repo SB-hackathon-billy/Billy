@@ -1,5 +1,4 @@
 // 통화 캐릭터 상태. 화면은 이 enum만 렌더러에 넘기므로 2D 일러스트를 3D 모델로 바꿔도 로직이 그대로다.
-import type { ComponentType } from 'react';
 import type { VoiceStatus } from '@sb/contracts';
 
 export const CharacterState = {
@@ -50,9 +49,8 @@ export function deriveCharacterState(input: CharacterInput): CharacterState {
 }
 
 /**
- * Renderer seam for the planned animated 3D character. A 3D renderer (e.g. react-three-fiber with a
- * GLB from /models/character/) implements the same props and is registered lazily, so the call
- * screen and its state logic stay unchanged.
+ * Props shared by the 3D renderer (Character3D, GLB clips named after CharacterState) and the 2D
+ * fallback shown while the model loads or when WebGL is unavailable.
  */
 export interface CharacterRendererProps {
   state: CharacterState;
@@ -60,4 +58,3 @@ export interface CharacterRendererProps {
   progress: number;
   reducedMotion: boolean;
 }
-export type CharacterRenderer = ComponentType<CharacterRendererProps>;

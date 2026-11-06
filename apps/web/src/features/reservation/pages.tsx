@@ -114,7 +114,6 @@ export function CatalogPage() {
       : '';
   return (
     <section>
-      <p className="eyebrow">둘러보기</p>
       <h1>
         동네에서 빌릴 수 있는
         <br />
@@ -129,7 +128,7 @@ export function CatalogPage() {
         }}
       >
         <label>
-          물건 이름
+          <span className="visually-hidden">물건 이름</span>
           <input
             type="search"
             value={q}
@@ -298,7 +297,6 @@ export function CatalogItemPage() {
   );
   return (
     <section>
-      <p className="eyebrow">물품 상세</p>
       <div className="catalog-hero">
         <img src={item.image.url} alt={item.image.alt} />
       </div>
@@ -315,7 +313,7 @@ export function CatalogItemPage() {
           있어요.
         </p>
       )}
-      <div className="content-card">
+      <section className="page-section">
         <h2>예약된 기간</h2>
         {item.occupied.length ? (
           <ul className="occupied-list">
@@ -338,9 +336,9 @@ export function CatalogItemPage() {
         {item.waitingCount > 0 && (
           <p className="field-hint">이 물품을 기다리는 이웃 {item.waitingCount}명</p>
         )}
-      </div>
+      </section>
       {item.mine ? (
-        <div className="content-card">
+        <div className="page-section">
           <p>내가 등록한 물품이에요. 들어온 신청은 요청함의 빌려주기 탭에서 확인해요.</p>
           {item.source === 'RESIDENT' && item.id.startsWith('lst_') && (
             <Link className="button secondary" to={`/listings/${item.id}`}>
@@ -518,7 +516,7 @@ export function ReservationPage() {
       <p className="demo-notice">실제 결제와 기관 예약은 없어요. 앱 안의 데모 예약이에요.</p>
       {owner ? <OwnerResponse view={view} /> : <CancelReservation view={view} />}
       {view.history.length > 0 && (
-        <div className="content-card">
+        <div className="page-section">
           <h2>진행 기록</h2>
           <ol className="history-list">
             {view.history.map((h, index) => (
@@ -567,7 +565,6 @@ export function NotificationsPage() {
   const data = notifications.data;
   return (
     <section>
-      <p className="eyebrow">알림</p>
       <h1>새 소식</h1>
       {data && data.unreadCount > 0 && (
         <ActionButton secondary onPress={() => read('ALL')} isDisabled={action.pending}>

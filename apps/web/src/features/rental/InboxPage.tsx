@@ -150,7 +150,6 @@ export function InboxPage() {
   const hasThreeContent = bookings.length > 0 || (!owner && waiting.length > 0);
   return (
     <section>
-      <p className="eyebrow">서로의 필요가 만나는 곳</p>
       <h1>요청함</h1>
       <div className="segmented" role="group" aria-label="요청함 종류">
         <ActionButton

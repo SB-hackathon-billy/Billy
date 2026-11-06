@@ -22,13 +22,12 @@ export function EntryPage() {
       <div className="entry-art">
         <Ink />
       </div>
-      <p className="eyebrow">성북의 이웃과 함께</p>
       <h1>
         필요할 때 잠깐,
         <br />
         함께 쓰는 일상.
       </h1>
-      <p>
+      <p className="lead">
         우리 동네 공공 물품과 이웃의 물품을
         <br />
         한곳에서 찾아보세요.
@@ -109,17 +108,12 @@ export function HomePage() {
     .slice(0, 2);
   return (
     <section>
-      <p className="eyebrow">우리 동네, 필요한 만큼 함께</p>
-      <h1>
-        {session?.user.displayName}님,
+      <p className="home-hello">{session?.user.displayName}님, 안녕하세요</p>
+      <h1 className="home-greeting">
+        오늘은 무엇이
         <br />
-        오늘은 무엇이 필요하세요?
+        필요하세요?
       </h1>
-      <p className="lead">
-        사는 대신 함께 쓰는 작은 시작.
-        <br />
-        공공 물품부터 이웃의 물건까지 찾아드려요.
-      </p>
       <Link className="voice-hero" to="/rental">
         <img
           className="home-illustration"
@@ -141,14 +135,18 @@ export function HomePage() {
             <path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8" />
           </svg>
         </span>
-        <strong>무엇이 필요하세요?</strong>
+        <strong>
+          필요한 물건,
+          <br />
+          알려만 주세요
+        </strong>
         <span>
-          눌러서 말하거나 글로 알려 주세요 <b aria-hidden="true">→</b>
+          말하거나 글로 요청하기 <b aria-hidden="true">→</b>
         </span>
       </Link>
       <Link className="catalog-teaser" to="/catalog">
         <strong>물품 둘러보기</strong>
-        <span>공공·이웃 물품을 기간별로 찾아 바로 신청해요 →</span>
+        <span>공공·이웃 물품을 골라 바로 신청해요</span>
       </Link>
       {upcoming.length > 0 && (
         <>
@@ -163,7 +161,7 @@ export function HomePage() {
       )}
       {offered > 0 && (
         <Link className="new-offers" to="/inbox">
-          ✦ 새로운 조건 {offered}개가 기다리고 있어요 <span>확인하기 →</span>
+          새로운 조건 {offered}개가 기다리고 있어요 <span>확인하기 →</span>
         </Link>
       )}
       <div className="section-heading">
@@ -200,8 +198,7 @@ export function HomePage() {
         </div>
       )}
       <Link to="/center" className="center-teaser">
-        <span>성북구 1인가구지원센터</span>
-        <strong>혼자여도, 함께하는 일상</strong>
+        <strong>성북구 1인가구지원센터</strong>
         <span>프로그램과 공간 살펴보기 →</span>
       </Link>
       <p className="demo-footnote">
@@ -216,23 +213,22 @@ export function ProfilePage() {
   const online = useOnline();
   return (
     <section>
-      <p className="eyebrow">내 정보</p>
       <h1>
         안녕하세요,
         <br />
         {session?.user.displayName}님
       </h1>
-      <div className="content-card">
-        <h2>현재 데모 아이디</h2>
+      <div className="content-card profile-id">
+        <span className="muted">데모 아이디</span>
         <p className="profile-handle">{session?.user.handle}</p>
-        <p>신원 인증이 아닌 시연용 계정입니다.</p>
-        <Link className="text-link" to="/inbox">
-          내 요청 내역 보기 →
-        </Link>
+        <p className="field-hint">신원 인증이 아닌 시연용 계정입니다.</p>
       </div>
-      <div className="content-card">
+      <Link className="button" to="/inbox">
+        내 요청 내역 보기
+      </Link>
+      <div className="profile-switch">
         <h2>다른 아이디로 참여하기</h2>
-        <p>
+        <p className="field-hint">
           현재 음성과 연결을 종료하고 아이디 입력 화면으로 이동합니다. 서버에 저장된 요청은
           유지됩니다.
         </p>

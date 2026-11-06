@@ -89,8 +89,8 @@ export function FormPreview({
               </div>
             ))}
           </dl>
-          <p>전송·접수·저장되지 않은 미리보기입니다.</p>
-          <Button className="center-button" onPress={() => setPreview(false)}>
+          <p className="center-footnote">전송·접수·저장되지 않은 미리보기입니다.</p>
+          <Button className="button secondary center-wide" onPress={() => setPreview(false)}>
             예시 내용 수정
           </Button>
         </div>
@@ -126,12 +126,12 @@ export function FormPreview({
               {error}
             </p>
           )}
-          <Button className="center-button center-primary" type="button" onPress={showPreview}>
+          <Button className="button" type="button" onPress={showPreview}>
             {definition.action}
           </Button>
         </form>
       )}
-      <Button className="center-button center-wide" onPress={onClose}>
+      <Button className="button secondary center-wide" onPress={onClose}>
         미리보기 닫기
       </Button>
     </Sheet>
@@ -189,8 +189,8 @@ export function SpacePreview({
           <dd>무료 (공개 안내 참고)</dd>
         </div>
       </dl>
-      <p>예약·승인·출입 권한은 생성되지 않습니다.</p>
-      <Button className="center-button center-primary center-wide" onPress={onClose}>
+      <p className="center-footnote">예약·승인·출입 권한은 생성되지 않습니다.</p>
+      <Button className="button center-wide" onPress={onClose}>
         미리보기 닫기
       </Button>
     </Sheet>

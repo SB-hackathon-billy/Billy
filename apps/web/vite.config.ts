@@ -6,8 +6,6 @@ import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 
 export default defineConfig({
-  // 3D call character (spec 0003 §8): model/texture formats are served as hashed static assets.
-  assetsInclude: ['**/*.glb', '**/*.gltf', '**/*.ktx2', '**/*.hdr'],
   plugins: [
     {
       name: 'development-mock-worker',
@@ -37,8 +35,8 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         display: 'standalone',
-        theme_color: '#253C52',
-        background_color: '#F8F7F1',
+        theme_color: '#F6F7F2',
+        background_color: '#F6F7F2',
         icons: [
           { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
           { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
@@ -47,6 +45,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webp,ico,woff2}', 'content/center/**/*.json'],
+        // The 3D call character (three.js) is fetched only when the call screen opens (spec 0003 §8).
+        globIgnores: ['**/Character3D-*.js'],
         navigateFallbackDenylist: [/^\/api(?:\/|$)/],
         runtimeCaching: [
           {
@@ -55,9 +55,10 @@ export default defineConfig({
             method: 'GET',
           },
           {
-            // Large character models are not precached; they are cached on first call-screen use.
+            // Character model and its renderer chunk are cached on first call-screen use, not precached.
             urlPattern: ({ url }) =>
-              url.origin === self.location.origin && /^\/models\/character\//.test(url.pathname),
+              url.origin === self.location.origin &&
+              /^\/(?:models\/character\/|assets\/Character3D-)/.test(url.pathname),
             handler: 'CacheFirst',
             options: {
               cacheName: 'call-character-models',

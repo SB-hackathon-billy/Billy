@@ -1,8 +1,8 @@
 import type { CharacterRendererProps } from './character.js';
 
 /**
- * Placeholder 2D character (임의 캐릭터). All motion is CSS keyed on data-state, so a 3D renderer can
- * replace this component without touching the call screen. Decorative: the state is announced as text.
+ * 2D character shown while the 3D model loads or when WebGL is unavailable. All motion is CSS keyed
+ * on data-state. Decorative: the state is announced as text.
  */
 export function Character2D({ state, progress, reducedMotion }: CharacterRendererProps) {
   const fill = Math.round(Math.max(0, Math.min(1, progress)) * 100);
@@ -16,9 +16,9 @@ export function Character2D({ state, progress, reducedMotion }: CharacterRendere
       <svg viewBox="0 0 200 200" width="200" height="200" focusable="false">
         <defs>
           <radialGradient id="vc-body" cx="38%" cy="30%" r="75%">
-            <stop offset="0" stopColor="#c9e4cf" />
-            <stop offset="0.6" stopColor="#8fbf9d" />
-            <stop offset="1" stopColor="#5f9474" />
+            <stop offset="0" style={{ stopColor: 'var(--lime-50)' }} />
+            <stop offset="0.6" style={{ stopColor: 'var(--lime-300)' }} />
+            <stop offset="1" style={{ stopColor: 'var(--lime-600)' }} />
           </radialGradient>
           <clipPath id="vc-belly">
             <ellipse cx="100" cy="132" rx="34" ry="24" />

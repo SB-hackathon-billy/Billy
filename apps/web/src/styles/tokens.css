@@ -1,21 +1,130 @@
 :root {
   color-scheme: light;
-  --navy-800: #253c52;
-  --navy-400: #648196;
-  --navy-100: #e4ebf0;
-  --green-700: #42705b;
-  --green-300: #91ad95;
-  --green-100: #e5eee4;
-  --paper: #f8f7f1;
-  --surface: #ffffff;
+  /* Source of truth: design/color-palette.html #palette-tokens. Keep values in sync. */
+  /* Primary — Lime (연두). 300 is the brand color. Fill only; never text/lines on light bg. */
+  --lime-50: #f2fce2;
+  --lime-100: #e6fac8;
+  --lime-200: #d4f7a0;
+  --lime-300: #c8f169;
+  --lime-400: #a6e259;
+  --lime-500: #8cc848;
+  --lime-600: #6fa936;
+  --lime-700: #50812c;
+  --lime-800: #43682c;
+  --lime-900: #314c24;
+  --lime-950: #1f3318;
+
+  /* Secondary — Forest (짙은 숲색). 900 is the deep brand color. */
+  --forest-50: #f0f8f2;
+  --forest-100: #e0f0e5;
+  --forest-200: #c6dfce;
+  --forest-300: #a5c8b2;
+  --forest-400: #7faa90;
+  --forest-500: #5c8d71;
+  --forest-600: #407358;
+  --forest-700: #2b5b44;
+  --forest-800: #1e4a35;
+  --forest-900: #173c2c;
+  --forest-950: #0f2a1e;
+
+  /* Neutral — green-tinted gray. */
+  --neutral-0: #ffffff;
+  --neutral-50: #f6f7f2;
+  --neutral-100: #e9ece5;
+  --neutral-200: #d3dcd5;
+  --neutral-300: #c4d0c8;
+  --neutral-400: #a3aca5;
+  --neutral-500: #738079;
+  --neutral-600: #536159;
+  --neutral-700: #44504a;
+  --neutral-800: #2c3933;
+  --neutral-900: #17231e;
+
+  /* Accent — Orange (포인트). Decorative fills only; text uses 600+. */
+  --orange-50: #fff4ef;
+  --orange-100: #ffe7dc;
+  --orange-200: #fecdb5;
+  --orange-300: #ffab86;
+  --orange-400: #fa8b5a;
+  --orange-500: #de7041;
+  --orange-600: #bc5a31;
+  --orange-700: #a14d2f;
+  --orange-800: #8b432a;
+  --orange-900: #673321;
+  --orange-950: #432014;
+
+  /* Status */
+  --success-bg: var(--lime-100);
+  --success-border: var(--lime-400);
+  --success-text: var(--lime-800);
+  --warning-bg: #fff7e9;
+  --warning-border: #f0dfba;
+  --warning-text: #74613c;
+  --danger-bg: #fbeceb;
+  --danger-border: #f0c4bf;
+  --danger-text: #b33830;
+  --info-bg: #e3ecef;
+  --info-border: #c3d4da;
+  --info-text: #3f5f6b;
+
+  /* Roles — screen code references these, not scale steps. */
+  --color-primary: var(--lime-300);
+  --color-primary-hover: var(--lime-400);
+  --color-primary-pressed: var(--lime-500);
+  --color-on-primary: var(--forest-900);
+  --color-primary-soft: var(--lime-100);
+  --color-primary-subtle: var(--lime-50);
+  --color-primary-text: var(--lime-800);
+  --color-strong: var(--forest-900);
+  --color-on-strong: var(--neutral-0);
+  --color-accent: var(--orange-400);
+  --color-bg: var(--neutral-50);
+  --color-surface: var(--neutral-0);
+  --color-sunken: var(--neutral-100);
+  --color-border: var(--neutral-100);
+  --color-border-strong: var(--neutral-300);
+  --color-text: var(--neutral-900);
+  --color-text-secondary: var(--neutral-600);
+  --color-text-tertiary: var(--neutral-500);
+  --color-placeholder: var(--neutral-400);
+  --color-focus: var(--forest-900);
+
+  /* Shape & elevation — soft white surfaces floating over the page gradient. */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --shadow-soft: 0 1px 2px rgb(23 60 44 / 0.04), 0 10px 28px -14px rgb(23 60 44 / 0.16);
+  --shadow-raised: 0 2px 8px rgb(23 60 44 / 0.05), 0 22px 44px -18px rgb(23 60 44 / 0.24);
+  --shadow-primary: 0 12px 24px -12px color-mix(in srgb, var(--lime-700) 75%, transparent);
+  --color-glass: color-mix(in srgb, var(--neutral-0) 82%, transparent);
+  /* Page background: lime glow at the top-left fading into the neutral base. */
+  --gradient-page:
+    radial-gradient(
+      95% 50% at 0% 0%,
+      color-mix(in srgb, var(--lime-200) 72%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      75% 42% at 100% 6%,
+      color-mix(in srgb, var(--forest-100) 95%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      90% 45% at 100% 100%,
+      color-mix(in srgb, var(--lime-100) 70%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--lime-50) 0%, var(--neutral-50) 50%);
+
   --font-body:
     'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
     'Noto Sans KR', 'Malgun Gothic', sans-serif;
   --touch-min: 44px;
   font-family: var(--font-body);
   font-size: 16px;
-  color: var(--navy-800);
-  background: var(--paper);
+  color: var(--color-text);
+  background: var(--color-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-text-size-adjust: 100%;
@@ -27,6 +136,15 @@ body {
   margin: 0;
   min-width: 280px;
   line-height: 1.65;
+}
+/* Fixed layer so the gradient stays put while content scrolls (background-attachment: fixed is unreliable on iOS). */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--gradient-page);
+  pointer-events: none;
 }
 button,
 input,
@@ -53,7 +171,7 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 :focus-visible {
-  outline: 3px solid var(--green-700);
+  outline: 3px solid var(--color-focus);
   outline-offset: 4px;
 }
 h1,
@@ -75,7 +193,6 @@ p {
 }
 .app-header {
   padding: max(1.25rem, env(safe-area-inset-top)) 1.25rem 1rem;
-  border-bottom: 1px solid var(--navy-100);
 }
 .brand {
   display: inline-flex;
@@ -94,21 +211,20 @@ p {
   padding: 1.75rem 1.25rem calc(8rem + env(safe-area-inset-bottom));
 }
 .eyebrow {
-  color: var(--green-700);
+  color: var(--color-primary-text);
   font-weight: 700;
 }
 .content-card {
   margin: 1.5rem 0;
   padding: 1.5rem;
-  border-radius: 1.25rem;
-  background: var(--surface);
-  border: 1px solid var(--navy-100);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
 }
 .demo-notice {
-  font-size: 1rem;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  background: var(--green-100);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
 }
 .primary-link {
   display: inline-flex;
@@ -116,10 +232,10 @@ p {
   justify-content: center;
   padding: 0.75rem 1.25rem;
   min-height: 48px;
-  border-radius: 0.75rem;
-  color: var(--surface);
-  background: var(--navy-800);
-  font-weight: 700;
+  border-radius: 0.875rem;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  font-weight: 800;
   text-decoration: none;
 }
 .bottom-tabs {
@@ -132,8 +248,7 @@ p {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.25rem;
   padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
-  background: var(--surface);
-  border-top: 1px solid var(--navy-100);
+  background: var(--color-glass);
 }
 .bottom-tabs a {
   min-height: 52px;
@@ -149,9 +264,8 @@ p {
   word-break: keep-all;
 }
 .bottom-tabs a[aria-current='page'] {
-  background: var(--green-100);
+  color: var(--color-on-primary);
   font-weight: 750;
-  box-shadow: inset 0 -3px var(--green-700);
 }
 .skip-link {
   position: fixed;
@@ -159,7 +273,7 @@ p {
   left: 1rem;
   z-index: 10;
   padding: 0.75rem 1rem;
-  background: var(--surface);
+  background: var(--color-surface);
 }
 .skip-link:focus {
   top: 1rem;

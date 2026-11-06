@@ -9,6 +9,8 @@ import {
   IntakeApprovalSchema,
   RequestViewSchema,
   createEmptyNeed,
+  pickRandomPolicy,
+  type CenterPolicyId,
   type ExtractNeedResult,
   type IntakeApproval,
   type RequestView,
@@ -30,6 +32,14 @@ import {
 } from './checklist.js';
 import { buildDemoScript } from './demo-script.js';
 import { reservationOutbox } from './reservation-outbox.js';
+import { PolicyCards } from './PolicyCards.js';
+import {
+  policyUtterances,
+  selectPolicyCards,
+  usePolicyMatch,
+  type PolicyCardSelection,
+} from './policy-match.js';
+import mascotAvatar from './assets/mascot-avatar.webp';
 import './voice-call.css';
 
 interface Line {
@@ -46,6 +56,9 @@ const reservationLabels: Record<IntakeApproval['status'], string> = {
   // 명세 0004: 계속 실패하면 재시도를 멈추고 알림으로 안내한다.
   FAILED: '예약 신청을 마치지 못했어요. 요청함에서 직접 진행해 주세요',
 };
+// The dialing screen stays this long while the real connection starts underneath, then gives way to
+// the call screen; errors and closes end it sooner.
+const RING_MS = 2_000;
 
 export function VoiceCallPage() {
   const [params] = useSearchParams();
@@ -75,6 +88,10 @@ export function VoiceCallPage() {
   const creating = useRef<Promise<RequestView> | null>(null);
   const createScope = useRef(new ActionScope());
   const scriptTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const [dialing, setDialing] = useState(false);
+  const ring = useRef({ timers: [] as ReturnType<typeof setTimeout>[], connecting: false });
+  // 명세 0005: 상황을 말하지 않았거나 맞는 정책이 없을 때 안내할 정책. 통화마다 한 번 고른다.
+  const [randomPolicy, setRandomPolicy] = useState<CenterPolicyId>(() => pickRandomPolicy());
 
   const client = useRef<VoiceCallClient | null>(null);
   client.current ??= new VoiceCallClient({
@@ -116,6 +133,24 @@ export function VoiceCallPage() {
       document.removeEventListener('visibilitychange', hide);
     };
   }, [scripted]);
+
+  const stopRinging = () => {
+    ring.current.timers.forEach(clearTimeout);
+    ring.current = { timers: [], connecting: false };
+    setDialing(false);
+  };
+  useEffect(() => () => ring.current.timers.forEach(clearTimeout), []);
+  // start() first reports CLOSED for the previous call, so a closing status only ends the dialing
+  // screen once this call has reported CONNECTING.
+  useEffect(() => {
+    if (!dialing) return;
+    if (status === 'CONNECTING') ring.current.connecting = true;
+    else if (
+      ring.current.connecting &&
+      ['ERROR', 'RECONNECT_REQUIRED', 'CLOSED', 'IDLE'].includes(status)
+    )
+      stopRinging();
+  }, [dialing, status]);
 
   const ensureRequest = async () => {
     if (requestRef.current) return requestRef.current;
@@ -160,6 +195,9 @@ export function VoiceCallPage() {
   const progress = checklistProgress(checklist);
   const active = ['CONNECTING', 'LISTENING', 'SPEAKING'].includes(status);
   const complete = readyForApproval(proposal?.result ?? null, eligible, serverClock.now());
+  // 명세 0005: 통화 중 발화로 관련 정책을 백그라운드에서 찾는다(통화 화면에는 표시하지 않음).
+  const utterances = useMemo(() => policyUtterances(lines), [lines]);
+  const policyMatch = usePolicyMatch(utterances, scripted);
 
   // Collection complete → hide the checklist, lift the character and raise the approval sheet.
   useEffect(() => {
@@ -206,29 +244,41 @@ export function VoiceCallPage() {
     setPhase('collecting');
     setDismissedTaskId(null);
     setReservation(null);
+    setRandomPolicy(pickRandomPolicy());
   };
   const startCall = () => {
     reset();
+    ring.current.timers.forEach(clearTimeout);
+    ring.current = {
+      timers: [setTimeout(stopRinging, RING_MS)],
+      connecting: false,
+    };
+    setDialing(true);
     if (scripted) {
       stopScript();
       const placeId = places.data?.items[0]?.id ?? 'place-center';
       for (const step of buildDemoScript(serverClock.now(), placeId))
         scriptTimers.current.push(
-          setTimeout(() => {
-            if (step.kind === 'status') setStatus(step.status);
-            if (step.kind === 'line') setLines((previous) => [...previous, step]);
-            if (step.kind === 'thinking') setScriptThinking(true);
-            if (step.kind === 'proposal') {
-              setScriptThinking(false);
-              setProposal({ taskId: `task_demo_${step.at}`, result: step.result });
-            }
-          }, step.at),
+          setTimeout(
+            () => {
+              if (step.kind === 'status') setStatus(step.status);
+              if (step.kind === 'line') setLines((previous) => [...previous, step]);
+              if (step.kind === 'thinking') setScriptThinking(true);
+              if (step.kind === 'proposal') {
+                setScriptThinking(false);
+                setProposal({ taskId: `task_demo_${step.at}`, result: step.result });
+              }
+            },
+            // The scripted call reports CONNECTING at once; everything after waits for the ring.
+            step.at === 0 ? 0 : step.at + RING_MS,
+          ),
         );
       return;
     }
     void client.current?.start(async () => (await ensureRequest()).request.id);
   };
   const endCall = () => {
+    stopRinging();
     stopScript();
     if (scripted) setStatus('CLOSED');
     void client.current?.stop();
@@ -272,7 +322,12 @@ export function VoiceCallPage() {
   const nextItem = checklist.find((item) => !item.optional && !item.done);
 
   return (
-    <section className="vc-screen" data-phase={phase} aria-labelledby="vc-title">
+    <section
+      className="vc-screen"
+      data-phase={phase}
+      data-dialing={dialing || undefined}
+      aria-labelledby="vc-title"
+    >
       <header className="vc-topbar">
         <Link to="/" className="vc-back" aria-label="홈으로 나가기">
           ←
@@ -281,9 +336,30 @@ export function VoiceCallPage() {
           <h1 id="vc-title">물품대여 상담 통화</h1>
           <p>성북구 1인가구지원센터 · 공유대여</p>
         </div>
-        <span className={active ? 'vc-live on' : 'vc-live'}>{active ? '통화 중' : '대기'}</span>
+        <span className={active ? 'vc-live on' : 'vc-live'}>
+          {dialing ? '연결 중' : active ? '통화 중' : '대기'}
+        </span>
       </header>
       {scripted && <p className="vc-script-badge">시연 스크립트 · 실제 통화·예약 없음</p>}
+      {dialing && (
+        <div className="vc-dialing">
+          <div className="vc-dialing-avatar" aria-hidden="true">
+            <span className="vc-dialing-wave" />
+            <span className="vc-dialing-wave" />
+            <img src={mascotAvatar} alt="" width={176} height={176} />
+          </div>
+          <p className="vc-dialing-name">공유대여 상담 도우미</p>
+          <p className="vc-dialing-text" role="status">
+            전화를 연결하고 있어요
+            <span className="vc-dialing-dots" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+          </p>
+          <ActionButton onPress={endCall}>통화 취소</ActionButton>
+        </div>
+      )}
 
       <div className="vc-stage">
         <CallCharacter state={character} progress={progress} />
@@ -371,6 +447,7 @@ export function VoiceCallPage() {
         reservation={reservationState}
         outboxFailed={outboxFailed}
         scripted={scripted}
+        policies={selectPolicyCards(policyMatch, randomPolicy)}
         onApprove={() => void approve()}
         onEdit={() => {
           setDismissedTaskId(proposal?.taskId ?? null);
@@ -414,6 +491,7 @@ function ApprovalSheet({
   reservation,
   outboxFailed,
   scripted,
+  policies,
   onApprove,
   onEdit,
 }: {
@@ -423,6 +501,7 @@ function ApprovalSheet({
   reservation: IntakeApproval | null;
   outboxFailed: boolean;
   scripted: boolean;
+  policies: PolicyCardSelection;
   onApprove: () => void;
   onEdit: () => void;
 }) {
@@ -499,6 +578,7 @@ function ApprovalSheet({
               요청함에서 확인하기
             </Link>
           )}
+          <PolicyCards selection={policies} />
         </>
       )}
       {phase === 'retrying' && outboxFailed && (

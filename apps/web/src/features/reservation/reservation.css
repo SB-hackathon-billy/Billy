@@ -2,256 +2,312 @@
 .catalog-search {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 0.6rem;
-  align-items: end;
-  margin: 0.5rem 0 0.8rem;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0 0 0.75rem;
 }
 .catalog-search input {
   width: 100%;
-  min-height: 48px;
-  border: 1px solid #c6d2d8;
-  border-radius: 12px;
-  padding: 0 0.8rem;
-  background: var(--surface);
+  min-height: 54px;
+  margin-top: 0;
+  padding: 0 1.25rem;
+  border-radius: var(--radius-pill);
 }
 .catalog-search .button {
   width: auto;
-  min-width: 5rem;
+  min-width: 5.5rem;
 }
 .filter-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.6rem;
+  gap: 0.5rem;
+}
+.filter-row label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 .filter-row select,
 .reserve-card select {
   width: 100%;
-  min-height: 48px;
-  border: 1px solid #c6d2d8;
-  border-radius: 12px;
-  padding: 0 0.6rem;
-  background: var(--surface);
+  min-height: 52px;
+  padding: 0 0.9rem;
+  color: var(--color-text);
+}
+.filter-row select {
+  margin-top: 0.35rem;
 }
 .period-filter {
-  margin: 0.8rem 0 0.4rem;
-  border: 1px solid var(--navy-100);
-  border-radius: 14px;
-  padding: 0.4rem 0.9rem 0.9rem;
-  background: var(--surface);
+  margin: 0.75rem 0 0.25rem;
 }
 .period-filter summary {
-  min-height: 44px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  cursor: pointer;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  box-shadow: inset 0 0 0 1px var(--neutral-200);
+  font-size: 0.9375rem;
   font-weight: 650;
+  cursor: pointer;
+}
+.period-filter[open] summary {
+  margin-bottom: 0.75rem;
+  background: var(--color-primary-soft);
+  box-shadow: none;
 }
 .catalog-list {
   list-style: none;
   padding: 0;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
   display: grid;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
+/* Borderless rows: the white image tile carries the grouping, whitespace separates items. */
 .catalog-card {
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
-  gap: 0.9rem;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 1rem;
   align-items: center;
-  padding: 0.8rem;
-  border: 1px solid var(--navy-100);
-  border-radius: 18px;
-  background: var(--surface);
+  padding: 0.4rem 0;
   text-decoration: none;
   color: inherit;
 }
 .catalog-card img {
-  width: 88px;
-  height: 88px;
+  width: 92px;
+  height: 92px;
   object-fit: cover;
-  border-radius: 14px;
-  background: var(--navy-100);
+  border-radius: 22px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
 }
 .catalog-card > div {
   display: grid;
-  gap: 0.15rem;
+  gap: 0.1rem;
   min-width: 0;
 }
 .catalog-card strong {
-  font-size: 1.05rem;
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 .catalog-card .muted {
-  font-size: 0.85rem;
+  font-size: 0.875rem;
 }
 .availability {
-  font-size: 0.85rem;
-  font-weight: 650;
-  color: #7a5b3a;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--warning-text);
 }
 .availability.is-available {
-  color: var(--green-700);
+  color: var(--color-primary-text);
 }
 .catalog-hero img {
+  display: block;
   width: 100%;
-  max-height: 260px;
+  max-height: 280px;
   object-fit: cover;
-  border-radius: 20px;
-  background: var(--navy-100);
+  border-radius: 28px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+.catalog-hero {
+  margin-bottom: 1.25rem;
 }
 .catalog-title {
-  margin-top: 0.3rem;
+  margin: 0.2rem 0 0.5rem;
 }
 .catalog-description {
   white-space: pre-line;
   line-height: 1.7;
+}
+.page-section {
+  margin: 2rem 0;
+}
+.page-section h2 {
+  margin: 0 0 0.6rem;
+}
+.page-section .button {
+  margin-top: 0.75rem;
 }
 .occupied-list {
   list-style: none;
   padding: 0;
   margin: 0.5rem 0;
   display: grid;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 .occupied-list li {
   display: grid;
-  gap: 0.1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--navy-100);
-  font-size: 0.9rem;
+  gap: 0.05rem;
+  font-size: 0.9375rem;
+}
+.occupied-list .muted {
+  font-size: 0.8125rem;
+}
+.reserve-card {
+  padding: 1.5rem 1.25rem;
+  box-shadow: var(--shadow-raised);
+}
+.reserve-card h2 {
+  margin: 0 0 1rem;
 }
 .reserve-card label {
-  margin-top: 0.6rem;
+  margin-top: 1rem;
 }
 .unavailable-note {
   margin-top: 1rem;
-  padding: 1rem;
-  border-radius: 14px;
-  background: #f6f1ea;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: var(--warning-bg);
 }
 .unavailable-note p {
   margin: 0 0 0.6rem;
 }
 .priority-note {
-  padding: 0.9rem 1rem;
-  border-radius: 14px;
-  background: var(--green-100);
-  color: #2f5442;
-  font-weight: 650;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-on-primary);
+  font-weight: 700;
 }
 .reservation-link {
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr);
-  gap: 0.8rem;
+  grid-template-columns: 60px minmax(0, 1fr);
+  gap: 0.9rem;
   align-items: start;
-  padding: 1rem 0;
-  border-bottom: 1px solid #d9e1e5;
+  padding: 0.75rem 0;
   text-decoration: none;
   color: inherit;
 }
 .reservation-link img {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   object-fit: cover;
-  border-radius: 12px;
-  background: var(--navy-100);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
 }
 .reservation-link > div {
   display: grid;
-  gap: 0.15rem;
+  gap: 0.1rem;
   min-width: 0;
 }
+.reservation-link strong {
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+}
 .reservation-link > div span {
-  font-size: 0.83rem;
-  color: #566a7a;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
 }
 .reservation-link > .status {
   grid-column: 2;
 }
 .reservation-actions {
-  margin: 1rem 0;
+  margin: 1.5rem 0;
+}
+.decline-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 .waitlist-card {
-  padding: 1rem;
+  padding: 1.1rem 1.25rem;
   margin: 0.75rem 0;
-  border: 1px solid var(--navy-100);
-  border-radius: 16px;
-  background: var(--surface);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
 }
 .waitlist-card.is-priority {
-  border-color: var(--green-300);
-  box-shadow: 0 0 0 2px var(--green-100);
+  box-shadow:
+    0 0 0 2px var(--lime-400),
+    var(--shadow-soft);
+}
+.waitlist-card strong {
+  font-size: 1.0625rem;
 }
 .waitlist-card p {
   margin: 0.3rem 0;
 }
+.waitlist-card .card-topline {
+  margin-bottom: 0.6rem;
+}
 .status-r-confirmed,
 .status-w-notified,
 .status-w-fulfilled {
-  color: #315640;
-  background: var(--green-100);
+  color: var(--color-primary-text);
+  background: var(--color-primary-soft);
 }
 .status-r-declined,
 .status-r-cancelled,
 .status-r-expired,
 .status-w-expired,
 .status-w-cancelled {
-  border: 1px solid #c6d2d8;
-  background: #f1f2ef;
+  background: var(--color-sunken);
+  color: var(--color-text-secondary);
 }
 .inbox-section-title {
-  margin: 1.6rem 0 0.2rem;
-  font-size: 1rem;
+  margin: 2rem 0 0.25rem;
+  font-size: 1.0625rem;
 }
 .notification-list {
   list-style: none;
   padding: 0;
-  margin: 1rem 0;
+  margin: 1.25rem 0;
   display: grid;
-  gap: 0.6rem;
+  gap: 0.5rem;
 }
+/* Read items sit on the background; unread ones lift onto a white surface. */
 .notification {
   display: grid;
-  gap: 0.25rem;
+  gap: 0.2rem;
   width: 100%;
   text-align: left;
-  padding: 0.9rem 1rem;
-  border: 1px solid var(--navy-100);
-  border-radius: 16px;
-  background: var(--surface);
+  padding: 0.9rem 1.1rem;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
   color: inherit;
   cursor: pointer;
 }
 .notification.is-unread {
-  border-color: var(--green-300);
-  background: #fbfdf9;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
 }
 .notification strong {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
+  font-size: 1rem;
 }
 .notification span {
-  font-size: 0.88rem;
+  font-size: 0.9375rem;
+}
+.notification span.muted {
+  font-size: 0.8125rem;
 }
 .unread-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--green-700);
+  background: var(--color-accent);
   flex: none;
 }
 .history-list {
-  padding-left: 1.1rem;
+  list-style: none;
+  padding: 0;
   margin: 0.5rem 0 0;
   display: grid;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 .history-list li {
   display: grid;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
 }
 .history-list li span:first-child {
-  color: #566a7a;
-  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
 }

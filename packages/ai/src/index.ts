@@ -38,3 +38,9 @@ export {
   type ListingDrafter,
   type ListingPhoto,
 } from './registration.js';
+export {
+  createPolicyMatcher,
+  parsePolicyMatchOutput,
+  POLICY_MATCH_INSTRUCTIONS,
+  type PolicyMatcher,
+} from './policy-match.js';

@@ -2,13 +2,13 @@ import type { ReactNode } from 'react';
 import type { Artwork } from './posts.js';
 
 const palette: Record<Artwork, [string, string]> = {
-  rental: ['#e3efe6', '#4d8466'],
-  counsel: ['#f6e8e4', '#b5635a'],
-  kitchen: ['#f7efdc', '#a77b2c'],
-  dining: ['#fbeede', '#c0703a'],
-  share: ['#e6eef6', '#4d6f93'],
-  club: ['#ece8f5', '#6c5b9e'],
-  laptop: ['#e4eef0', '#3f7480'],
+  rental: ['#e6fac8', '#43682c'],
+  counsel: ['#ffe7dc', '#a14d2f'],
+  kitchen: ['#fff7e9', '#74613c'],
+  dining: ['#e0f0e5', '#2b5b44'],
+  share: ['#e3ecef', '#3f5f6b'],
+  club: ['#f0f8f2', '#407358'],
+  laptop: ['#e9ece5', '#173c2c'],
 };
 const shapes: Record<Artwork, ReactNode> = {
   rental: (
@@ -82,7 +82,7 @@ export function PostArtwork({ artwork, label }: { artwork: Artwork; label?: stri
       focusable="false"
     >
       <rect width="200" height="140" fill={background} />
-      <circle cx="170" cy="20" r="34" fill="#ffffff" opacity="0.45" />
+      <circle cx="170" cy="20" r="34" fill="#FFFFFF" opacity="0.45" />
       <g fill="none" stroke={ink} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
         {shapes[artwork]}
       </g>
