@@ -1,14 +1,15 @@
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import type { Artwork } from './posts.js';
 
-const palette: Record<Artwork, [string, string]> = {
-  rental: ['#e6fac8', '#43682c'],
-  counsel: ['#ffe7dc', '#a14d2f'],
-  kitchen: ['#fff7e9', '#74613c'],
-  dining: ['#e0f0e5', '#2b5b44'],
-  share: ['#e3ecef', '#3f5f6b'],
-  club: ['#f0f8f2', '#407358'],
-  laptop: ['#e9ece5', '#173c2c'],
+/** [배경 밝은 색, 배경 중간 색(그림자 선), 잉크]. */
+const palette: Record<Artwork, [string, string, string]> = {
+  rental: ['#f1fbe0', '#c4e98a', '#2f5a1c'],
+  counsel: ['#fff2ea', '#ffc2a3', '#8f3b1f'],
+  kitchen: ['#fff9ec', '#f1d493', '#6a5326'],
+  dining: ['#ebf7ef', '#a6dbb9', '#1f513a'],
+  share: ['#edf4f7', '#b2cfdb', '#2e4f5c'],
+  club: ['#f2faf4', '#b6e2c3', '#2f6347'],
+  laptop: ['#f0f3ec', '#c4cfbc', '#163828'],
 };
 const shapes: Record<Artwork, ReactNode> = {
   rental: (
@@ -71,7 +72,13 @@ const shapes: Record<Artwork, ReactNode> = {
 
 /** Decorative illustration standing in for the post's original photo. */
 export function PostArtwork({ artwork, label }: { artwork: Artwork; label?: string }) {
-  const [background, ink] = palette[artwork];
+  const [light, mid, ink] = palette[artwork];
+  // 같은 화면에 여러 장이 있어도 그라데이션 id가 겹치지 않게 한다.
+  const uid = useId().replace(/:/g, '');
+  const bg = `cb-bg-${uid}`;
+  const glow = `cb-glow-${uid}`;
+  const shadow = `cb-shadow-${uid}`;
+  const clip = `cb-clip-${uid}`;
   return (
     <svg
       className="cb-artwork"
@@ -81,10 +88,64 @@ export function PostArtwork({ artwork, label }: { artwork: Artwork; label?: stri
       aria-hidden={label ? undefined : true}
       focusable="false"
     >
-      <rect width="200" height="140" fill={background} />
-      <circle cx="170" cy="20" r="34" fill="#FFFFFF" opacity="0.45" />
-      <g fill="none" stroke={ink} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
-        {shapes[artwork]}
+      <defs>
+        <linearGradient id={bg} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor={light} />
+          <stop offset="1" stopColor={mid} />
+        </linearGradient>
+        <radialGradient id={glow}>
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.85" />
+          <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
+        </radialGradient>
+        <filter id={shadow} x="-20%" y="-20%" width="140%" height="150%">
+          <feDropShadow dx="0" dy="6" stdDeviation="7" floodColor={ink} floodOpacity="0.16" />
+        </filter>
+        {/* 칸이 그림보다 넓어도(상세 화면) 장식이 그림 밖으로 나가지 않게 자른다. */}
+        <clipPath id={clip}>
+          <rect width="200" height="140" rx="14" />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${clip})`}>
+        <rect width="200" height="140" fill={`url(#${bg})`} />
+        <circle cx="172" cy="14" r="64" fill={`url(#${glow})`} />
+        <circle cx="16" cy="132" r="44" fill="#FFFFFF" opacity="0.28" />
+        <rect
+          x="32"
+          y="20"
+          width="136"
+          height="104"
+          rx="26"
+          fill="#FFFFFF"
+          fillOpacity="0.7"
+          filter={`url(#${shadow})`}
+        />
+        <g transform="translate(10 7.8) scale(0.9)">
+          {/* 어긋난 그림자 선으로 투톤 느낌을 낸다. */}
+          <g
+            fill="none"
+            stroke={mid}
+            strokeWidth="8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            transform="translate(3 4)"
+          >
+            {shapes[artwork]}
+          </g>
+          <g
+            fill="none"
+            stroke={ink}
+            strokeWidth="4.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {shapes[artwork]}
+          </g>
+        </g>
+        <g fill="#FFFFFF">
+          <path d="M158 36l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z" />
+          <circle cx="44" cy="112" r="2.5" opacity="0.9" />
+          <circle cx="176" cy="104" r="3" opacity="0.7" />
+        </g>
       </g>
     </svg>
   );

@@ -146,7 +146,7 @@ export function ServicesPage() {
       <header className="cb-hero">
         <h1 id="cb-services-title">센터에서 이용할 수 있어요</h1>
         <p>
-          센터가 운영하는 서비스를 한곳에 모았어요. 물품대여는 상담 통화로 바로 신청할 수 있어요.
+          센터가 운영하는 서비스를 한곳에 모았어요. 물품대여는 앱에서 바로 신청할 수 있어요.
         </p>
       </header>
       <ul className="cb-services">
