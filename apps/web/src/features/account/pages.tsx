@@ -73,7 +73,7 @@ export function EntryPage() {
       <ErrorNotice action={action} />
       <h2 className="entry-pick">준비된 아이디 고르기</h2>
       <div className="handle-options">
-        {['hana', 'duri', 'seul', 'jun', 'hub'].map((name, i) => (
+        {['hana', 'duri', 'seul', 'jun', 'bom'].map((name, i) => (
           <button
             type="button"
             key={name}
@@ -81,17 +81,13 @@ export function EntryPage() {
             aria-pressed={handle === `demo-${name}`}
             onClick={() => setHandle(`demo-${name}`)}
           >
-            {['하나', '두리', '슬', '준', '거점 관리자'][i]} – {name}
+            {['하나', '두리', '슬', '준', '봄'][i]} – {name}
           </button>
         ))}
       </div>
       <Link className="button" to="/center">
         센터 안내 먼저 보기
       </Link>
-      <p className="demo-notice">
-        데모 아이디는 신원 인증이 아니에요. 같은 아이디를 입력하면 같은 합성 계정을 쓰고, 실제
-        결제와 기관 예약은 이루어지지 않아요.
-      </p>
     </section>
   );
 }
@@ -186,9 +182,6 @@ export function HomePage() {
       <Link to="/center" className="button home-center">
         성북구 1인가구지원센터 살펴보기 →
       </Link>
-      <p className="demo-footnote">
-        공공 신청·요금은 데모입니다. 주민의 응답은 참여자가 직접 결정해요.
-      </p>
     </section>
   );
 }
@@ -206,7 +199,6 @@ export function ProfilePage() {
       <div className="content-card profile-id">
         <span className="muted">데모 아이디</span>
         <p className="profile-handle">{session?.user.handle}</p>
-        <p className="field-hint">신원 인증이 아닌 시연용 계정입니다.</p>
       </div>
       <Link className="button" to="/inbox">
         내 요청 내역 보기
@@ -226,9 +218,6 @@ export function ProfilePage() {
         </ActionButton>
         <ErrorNotice action={action} />
       </div>
-      <p className="demo-notice">
-        실제 결제와 기관 예약은 이루어지지 않습니다. 예약은 앱 안의 데모 상태예요.
-      </p>
     </section>
   );
 }

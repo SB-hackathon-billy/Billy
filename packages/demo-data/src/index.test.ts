@@ -11,6 +11,7 @@ describe('contract §14 fixtures', () => {
       ['u_duri', 'demo-duri', '두리'],
       ['u_seul', 'demo-seul', '슬'],
       ['u_jun', 'demo-jun', '준'],
+      ['u_bom', 'demo-bom', '봄'],
       ['u_hub', 'demo-hub', '거점 관리자'],
     ]);
     expect(

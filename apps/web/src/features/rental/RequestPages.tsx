@@ -403,11 +403,11 @@ export function PaymentPage() {
       ) : (
         <>
           <div className={`hold-notice ${active ? '' : 'expired'}`}>
-            <strong>{active ? '데모 선택 유효시간' : '데모 선택 유효시간 종료'}</strong>
+            <strong>{active ? '선택 유효시간' : '선택 유효시간 종료'}</strong>
             {active && <span>{durationLabel(seconds)}</span>}
             <p>
               {active
-                ? '중복 선택을 막기 위한 임시 점유이며 실제 예약이 아닙니다.'
+                ? '중복 선택을 막기 위한 임시 점유예요.'
                 : '요약은 계속 볼 수 있어요. 다른 거래를 시험하려면 새 요청을 시작해 주세요.'}
             </p>
           </div>
@@ -437,7 +437,7 @@ export function PaymentPage() {
             checked={method === 'demo-card'}
             onChange={() => setMethod('demo-card')}
           />
-          데모 카드 · 청구되지 않음
+          카드
         </label>
         <label className="radio">
           <input
@@ -446,12 +446,12 @@ export function PaymentPage() {
             checked={method === 'demo-wallet'}
             onChange={() => setMethod('demo-wallet')}
           />
-          데모 간편결제 · 청구되지 않음
+          간편결제
         </label>
       </fieldset>
       <ErrorNotice error={preview.error} />
       <Link className="button" to="/inbox">
-        데모 확인 완료
+        확인 완료
       </Link>
       <p className="field-hint">요청함으로 이동해요. 결제 상태는 변경되지 않습니다.</p>
       {!active && (

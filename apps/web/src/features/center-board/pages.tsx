@@ -220,9 +220,6 @@ export function ServicePage() {
         <Modal className="cb-modal">
           <Dialog aria-label={`${service.title} 신청 시연`}>
             <Heading slot="title">{service.title} 신청</Heading>
-            <p className="cb-demo">
-              시연 화면이에요. 실제 센터 시스템과 연동되지 않아 신청이 접수·저장되지 않아요.
-            </p>
             <ul className="cb-bullets">
               {service.demoFields?.map((field) => (
                 <li key={field}>{field}</li>
@@ -246,8 +243,8 @@ export function ServicePage() {
 function SourceNote() {
   return (
     <p className="cb-note">
-      공개된 센터 공지·보도 내용을 옮긴 시연 화면입니다. 이미지는 원본 사진 대신 쓴 일러스트이며,
-      최신 내용은 원문과 <ExternalLink href={CENTER_PROFILE.site}>센터 공식 사이트</ExternalLink>
+      이미지는 원본 사진 대신 쓴 일러스트이며, 최신 내용은 원문과{' '}
+      <ExternalLink href={CENTER_PROFILE.site}>센터 공식 사이트</ExternalLink>
       에서 확인해 주세요. 문의 {CENTER_PROFILE.phone}
     </p>
   );

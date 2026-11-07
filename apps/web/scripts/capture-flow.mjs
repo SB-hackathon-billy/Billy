@@ -158,7 +158,7 @@ try {
     page.getByText('실제 결제와 예약이 이루어지지 않습니다.', { exact: true }),
   ).toBeVisible();
   await capture('R06-payment-preview');
-  await page.getByRole('link', { name: '데모 확인 완료', exact: true }).click();
+  await page.getByRole('link', { name: '확인 완료', exact: true }).click();
   await expect(page).toHaveURL(/\/inbox$/);
   await switchTo('duri');
   await page.getByRole('link', { name: '요청함', exact: true }).click();

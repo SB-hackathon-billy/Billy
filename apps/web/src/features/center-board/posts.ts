@@ -252,7 +252,7 @@ export const centerServices: CenterService[] = [
       '소셜다이닝·나눔 활동이 공유주방에서 열립니다.',
       '일정과 이용 방법은 센터 공지로 안내합니다.',
     ],
-    artwork: 'kitchen',
+    artwork: 'dining',
     demoFields: ['이용 희망일', '인원', '이용 목적'],
   },
   {

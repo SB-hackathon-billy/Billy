@@ -370,7 +370,6 @@ export function VoiceCallPage() {
           {dialing ? '연결 중' : active ? '통화 중' : '대기'}
         </span>
       </header>
-      {scripted && <p className="vc-script-badge">시연 스크립트 · 실제 통화·예약 없음</p>}
       {dialing && (
         <div className="vc-dialing">
           <div className="vc-dialing-avatar" aria-hidden="true">
@@ -644,7 +643,7 @@ function ApprovalSheet({
         <>
           <h2 id="vc-sheet-title" ref={heading} tabIndex={-1}>
             {scripted
-              ? '시연: 예약 신청이 접수됐어요'
+              ? '예약 신청이 접수됐어요'
               : reservation
                 ? reservationLabels[reservation.status]
                 : '예약 신청을 접수했어요'}

@@ -105,8 +105,12 @@ export function usePolicyMatch(utterances: readonly string[], scripted: boolean)
 
 export type PolicyCardSelection =
   | { kind: 'pending' }
-  | { kind: 'matched'; situation: string | null; policyIds: CenterPolicyId[] }
-  | { kind: 'random'; policyIds: [CenterPolicyId] };
+  | {
+      kind: 'matched';
+      situation: string | null;
+      policyIds: CenterPolicyId[];
+    }
+  | { kind: 'random'; policyIds: CenterPolicyId[] };
 
 /**
  * The latest answer's policies when it found any, even while a newer search is pending or after it
@@ -118,8 +122,9 @@ export function selectPolicyCards(
   randomPolicy: CenterPolicyId,
 ): PolicyCardSelection {
   if (state.status === 'pending' && !state.match) return { kind: 'pending' };
-  if (state.match?.policyIds.length)
-    return { kind: 'matched', situation: state.match.situation, policyIds: state.match.policyIds };
+  const best = state.match?.policyIds[0];
+  if (state.match && best)
+    return { kind: 'matched', situation: state.match.situation, policyIds: [best] };
   return { kind: 'random', policyIds: [randomPolicy] };
 }
 

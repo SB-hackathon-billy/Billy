@@ -192,9 +192,6 @@ function AppShell() {
           )}
         </div>
       </header>
-      {session?.demoScenario === 'expiry-fast' && (
-        <div className="scenario-banner">빠른 만료 시연</div>
-      )}
       {import.meta.env.DEV && import.meta.env.VITE_API_MOCK === '1' && (
         <div className="mock-banner">개발용 모의 API · 실제 서버·음성 검증 아님</div>
       )}

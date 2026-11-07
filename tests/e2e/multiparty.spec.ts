@@ -189,10 +189,10 @@ test('AT04/07/13/14/19/22: three cookie stores, real server, keyboard journey an
       if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method()))
         paymentMutations.push(new URL(request.url()).pathname);
     });
-    await tabTo(hana, hana.getByRole('radio', { name: '데모 카드 · 청구되지 않음' }));
+    await tabTo(hana, hana.getByRole('radio', { name: '카드' }));
     await hana.keyboard.press('ArrowDown');
-    await expect(hana.getByRole('radio', { name: '데모 간편결제 · 청구되지 않음' })).toBeChecked();
-    await activate(hana, hana.getByRole('link', { name: '데모 확인 완료', exact: true }));
+    await expect(hana.getByRole('radio', { name: '간편결제' })).toBeChecked();
+    await activate(hana, hana.getByRole('link', { name: '확인 완료', exact: true }));
     expect(paymentMutations).toEqual([]);
 
     // AT14: same cookie store rotates identity and must not retain the requester's data.

@@ -99,12 +99,10 @@ export function AboutPage() {
             <ContentBody item={findCenterContent('center-guide')!} />
             <ol className="center-steps">
               <li>관심 있는 활동과 이용 대상을 확인해요.</li>
-              <li>이 데모에서는 양식만 미리 살펴봐요.</li>
               <li>실제 이용은 공식 센터 안내를 따라요.</li>
             </ol>
             <div className="center-surface">
               <h3>기존 사이트 안내</h3>
-              <p>데모 아이디는 본인인증이나 센터 회원 자격이 아닙니다.</p>
               <ExternalLink href="https://sb1in.or.kr/register">
                 기존 회원가입·인증 안내
               </ExternalLink>

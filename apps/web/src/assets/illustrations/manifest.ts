@@ -21,7 +21,7 @@ export const illustrationManifest = [
     license: 'CC0-1.0',
     creator: '성북 공유대여 · 자체 SVG 제작',
     format: 'svg',
-    byteSize: 1534,
+    byteSize: 387,
   },
   {
     id: 'cleaning',
@@ -33,7 +33,7 @@ export const illustrationManifest = [
     license: 'CC0-1.0',
     creator: '성북 공유대여 · 자체 SVG 제작',
     format: 'svg',
-    byteSize: 816,
+    byteSize: 427,
   },
   {
     id: 'tools',
@@ -45,7 +45,7 @@ export const illustrationManifest = [
     license: 'CC0-1.0',
     creator: '성북 공유대여 · 자체 SVG 제작',
     format: 'svg',
-    byteSize: 781,
+    byteSize: 367,
   },
   {
     id: 'travel',
@@ -57,7 +57,7 @@ export const illustrationManifest = [
     license: 'CC0-1.0',
     creator: '성북 공유대여 · 자체 SVG 제작',
     format: 'svg',
-    byteSize: 977,
+    byteSize: 446,
   },
   {
     id: 'hobby',
@@ -69,7 +69,7 @@ export const illustrationManifest = [
     license: 'CC0-1.0',
     creator: '성북 공유대여 · 자체 SVG 제작',
     format: 'svg',
-    byteSize: 954,
+    byteSize: 383,
   },
   {
     id: 'empty',
@@ -81,7 +81,7 @@ export const illustrationManifest = [
     license: 'CC0-1.0',
     creator: '성북 공유대여 · 자체 SVG 제작',
     format: 'svg',
-    byteSize: 793,
+    byteSize: 332,
   },
   {
     id: 'waiting',
@@ -93,7 +93,7 @@ export const illustrationManifest = [
     license: 'CC0-1.0',
     creator: '성북 공유대여 · 자체 SVG 제작',
     format: 'svg',
-    byteSize: 873,
+    byteSize: 358,
   },
   {
     id: 'comparison',
@@ -105,7 +105,7 @@ export const illustrationManifest = [
     license: 'CC0-1.0',
     creator: '성북 공유대여 · 자체 SVG 제작',
     format: 'svg',
-    byteSize: 907,
+    byteSize: 333,
   },
   {
     id: 'center-garden',
@@ -117,7 +117,7 @@ export const illustrationManifest = [
     license: 'CC0-1.0',
     creator: '성북 공유대여 · 자체 SVG 제작',
     format: 'svg',
-    byteSize: 1190,
+    byteSize: 384,
   },
   {
     id: 'center-space',
@@ -129,7 +129,7 @@ export const illustrationManifest = [
     license: 'CC0-1.0',
     creator: '성북 공유대여 · 자체 SVG 제작',
     format: 'svg',
-    byteSize: 1078,
+    byteSize: 361,
   },
 ] as const satisfies readonly AssetMetadata[];
 

@@ -6,7 +6,6 @@ test('AT19: a real 30-second hold expires without a payment or reservation mutat
   page,
 }) => {
   await enter(page, 'hana');
-  await expect(page.getByText('빠른 만료 시연', { exact: true })).toBeVisible();
   await page.getByRole('link', { name: '공유대여', exact: true }).click();
   // 명세 0003: /rental은 통화 화면, 텍스트 접수는 /rental/classic.
   await page.getByRole('link', { name: '텍스트로 입력하기', exact: true }).click();
@@ -39,14 +38,14 @@ test('AT19: a real 30-second hold expires without a payment or reservation mutat
     'Space',
   );
   await page.getByRole('button', { name: '선택하고 결제 미리보기' }).click();
-  await expect(page.getByText('데모 선택 유효시간', { exact: true })).toBeVisible();
+  await expect(page.getByText('선택 유효시간', { exact: true })).toBeVisible();
   const mutations: string[] = [];
   page.on('request', (request) => {
     if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method()))
       mutations.push(new URL(request.url()).pathname);
   });
   await screenshot(page, '17-fast-hold-active');
-  await expect(page.getByText('데모 선택 유효시간 종료', { exact: true })).toBeVisible({
+  await expect(page.getByText('선택 유효시간 종료', { exact: true })).toBeVisible({
     timeout: 40_000,
   });
   const restored = page.waitForResponse(
@@ -62,7 +61,7 @@ test('AT19: a real 30-second hold expires without a payment or reservation mutat
     mode: 'PREVIEW_ONLY',
     totalFeeKrw: 3000,
   });
-  await expect(page.getByText('데모 선택 유효시간 종료', { exact: true })).toBeVisible();
+  await expect(page.getByText('선택 유효시간 종료', { exact: true })).toBeVisible();
   await screenshot(page, '18-fast-hold-expired');
   expect(mutations).toEqual([]);
   writeFileSync(

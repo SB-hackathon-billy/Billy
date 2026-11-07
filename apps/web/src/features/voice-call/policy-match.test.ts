@@ -51,20 +51,32 @@ describe('background policy search during a call', () => {
     expect(call.state()).toEqual({ status: 'ready', match: travel });
     await call.say('친구들이랑 여행 가요', '센터에서 받을게요');
     expect(call.state()).toEqual({ status: 'failed', match: travel });
-    expect(selectPolicyCards(call.state(), 'gotgan')).toEqual({ kind: 'matched', ...travel });
+    expect(selectPolicyCards(call.state(), 'gotgan')).toEqual({
+      kind: 'matched',
+      ...travel,
+      policyIds: [travel.policyIds[0]!],
+    });
   });
   it('keeps the earlier match when a later search is rate limited', async () => {
     const call = track([ok(travel), error(429, 'RATE_LIMITED')]);
     await call.say('친구들이랑 여행 가요');
     await call.say('친구들이랑 여행 가요', '내일 받을게요');
-    expect(selectPolicyCards(call.state(), 'gotgan')).toEqual({ kind: 'matched', ...travel });
+    expect(selectPolicyCards(call.state(), 'gotgan')).toEqual({
+      kind: 'matched',
+      ...travel,
+      policyIds: [travel.policyIds[0]!],
+    });
   });
   it('shows the earlier match while the newest search is still running', async () => {
     const call = track([ok(travel)]);
     await call.say('친구들이랑 여행 가요');
     call.tracker.update(['친구들이랑 여행 가요', '센터에서 받을게요']);
     expect(call.state().status).toBe('pending');
-    expect(selectPolicyCards(call.state(), 'gotgan')).toEqual({ kind: 'matched', ...travel });
+    expect(selectPolicyCards(call.state(), 'gotgan')).toEqual({
+      kind: 'matched',
+      ...travel,
+      policyIds: [travel.policyIds[0]!],
+    });
   });
   it('searches only once the utterances settle and adopts only the latest answer', async () => {
     const call = track([ok({ situation: null, policyIds: [] })]);
@@ -113,6 +125,17 @@ describe('done-sheet policy cards', () => {
     ).toEqual(random);
     expect(selectPolicyCards({ status: 'failed', match: null }, 'gotgan')).toEqual(random);
     expect(selectPolicyCards({ status: 'idle', match: null }, 'gotgan')).toEqual(random);
+  });
+  it('shows only the best match', () => {
+    const ready = {
+      status: 'ready' as const,
+      match: { situation: 'x', policyIds: ['club', 'gotgan'] as never },
+    };
+    expect(selectPolicyCards(ready, 'membership')).toEqual({
+      kind: 'matched',
+      situation: 'x',
+      policyIds: ['club'],
+    });
   });
   it('waits only when no answer has arrived yet', () => {
     expect(selectPolicyCards({ status: 'pending', match: null }, 'gotgan')).toEqual({

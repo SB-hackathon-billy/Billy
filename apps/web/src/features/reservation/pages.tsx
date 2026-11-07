@@ -414,7 +414,7 @@ export function CatalogItemPage() {
               <p className="field-hint">
                 {item.source === 'PUBLIC'
                   ? '센터가 곧 응답해요.'
-                  : `${item.ownerDisplayName ?? '소유자'}님이 승인하면 이 기간이 확정돼요. 실제 결제는 없어요.`}
+                  : `${item.ownerDisplayName ?? '소유자'}님이 승인하면 이 기간이 확정돼요.`}
               </p>
               <Check isSelected={agreed} onChange={setAgreed}>
                 기간·장소·대여료를 확인했어요.

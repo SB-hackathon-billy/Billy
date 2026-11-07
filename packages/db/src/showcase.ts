@@ -8,10 +8,12 @@ import { centerPhotoUrl, seoulCalendarDate, seoulDateTimeToUtc } from '@sb/demo-
 import { Database } from './database.js';
 import {
   createReservation,
+  getReservation,
   recordInspection,
   recordPickup,
   recordReturn,
   respondReservation,
+  sweepReservations,
 } from './reservations.js';
 import { id, put } from './storage.js';
 
@@ -308,8 +310,8 @@ export async function showcase(db: Database, now = new Date()) {
   );
   await approve('u_jun', qr, now);
 
-  // 빌리기(하나) ② 소유자 응답 대기(24시간 안에 응답하지 않으면 만료).
-  await reserve('u_hana', 'res-cleaner-seul', 'place-sungshin', [2, '10:00'], [3, '10:00'], now);
+  // 빌리기(하나) ② 소유자(준) 응답 대기(24시간 안에 응답하지 않으면 만료).
+  await reserve('u_hana', 'res-headset-jun', 'place-korea', [2, '10:00'], [3, '10:00'], now);
 
   // 빌리기(하나) ③ 지난주 대여 · 반납 완료(AI 비교 → 관리자 문제 없음).
   const past = await reserve(
@@ -361,6 +363,102 @@ export async function showcase(db: Database, now = new Date()) {
   );
   const lentOk = await approve('u_hana', lent, when(-2, '11:00'));
   await pickup(lentOk, when(-1, '10:05'));
+
+  // 물품마다 수령 가능한 장소가 달라, 원하는 거점이 허용되지 않으면 첫 번째 허용 장소를 쓴다.
+  const placeFor = (itemId: string, prefer: string) => {
+    const allowed = items.find((it) => it.id === itemId)!.allowedPlaceIds;
+    return allowed.includes(prefer) ? prefer : allowed[0]!;
+  };
+  // ---- 계정별 요청함 내역. 빌려준 내역은 하나·준에게만 있고 두리·슬·봄은 빌리기만 한다. ----
+  // 공공 물품은 worker가 응답하므로 sweepReservations로 확정한 뒤 인계·반납을 기록한다.
+  const publicPast = async (
+    who: string,
+    itemId: string,
+    placeId: string,
+    startOffset: number,
+    returnedOffset: number,
+  ) => {
+    const reserved = await reserve(
+      who,
+      itemId,
+      placeFor(itemId, placeId),
+      [startOffset, '10:00'],
+      [startOffset, '18:00'],
+      when(startOffset - 1, '09:00'),
+    );
+    await sweepReservations(db, when(startOffset - 1, '09:30'));
+    const view = await db.transaction(
+      (u) => getReservation(u, who, reserved.reservation.id),
+      when(startOffset - 1, '09:31'),
+    );
+    const picked = await pickup(view, when(startOffset, '10:10'));
+    const back = await photo(picked.reservation.item.image.url);
+    const returned = await db.transaction(
+      (u) =>
+        recordReturn(
+          u,
+          'u_hub',
+          picked.reservation.handover!.code!,
+          { expectedVersion: picked.reservation.version, photoId: back },
+          async () => ({
+            status: 'DONE',
+            summary: '눈에 띄게 달라진 부분이 없어요.',
+            differences: [],
+          }),
+        ),
+      when(returnedOffset, '17:50'),
+    );
+    await db.transaction(
+      (u) =>
+        recordInspection(u, 'u_hub', returned.reservation.handover!.code!, {
+          expectedVersion: returned.reservation.version,
+          result: 'OK',
+        }),
+      when(returnedOffset, '18:00'),
+    );
+  };
+  // 반납 완료(지난 대여)
+  await publicPast('u_jun', 'pub-humidifier', 'place-center', -5, -5);
+  await publicPast('u_duri', 'pub-speaker', 'place-sungshin', -6, -6);
+  await publicPast('u_seul', 'pub-campchair', 'place-dongduk', -4, -4);
+  await publicPast('u_bom', 'pub-icebox', 'place-korea', -8, -8);
+  // 대여 중(거점에서 인계 완료, 아직 반납 전)
+  const ongoing = async (who: string, itemId: string, placeId: string) => {
+    const reserved = await reserve(
+      who,
+      itemId,
+      placeFor(itemId, placeId),
+      [-1, '10:00'],
+      [2, '10:00'],
+      when(-2, '09:00'),
+    );
+    await sweepReservations(db, when(-2, '09:30'));
+    const view = await db.transaction(
+      (u) => getReservation(u, who, reserved.reservation.id),
+      when(-2, '09:31'),
+    );
+    await pickup(view, when(-1, '10:05'));
+  };
+  await ongoing('u_duri', 'pub-laptop', 'place-center');
+  await ongoing('u_bom', 'pub-polaroid', 'place-hansung');
+  // 인계 대기(확정됨, 아직 수령 전)
+  await reserve(
+    'u_bom',
+    'pub-gopro',
+    placeFor('pub-gopro', 'place-kookmin'),
+    [3, '10:00'],
+    [4, '10:00'],
+    now,
+  );
+  await reserve(
+    'u_seul',
+    'pub-airwrap',
+    placeFor('pub-airwrap', 'place-seokyeong'),
+    [2, '10:00'],
+    [3, '10:00'],
+    now,
+  );
+  await sweepReservations(db, now);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -368,7 +466,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   try {
     await showcase(db);
     console.log(
-      `Showcase: 캠퍼스 거점 6곳, 물품 ${items.length}개, 예약 5건(인계 대기·응답 대기·반납 완료·승인 대기·대여 중).`,
+      `Showcase: 캠퍼스 거점 6곳, 물품 ${items.length}개, 예약 13건(인계 대기·응답 대기·반납 완료·승인 대기·대여 중). 빌려준 내역은 하나·준만.`,
     );
   } finally {
     await db.close();

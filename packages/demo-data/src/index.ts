@@ -34,7 +34,7 @@ export const SeedTimingSchema = z
   .strict();
 export const SeedDataSchema = z
   .object({
-    users: z.array(DemoUserSchema).length(5),
+    users: z.array(DemoUserSchema).length(6),
     places: z.array(PlaceSchema).length(3),
     items: z.array(ItemSchema).length(10),
     scenario: z.object({ name: DemoScenarioSchema, timing: SeedTimingSchema }).strict(),
@@ -106,6 +106,7 @@ export function buildSeed({
     { id: 'u_duri', handle: 'demo-duri', displayName: '두리', demoEligible: true },
     { id: 'u_seul', handle: 'demo-seul', displayName: '슬', demoEligible: true },
     { id: 'u_jun', handle: 'demo-jun', displayName: '준', demoEligible: scenario !== 'ineligible' },
+    { id: 'u_bom', handle: 'demo-bom', displayName: '봄', demoEligible: true },
     // 거점 관리자(명세 0007). 물품을 소유하지 않고 인계·반납만 기록한다.
     { id: 'u_hub', handle: 'demo-hub', displayName: '거점 관리자', demoEligible: true },
   ];
