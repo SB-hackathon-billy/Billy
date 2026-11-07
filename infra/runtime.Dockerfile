@@ -16,5 +16,6 @@ COPY apps/api ./apps/api
 COPY apps/worker ./apps/worker
 # 시연 데이터(showcase)의 인계·반납 사진: 센터 물품 사진(공공누리 제1유형).
 COPY apps/web/public/assets/items/center ./apps/web/public/assets/items/center
+COPY apps/web/public/assets/items/lent ./apps/web/public/assets/items/lent
 USER node
 CMD ["npm", "run", "-w", "@sb/api", "start"]

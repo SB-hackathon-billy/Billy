@@ -117,7 +117,7 @@ const publicItems: Item[] = [
   item('pub-case24', '캐리어 24인치 내셔널지오그래픽', 'TRAVEL', 1_000, null, center(), 17),
 ];
 /** 이웃 물품. 같은 청소기라도 가격이 달라 조건을 비교할 수 있다(기존 1,000원 청소기와 함께). */
-const residentItems: Item[] = [
+const formerResidentItems: Item[] = [
   item(
     'res-cleaner-jun',
     '준의 무선 청소기',
@@ -192,19 +192,68 @@ const residentItems: Item[] = [
     43,
   ),
 ];
-const items: Item[] = [...publicItems, ...residentItems];
+/** 예전 이웃 물품은 모두 센터(공공) 물품으로 돌린다. 사진은 그대로 센터 사진을 쓴다. */
+const convertedItems: Item[] = formerResidentItems.map((it) => ({
+  ...it,
+  id: it.id.replace('res-', 'pub-'),
+  title: it.title.replace(/^.+?의 /, ''),
+  ownerId: null,
+  source: 'PUBLIC',
+  publicScenario: 'APPROVE',
+}));
+/** 사용자가 빌려주는 물품. 사진은 인터넷 상품 사진을 캡처해 apps/web/public/assets/items/lent에 둔다. */
+const lent = (
+  itemId: string,
+  title: string,
+  category: Item['category'],
+  dailyRateKrw: number,
+  ownerId: string,
+  allowedPlaceIds: string[],
+): Item => ({
+  ...item(itemId, title, category, dailyRateKrw, ownerId, allowedPlaceIds, 0),
+  image: { url: `/assets/items/lent/${itemId}.webp`, alt: `${title} 사진`, isIllustration: false },
+});
+const residentItems: Item[] = [
+  lent('res-stanbyme-jun', 'LG 스탠바이미2', 'HOBBY', 5_000, 'u_jun', [
+    'place-hansung',
+    'place-korea',
+  ]),
+  lent('res-robot-jun', '로보락 로봇청소기', 'CLEANING', 3_000, 'u_jun', [
+    'place-hansung',
+    'place-kookmin',
+  ]),
+  lent('res-headphone-jun', '소니 WH-1000XM5 헤드폰', 'HOBBY', 2_000, 'u_jun', [
+    'place-korea',
+    'place-kookmin',
+  ]),
+  lent('res-airfryer-hana', '필립스 에어프라이어 XXL', 'TOOLS', 1_500, 'u_hana', [
+    'place-hansung',
+    'place-sungshin',
+  ]),
+  lent('res-switch-hana', '닌텐도 스위치 OLED', 'HOBBY', 3_000, 'u_hana', [
+    'place-hansung',
+    'place-center',
+  ]),
+];
+const items: Item[] = [...publicItems, ...convertedItems, ...residentItems];
 /** 기존 물품도 캠퍼스 거점에서 주고받게 한다(장소는 최대 3곳). */
-const addHansung = ['res-cleaner-duri', 'res-projector-duri', 'res-case-hana'];
 /** 실제 사진이 없는 기본 물품은 시연 목록에서 뺀다(테스트 fixture에는 남는다). */
-const hidden = ['res-tool-hana'];
+const hidden = [
+  'res-projector-duri',
+  'res-cleaner-duri',
+  'res-projector-seul',
+  'res-case-seul',
+  'res-tool-hana',
+  'res-case-hana',
+];
 
 /**
  * 거점 인계·반납 사진: 그 물품의 실제 사진(센터 물품대여 사진, 공공누리 제1유형)을 쓴다.
  * 운영 api 이미지에도 같은 폴더가 들어간다(infra/runtime.Dockerfile).
  */
-const PHOTO_DIR = new URL('../../../apps/web/public/assets/items/center/', import.meta.url);
+const PHOTO_DIR = new URL('../../../apps/web/public/assets/items/', import.meta.url);
 async function itemPhoto(imageUrl: string): Promise<{ contentType: string; bytes: Buffer }> {
-  const file = /\/center\/(cat-type-\d+\.webp)$/.exec(imageUrl)?.[1];
+  const file = /\/items\/((?:center|lent)\/[\w-]+\.webp)$/.exec(imageUrl)?.[1];
   if (!file) throw new Error(`실제 사진이 없는 물품입니다: ${imageUrl}`);
   return { contentType: 'image/webp', bytes: await readFile(new URL(file, PHOTO_DIR)) };
 }
@@ -224,11 +273,6 @@ export async function showcase(db: Database, now = new Date()) {
         [place.id, place],
       );
     for (const it of items) await put(u.c, 'items', it, true);
-    await u.c.query(
-      `UPDATE items SET data = jsonb_set(data, '{allowedPlaceIds}', (data->'allowedPlaceIds') || '"place-hansung"')
-       WHERE id = ANY($1::text[]) AND NOT (data->'allowedPlaceIds' ? 'place-hansung')`,
-      [addHansung],
-    );
     await u.c.query(
       `UPDATE items SET data = jsonb_set(data, '{enabled}', 'false') WHERE id = ANY($1::text[])`,
       [hidden],
@@ -302,7 +346,7 @@ export async function showcase(db: Database, now = new Date()) {
   // 빌리기(하나) ① 확정 · 인계 대기: 예약 화면에 QR이 바로 보인다.
   const qr = await reserve(
     'u_hana',
-    'res-cleaner-jun',
+    'res-stanbyme-jun',
     'place-hansung',
     [1, '10:00'],
     [1, '18:00'],
@@ -311,12 +355,12 @@ export async function showcase(db: Database, now = new Date()) {
   await approve('u_jun', qr, now);
 
   // 빌리기(하나) ② 소유자(준) 응답 대기(24시간 안에 응답하지 않으면 만료).
-  await reserve('u_hana', 'res-headset-jun', 'place-korea', [2, '10:00'], [3, '10:00'], now);
+  await reserve('u_hana', 'res-headphone-jun', 'place-korea', [2, '10:00'], [3, '10:00'], now);
 
   // 빌리기(하나) ③ 지난주 대여 · 반납 완료(AI 비교 → 관리자 문제 없음).
   const past = await reserve(
     'u_hana',
-    'res-ladder-jun',
+    'res-robot-jun',
     'place-hansung',
     [-3, '10:00'],
     [-3, '18:00'],
@@ -350,12 +394,12 @@ export async function showcase(db: Database, now = new Date()) {
   );
 
   // 빌려주기(하나) ④ 슬의 신청 · 하나가 승인할 차례.
-  await reserve('u_seul', 'res-dryer-hana', 'place-hansung', [1, '13:00'], [2, '13:00'], now);
+  await reserve('u_seul', 'res-airfryer-hana', 'place-hansung', [1, '13:00'], [2, '13:00'], now);
 
-  // 빌려주기(하나) ⑤ 준에게 빌려준 여행 가방 · 대여 중(거점에서 인계 완료).
+  // 빌려주기(하나) ⑤ 준에게 빌려준 닌텐도 스위치 · 대여 중(거점에서 인계 완료).
   const lent = await reserve(
     'u_jun',
-    'res-case-hana',
+    'res-switch-hana',
     'place-hansung',
     [-1, '10:00'],
     [2, '10:00'],
