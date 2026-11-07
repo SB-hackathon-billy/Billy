@@ -229,7 +229,7 @@ export function HubDetailPage() {
           ))}
         </ul>
       )}
-      <PhotoCredit />
+      <PhotoCredit urls={items.data?.items.map((item) => item.image.url)} />
     </section>
   );
 }

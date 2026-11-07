@@ -53,15 +53,24 @@ function SourceLabel({
   );
 }
 
-/** 물품 사진 출처(공공누리 제1유형: 출처표시). */
-export function PhotoCredit() {
+/** 물품 사진 출처. 센터 사진은 공공누리 제1유형(출처표시), 이웃 물품은 인터넷 상품 사진. */
+export function PhotoCredit({ urls }: { urls?: readonly string[] | undefined }) {
+  const center = !urls || urls.some((url) => url.includes('/items/center/'));
+  const lent = !!urls?.some((url) => url.includes('/items/lent/'));
+  if (!center && !lent) return null;
   return (
     <p className="field-hint photo-credit">
-      물품 사진 출처:{' '}
-      <a href="https://sb1in.or.kr/online/rental" target="_blank" rel="noreferrer">
-        성북구1인가구지원센터
-      </a>{' '}
-      · 공공누리 제1유형
+      {center && (
+        <>
+          센터 물품 사진 출처:{' '}
+          <a href="https://sb1in.or.kr/online/rental" target="_blank" rel="noreferrer">
+            성북구1인가구지원센터
+          </a>{' '}
+          · 공공누리 제1유형
+        </>
+      )}
+      {center && lent && <br />}
+      {lent && '이웃 물품 사진: 인터넷 상품 사진'}
     </p>
   );
 }
@@ -236,7 +245,7 @@ export function CatalogPage() {
           더 보기
         </ActionButton>
       )}
-      <PhotoCredit />
+      <PhotoCredit urls={items.map((item) => item.image.url)} />
     </section>
   );
 }
@@ -461,7 +470,7 @@ export function CatalogItemPage() {
       <Link className="text-link" to="/catalog">
         ← 목록으로
       </Link>
-      {!item.image.isIllustration && <PhotoCredit />}
+      {!item.image.isIllustration && <PhotoCredit urls={[item.image.url]} />}
     </section>
   );
 }
