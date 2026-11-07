@@ -9,6 +9,7 @@
 !apps/worker/**
 !apps/web/package.json
 !apps/web/public/assets/items/center/**
+!apps/web/public/assets/items/lent/**
 **/node_modules
 **/dist
 **/.env*
